@@ -1,9 +1,6 @@
 name: Frontend preview deploy
 on:
-  pull_request:
-    paths:
-      - "packages/front/**"
-      - "yarn.lock"
+  - pull_request
 
 jobs:
   deploy:
