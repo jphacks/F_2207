@@ -12,10 +12,7 @@ const Index: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="p-4">
-        <div className="m-4">
-          <p className="text-red-400">Hello, world</p>
-        </div>
-        <Button>Hello, from Mantine!</Button>
+        <Box id="map" sx={{ width: "90%", height: "800px" }}></Box>
       </main>
     </>
   )
