@@ -24,11 +24,11 @@ const CapsuleAdd: NextPage = () => {
   const gpsColors = ["#000000", "#FFFFFF"]
 
   return (
-    <Box>
-      <Text>カプセルを作ろう</Text>
-      <Text>カプセルの色</Text>
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#212121" }}>
+      <Text color={"white"}>カプセルを作ろう</Text>
+      <Text color={"white"}>カプセルの色</Text>
       <ColorSelector colors={capsuleColors} onSelect={() => {}} />
-      <Text>GPSの色</Text>
+      <Text color={"white"}>GPSの色</Text>
       <ColorSelector colors={gpsColors} onSelect={() => {}} />
     </Box>
   )
