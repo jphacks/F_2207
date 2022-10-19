@@ -1,6 +1,7 @@
-import { Box, Button, Center, Drawer, Text, useMantineTheme } from "@mantine/core"
+import { Box, Button, Center, Drawer, Group, Text, useMantineTheme } from "@mantine/core"
 import { useState } from "react"
 import Picker from "emoji-picker-react"
+import Link from "next/link"
 
 import ColorSelector from "@/view/ CapsuleColorSelector"
 import CapsulePreview from "@/view/CapsulePreview"
@@ -39,6 +40,13 @@ const CapsuleAdd: NextPage = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#212121" }}>
+      <Group className="pr-5 pt-10" position="right">
+        <Link href="">
+          <Text color="brand.3" weight={600} style={{ cursor: "pointer" }}>
+            次へ
+          </Text>
+        </Link>
+      </Group>
       <Text className="mb-8" color={"white"} align="center">
         カプセルを作ろう
       </Text>
