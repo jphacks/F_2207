@@ -6,22 +6,28 @@ import axios from "axios"
 import type { NextPage } from "next"
 
 const loadScript = (url: string, onload: () => void) => {
-  const head = document.getElementsByTagName("head")[0] as HTMLElement
-  const script = document.createElement("script")
-  script.type = "text/javascript"
-  script.src = url
-  script.addEventListener("load", onload)
+  // check if it is already loaded
+  if (!Array.from(document.scripts).find((s) => s.src == url)) {
+    const head = document.getElementsByTagName("head")[0] as HTMLElement
+    const script = document.createElement("script")
+    script.setAttribute("type", "text/javascript")
+    script.setAttribute("src", url)
+    script.addEventListener("load", onload)
 
-  head.appendChild(script)
+    head.appendChild(script)
+  }
 }
 
 const loadCss = (url: string) => {
-  const head = document.getElementsByTagName("head")[0] as HTMLElement
-  const link = document.createElement("link")
-  link.rel = "stylesheet"
-  link.href = url
+  // check if it is already loaded
+  if (!Array.from(document.getElementsByTagName("link")).find((l) => l.href == url)) {
+    const head = document.getElementsByTagName("head")[0] as HTMLElement
+    const link = document.createElement("link")
+    link.setAttribute("rel", "stylesheet")
+    link.setAttribute("href", url)
 
-  head.appendChild(link)
+    head.appendChild(link)
+  }
 }
 
 const mapSetUp = () => {
