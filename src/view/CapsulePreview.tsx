@@ -17,6 +17,7 @@ const CapsulePreview: React.FC<CapsulePreviewProps> = ({ capsuleColor, gpsColor,
           height: "160px",
           borderRadius: "80px",
           position: "relative",
+          boxShadow: "0px 4px 49px 0px #FFFFFF40",
         }}
       >
         <Text size={80}>{emoji}</Text>
