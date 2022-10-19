@@ -1,5 +1,6 @@
-import { Box, Group, Button, Text, CloseButton, Stack } from "@mantine/core"
+import { Box, Group, Button, Text, Stack, ActionIcon } from "@mantine/core"
 import React from "react"
+import { FiX, FiChevronLeft } from "react-icons/fi"
 
 export type WalkthroughLayoutProps = {
   title: string
@@ -17,7 +18,9 @@ const WalkthroughLayout: React.FC<WalkthroughLayoutProps> = ({
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#212121" }}>
       <Group className="w-full p-4" position="apart">
-        <CloseButton aria-label="Close modal" size="xl" color="dark" />
+        <ActionIcon aria-label="Close modal" size="lg" color="dark">
+          {currentStep === 0 ? <FiX size={24} /> : <FiChevronLeft size={24} />}
+        </ActionIcon>
         <Button variant="subtle" size="md" color="brand.3" compact style={{ cursor: "pointer" }}>
           <Text weight={600}>次へ</Text>
         </Button>
