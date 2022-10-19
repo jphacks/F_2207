@@ -25,7 +25,9 @@ const Map: React.FC = () => {
   const mapSetUp = () => {
     // show map on Box
     // @ts-ignore
-    const transformRequest = mqplatformTransformRequest("63da4d3c414e4ae59b7af3d654fefaff")
+    const transformRequest = mqplatformTransformRequest(
+      process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY,
+    )
     // @ts-ignore
     var map = new mapboxgl.Map({
       container: "map",
@@ -79,7 +81,7 @@ const Map: React.FC = () => {
     // get mapquest layer id
     axios
       .get(
-        "https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=63da4d3c414e4ae59b7af3d654fefaff",
+        `https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
       )
       .then((res) => {
         // @ts-ignore
@@ -88,7 +90,7 @@ const Map: React.FC = () => {
             // set Image
             axios
               .get(
-                `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=63da4d3c414e4ae59b7af3d654fefaff`,
+                `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
               )
               .then((res) => {
                 // @ts-ignore
