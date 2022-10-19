@@ -20,9 +20,13 @@ export const useShakeAmount = () => {
       if (10 < deltas.current.length) {
         console.log(deltas.current)
 
-        setShakeAmount(
-          (prev) => prev + deltas.current.reduce((acc, c) => acc + c, 0) / deltas.current.length,
-        )
+        setShakeAmount((prev) => {
+          const res = prev + deltas.current.reduce((acc, c) => acc + c, 0) / deltas.current.length
+          if (Number.isNaN(res)) {
+            return prev
+          }
+          return res
+        })
         deltas.current = []
       }
     }, 300)
