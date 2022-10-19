@@ -11,7 +11,7 @@ const UserAvater: React.FC<UserAvaterProps> = ({ user }) => {
   return (
     <Stack align="center" style={{ width: 80 }} spacing={12}>
       <Avatar src={user.iconUrl} style={{ width: 64, height: 64, borderRadius: "50%" }} />
-      <Text size="xs" className="w-full truncate max-line" align="center">
+      <Text size="xs" className="max-line w-full truncate" align="center">
         {user.name}
       </Text>
     </Stack>
