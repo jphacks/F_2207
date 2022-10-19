@@ -1,4 +1,5 @@
 import { Box, Button, Text } from "@mantine/core"
+import { NextLink } from "@mantine/next"
 
 import Map from "../../view/Map"
 
@@ -8,6 +9,8 @@ const MapPage: NextPage = () => {
   return (
     <Box sx={{ position: "relative" }}>
       <Button
+        component={NextLink}
+        href="/map/addCapsule"
         color="brand.3"
         radius="xl"
         size="xl"
