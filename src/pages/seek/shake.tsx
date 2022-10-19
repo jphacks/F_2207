@@ -3,14 +3,12 @@ import React, { useEffect } from "react"
 import { Button } from "@mantine/core"
 
 import DefaultLayout from "@/view/layout/default"
-import { useAcceleration } from "@/lib/useAcceleration"
 import { useShakeAmount } from "@/lib/useShakeAmount"
 
 const TOTAL_COUNT = 1000
 
 const Shake: NextPage = () => {
-  const { acceleration, requirePermission } = useAcceleration()
-  const { shakeAmount, resetAmount } = useShakeAmount()
+  const { acceleration, requirePermission, shakeAmount, resetAmount } = useShakeAmount()
 
   useEffect(() => {
     if (TOTAL_COUNT < shakeAmount) {
