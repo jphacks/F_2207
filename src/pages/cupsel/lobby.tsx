@@ -8,7 +8,7 @@ import { useGeolocation } from "@/lib/useGeolocation"
 import { createMatching } from "@/repository/matchingCreate"
 import DefaultLayout from "@/view/layout/default"
 
-const Create: NextPage = () => {
+const Lobby: NextPage = () => {
   const router = useRouter()
   const user = useUser()
   const location = useGeolocation()
@@ -30,4 +30,4 @@ const Create: NextPage = () => {
   )
 }
 
-export default Create
+export default Lobby
