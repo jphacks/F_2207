@@ -23,6 +23,27 @@ const loadCss = (url: string) => {
   head.appendChild(link)
 }
 
+const mapSetUp = () => {
+  // show map on Box
+  // @ts-ignore
+  const transformRequest = mqplatformTransformRequest("63da4d3c414e4ae59b7af3d654fefaff")
+  // @ts-ignore
+  var map = new mapboxgl.Map({
+    container: "map",
+    style: "mqplatform://maps-api/styles/v1/18",
+    transformRequest: transformRequest,
+  })
+  // @ts-ignore
+  map.addControl(new mapboxgl.NavigationControl())
+
+  map.on("load", () => {
+    // show user's layer
+    // it shows only on UI(not set property in mapquest)
+    const layerID = "user1"
+    map.setLayoutProperty(layerID, "visibility", "visible")
+  })
+}
+
 const Index: NextPage = () => {
   useEffect(() => {
     let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
@@ -30,18 +51,7 @@ const Index: NextPage = () => {
     let mapboxCssHref = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
 
     loadScript(mapquestSrc, () => {
-      loadScript(mapboxSrc, () => {
-        // @ts-ignore
-        const transformRequest = mqplatformTransformRequest("63da4d3c414e4ae59b7af3d654fefaff")
-        // @ts-ignore
-        var map = new mapboxgl.Map({
-          container: "map",
-          style: "mqplatform://maps-api/styles/v1/18",
-          transformRequest: transformRequest,
-        })
-        // @ts-ignore
-        map.addControl(new mapboxgl.NavigationControl())
-      })
+      loadScript(mapboxSrc, mapSetUp)
     })
 
     loadCss(mapboxCssHref)
