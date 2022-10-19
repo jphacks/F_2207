@@ -17,18 +17,19 @@ export const useShakeAmount = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (10 < deltas.current.length) {
-        console.log(deltas.current)
-
-        setShakeAmount((prev) => {
-          const res = prev + deltas.current.reduce((acc, c) => acc + c, 0) / deltas.current.length
-          if (Number.isNaN(res)) {
-            return prev
-          }
-          return res
-        })
-        deltas.current = []
+      if (deltas.current.length < 10) {
+        return
       }
+      const deltaSum = deltas.current.reduce((acc, c) => acc + c, 0) / deltas.current.length
+
+      if (Number.isNaN(deltaSum)) {
+        return
+      }
+
+      console.log(deltas.current, deltaSum)
+
+      setShakeAmount((prev) => prev + deltaSum)
+      deltas.current = []
     }, 300)
 
     return () => clearInterval(timer)
