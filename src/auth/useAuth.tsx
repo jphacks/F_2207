@@ -4,11 +4,11 @@ import {
   onAuthStateChanged,
   signInWithRedirect,
   signOut,
-  User,
 } from "firebase/auth"
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 
 import { auth } from "@/lib/firebase/init"
+import { AppUser } from "@/types/user"
 
 export type AuthContextType =
   | {
@@ -17,7 +17,7 @@ export type AuthContextType =
     }
   | {
       isLoading: false
-      user: User
+      user: AppUser
     }
 
 export type AuthOperationContextType = {
@@ -37,7 +37,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      setAuthValue({ isLoading: false, user })
+      setAuthValue({
+        isLoading: false,
+        user:
+          user == null
+            ? null
+            : {
+                id: user.uid,
+                name: user.displayName as string,
+                iconUrl: user.photoURL as string,
+              },
+      })
     })
   }, [])
 
