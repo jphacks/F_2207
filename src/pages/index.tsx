@@ -70,6 +70,7 @@ const mapSetUp = () => {
         "https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=63da4d3c414e4ae59b7af3d654fefaff",
       )
       .then((res) => {
+        // @ts-ignore
         res.data.forEach((layer) => {
           if (layer.name == layerID) {
             // set Image
@@ -78,6 +79,7 @@ const mapSetUp = () => {
                 `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=63da4d3c414e4ae59b7af3d654fefaff`,
               )
               .then((res) => {
+                // @ts-ignore
                 res.data.features.forEach((feature) => {
                   if (feature.properties.imageSrc && feature.properties.imageID) {
                     console.log(feature.properties.imageSrc)
@@ -94,7 +96,9 @@ const mapSetUp = () => {
   })
 
   map.on("click", "user2", (e) => {
+    // @ts-ignore
     const coordinates = e.features[0].geometry.coordinates.slice()
+    // @ts-ignore
     const description = e.features[0].properties.imageID
 
     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
