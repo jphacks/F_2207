@@ -8,6 +8,9 @@ export type Acceleration = {
   z: number
 }
 
+/**
+ * 端末の加速度情報を求める
+ */
 export const useAcceleration = () => {
   const [isReady, setIsReady] = useState(false)
   const [acceleration, setAcceleration] = useState<Acceleration>({ x: 0, y: 0, z: 0 })

@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { useAcceleration } from "./useAcceleration"
 
+/**
+ * 端末を振った量を計算する
+ */
 export const useShakeAmount = () => {
   const { acceleration } = useAcceleration()
 
