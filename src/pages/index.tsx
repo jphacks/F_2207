@@ -1,7 +1,8 @@
 import Head from "next/head"
-import { Button } from "@mantine/core"
+import { Avatar, Button, Group } from "@mantine/core"
 
 import { useAuth, useAuthOperation } from "@/auth/useAuth"
+import DefaultLayout from "@/view/layout/default"
 
 import type { NextPage } from "next"
 
@@ -16,17 +17,22 @@ const Index: NextPage = () => {
         <meta name="description" content="sample next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="p-4">
-        <div className="m-4">
-          <p>{isLoading ? "loading" : ""}</p>
-          <p className="text-red-400">{user?.displayName ?? "not logged in"}</p>
-        </div>
-        {user == null ? (
-          <Button onClick={login}>👋 LOGIN with Google</Button>
-        ) : (
-          <Button onClick={logout}>👋 LOGOUT</Button>
-        )}
-      </main>
+      <DefaultLayout>
+        <main className="p-4">
+          <div className="m-4">
+            <p>{isLoading ? "loading" : ""}</p>
+            <Group>
+              <Avatar src={user?.iconUrl} />
+              <p className="text-red-400">{user?.name ?? "not logged in"}</p>
+            </Group>
+          </div>
+          {user == null ? (
+            <Button onClick={login}>👋 LOGIN with Google</Button>
+          ) : (
+            <Button onClick={logout}>👋 LOGOUT</Button>
+          )}
+        </main>
+      </DefaultLayout>
     </>
   )
 }

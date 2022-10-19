@@ -4,6 +4,7 @@ import { MantineProvider } from "@mantine/core"
 
 import { AuthProvider } from "@/auth/useAuth"
 import Loading from "@/auth/Loading"
+import MatchingDialog from "@/view/MatchingDialog"
 
 import type { AppProps } from "next/app"
 
@@ -58,7 +59,9 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
       >
         <AuthProvider>
           <Loading>
-            <Component {...pageProps} />
+            <MatchingDialog>
+              <Component {...pageProps} />
+            </MatchingDialog>
           </Loading>
         </AuthProvider>
       </MantineProvider>
