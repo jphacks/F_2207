@@ -39,7 +39,9 @@ const CapsuleAdd: NextPage = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#212121" }}>
-      <Text color={"white"}>カプセルを作ろう</Text>
+      <Text className="mb-8" color={"white"} align="center">
+        カプセルを作ろう
+      </Text>
       <CapsulePreview
         capsuleColor={capsuleColor}
         gpsColor={gpsColor}
@@ -61,7 +63,7 @@ const CapsuleAdd: NextPage = () => {
         </Drawer>
       </Box>
       <Box className="p-4">
-        <Text color={"white"}>GPSの色</Text>
+        <Text color={"white"}>GPSロゴの色</Text>
         <ColorSelector colors={gpsColors} onSelect={setGpsColor} />
       </Box>
     </Box>
