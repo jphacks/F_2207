@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import Head from "next/head"
 import { Box } from "@mantine/core"
+import axios from "axios"
 
 import type { NextPage } from "next"
 
@@ -60,8 +61,36 @@ const mapSetUp = () => {
   map.on("load", () => {
     // show user's layer
     // it shows only on UI(not set property in mapquest)
-    const layerID = "user1"
+    const layerID = "user2"
     map.setLayoutProperty(layerID, "visibility", "visible")
+
+    // get mapquest layer id
+    axios
+      .get(
+        "https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=63da4d3c414e4ae59b7af3d654fefaff",
+      )
+      .then((res) => {
+        res.data.forEach((layer) => {
+          if (layer.name == layerID) {
+            // set Image
+            axios
+              .get(
+                `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=63da4d3c414e4ae59b7af3d654fefaff`,
+              )
+              .then((res) => {
+                res.data.features.forEach((feature) => {
+                  if (feature.properties.imageSrc && feature.properties.imageID) {
+                    console.log(feature.properties.imageSrc)
+                    map.loadImage(feature.properties.imageSrc, (error, image) => {
+                      if (error) throw error
+                      map.addImage(feature.properties.imageID, image!)
+                    })
+                  }
+                })
+              })
+          }
+        })
+      })
   })
 }
 
