@@ -26,14 +26,20 @@ const CapsuleAdd: NextPage = () => {
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#212121" }}>
       <Text color={"white"}>カプセルを作ろう</Text>
-      <Text color={"white"}>カプセルの色</Text>
-      <ColorSelector colors={capsuleColors} onSelect={() => {}} />
-      <Text color={"white"}>絵文字</Text>
-      <Button fullWidth color="gray">
-        😄カプセル絵文字を変更する
-      </Button>
-      <Text color={"white"}>GPSの色</Text>
-      <ColorSelector colors={gpsColors} onSelect={() => {}} />
+      <Box className="p-4">
+        <Text color={"white"}>カプセルの色</Text>
+        <ColorSelector colors={capsuleColors} onSelect={() => {}} />
+      </Box>
+      <Box className="p-4">
+        <Text color={"white"}>絵文字</Text>
+        <Button className="mt-4" fullWidth color="gray">
+          😄カプセル絵文字を変更する
+        </Button>
+      </Box>
+      <Box className="p-4">
+        <Text color={"white"}>GPSの色</Text>
+        <ColorSelector colors={gpsColors} onSelect={() => {}} />
+      </Box>
     </Box>
   )
 }
