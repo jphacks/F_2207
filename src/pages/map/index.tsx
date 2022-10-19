@@ -1,9 +1,30 @@
+import { Box, Button, Text } from "@mantine/core"
+
 import Map from "../../view/Map"
 
 import type { NextPage } from "next"
 
 const MapPage: NextPage = () => {
-  return <Map />
+  return (
+    <Box sx={{ position: "relative" }}>
+      <Button
+        color="brand.3"
+        radius="xl"
+        size="xl"
+        compact
+        sx={{
+          position: "absolute",
+          zIndex: 10,
+          bottom: "30px",
+          right: "30px",
+          boxShadow: "0px 1px 6px 0px #84848442",
+        }}
+      >
+        <Text color="gray.9">+</Text>
+      </Button>
+      <Map />
+    </Box>
+  )
 }
 
 export default MapPage
