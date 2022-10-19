@@ -12,7 +12,6 @@ export const useShakeAmount = () => {
 
   const deltas = useRef<number[]>([])
 
-  console.log(acceleration.x, acceleration.y, acceleration.z)
   deltas.current.push((acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2) / 5)
 
   useEffect(() => {
@@ -25,8 +24,6 @@ export const useShakeAmount = () => {
       if (Number.isNaN(deltaSum)) {
         return
       }
-
-      console.log(deltas.current, deltaSum)
 
       setShakeAmount((prev) => prev + deltaSum)
       deltas.current = []
