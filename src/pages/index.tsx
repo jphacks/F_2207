@@ -34,7 +34,28 @@ const mapSetUp = () => {
     transformRequest: transformRequest,
   })
   // @ts-ignore
+  // zoom control
   map.addControl(new mapboxgl.NavigationControl())
+  // current place control
+  map.addControl(
+    // @ts-ignore
+    new mapboxgl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: true,
+      showUserLocation: true,
+    }),
+  )
+
+  map.once("data", () => {
+    // get current position
+    navigator.geolocation.getCurrentPosition((position) => {
+      // set current place to center
+      const { latitude, longitude } = position.coords
+      // @ts-ignore
+      map.setCenter([longitude, latitude])
+      map.setZoom(15)
+    })
+  })
 
   map.on("load", () => {
     // show user's layer
