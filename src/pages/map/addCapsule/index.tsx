@@ -2,6 +2,7 @@ import { Box, Button, Text, useMantineTheme } from "@mantine/core"
 import { useState } from "react"
 
 import ColorSelector from "@/view/ CapsuleColorSelector"
+import CapsulePreview from "@/view/CapsulePreview"
 
 import type { NextPage } from "next"
 
@@ -30,6 +31,7 @@ const CapsuleAdd: NextPage = () => {
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#212121" }}>
       <Text color={"white"}>カプセルを作ろう</Text>
+      <CapsulePreview capsuleColor={capsuleColor} gpsColor={gpsColor} emoji={"😄"} />
       <Box className="p-4">
         <Text color={"white"}>カプセルの色</Text>
         <ColorSelector colors={capsuleColors} onSelect={setCapsuleColor} />
