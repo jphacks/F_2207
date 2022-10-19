@@ -1,14 +1,15 @@
 import { NextPage } from "next"
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import { Avatar, Button, Stack } from "@mantine/core"
+import { Button, Group, Stack, Text } from "@mantine/core"
 
 import { startMatching, stopMatching } from "@/repository/matchingCreate"
 import { AppUser } from "@/types/user"
 import { useUser } from "@/auth/useAuth"
 import { matchingStatus } from "@/repository/matching"
-import DefaultLayout from "@/view/layout/default"
 import { useMatchingWithRedirect } from "@/hooks/useMatching"
+import WalkthroughLayout from "@/view/layout/walkthrough"
+import UserAvater from "@/view/UserAvater"
 
 /**
  * マッチングの参加者情報を購読する
@@ -35,6 +36,8 @@ const Lobby: NextPage = () => {
   const matching = useMatchingWithRedirect(matchingId)
   const matchingUsers = useMatchingUsers(matchingId)
 
+  const isOwner = matching != null && user != null && matching.ownerId === user.id
+
   const handleConfirmMembers = async () => {
     await stopMatching(matchingId)
   }
@@ -49,19 +52,36 @@ const Lobby: NextPage = () => {
   }, [matching, matchingId, router])
 
   return (
-    <DefaultLayout>
-      <Stack>
-        {matchingUsers.map((user) => (
-          <div key={user.id} className="flex items-center">
-            <Avatar src={user.iconUrl} />
-            <p>{user.name}</p>
-          </div>
-        ))}
-        {matching != null && user != null && matching.ownerId === user.id && (
-          <Button onClick={handleConfirmMembers}>参加者を確定する</Button>
+    <WalkthroughLayout
+      title="友達とシェアしよう"
+      totalStep={4}
+      currentStep={1}
+      onClickNext={isOwner ? handleConfirmMembers : null}
+      onClickPrevOrClose={isOwner ? () => router.push("/cupsel/create") : null}
+    >
+      <Stack align="center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/communication.png" width="80%" className="my-[60px] max-w-[240px]" alt="" />
+        {isOwner && (
+          <Button color="brand.3" onClick={() => {}} fullWidth size="md">
+            <Text color="black">近くにいる友だちを招待</Text>
+          </Button>
         )}
+        <Stack mt={32} align="self-start" style={{ width: "100%" }} spacing={16}>
+          <Text color="white" weight="bold" size="sm">
+            参加者
+          </Text>
+          <Text size={32} weight="bold" color="white">
+            {matchingUsers.length}名
+          </Text>
+          <Group spacing={10}>
+            {matchingUsers.map((matchingUser) => (
+              <UserAvater key={matchingUser.id} user={matchingUser} />
+            ))}
+          </Group>
+        </Stack>
       </Stack>
-    </DefaultLayout>
+    </WalkthroughLayout>
   )
 }
 

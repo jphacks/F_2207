@@ -7,6 +7,8 @@ export type WalkthroughLayoutProps = {
   children: React.ReactNode
   totalStep: number
   currentStep: number
+  onClickNext: (() => void) | null
+  onClickPrevOrClose: (() => void) | null
 }
 
 const WalkthroughLayout: React.FC<WalkthroughLayoutProps> = ({
@@ -14,16 +16,35 @@ const WalkthroughLayout: React.FC<WalkthroughLayoutProps> = ({
   children,
   totalStep,
   currentStep,
+  onClickNext,
+  onClickPrevOrClose,
 }) => {
   return (
-    <Box sx={{ minHeight: "100vh", backgroundColor: "#212121" }}>
-      <Group className="w-full p-4" position="apart">
-        <ActionIcon aria-label="Close modal" size="lg" color="dark">
-          {currentStep === 0 ? <FiX size={24} /> : <FiChevronLeft size={24} />}
-        </ActionIcon>
-        <Button variant="subtle" size="md" color="brand.3" compact style={{ cursor: "pointer" }}>
-          <Text weight={600}>次へ</Text>
-        </Button>
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#212121" }} p={20}>
+      <Group className="w-full" position="apart">
+        {onClickPrevOrClose != null ? (
+          <ActionIcon aria-label="Close modal" size="lg" color="dark" onClick={onClickPrevOrClose}>
+            {currentStep === 0 ? <FiX size={24} /> : <FiChevronLeft size={24} />}
+          </ActionIcon>
+        ) : (
+          <div />
+        )}
+        {onClickNext != null ? (
+          <Button
+            variant="subtle"
+            size="md"
+            color="brand.3"
+            compact
+            style={{ cursor: "pointer" }}
+            onClick={onClickNext}
+          >
+            <Text weight={600} size="md">
+              次へ
+            </Text>
+          </Button>
+        ) : (
+          <div />
+        )}
       </Group>
       <Stack mb={32} spacing={12}>
         <Group position="center" spacing={10}>

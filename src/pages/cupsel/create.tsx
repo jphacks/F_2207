@@ -1,15 +1,22 @@
 import { Box, Drawer, Text, useMantineTheme } from "@mantine/core"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import Picker, { Theme } from "emoji-picker-react"
+import { useRouter } from "next/router"
 
 import CapsulePreview from "@/view/CapsulePreview"
 import ColorSelector from "@/view/CapsuleColorSelector"
 import WalkthroughLayout from "@/view/layout/walkthrough"
+import { createMatching } from "@/repository/matchingCreate"
+import { useUser } from "@/auth/useAuth"
+import { useGeolocation } from "@/lib/useGeolocation"
 
 import type { NextPage } from "next"
 import type { EmojiClickData } from "emoji-picker-react"
 
 const CapsuleAdd: NextPage = () => {
+  const router = useRouter()
+  const location = useGeolocation()
+  const user = useUser()
   const theme = useMantineTheme()
   const [capsuleColor, setCapsuleColor] = useState(theme.colors["brand"][3])
   const [gpsColor, setGpsColor] = useState("#000000")
@@ -38,9 +45,24 @@ const CapsuleAdd: NextPage = () => {
     setOpened(false)
   }
 
+  const handleClickNext = useCallback(async () => {
+    console.log(user, location?.coords)
+    if (user == null || location?.coords == null) {
+      return
+    }
+    const matchingId = await createMatching({ user, location: location?.coords })
+    await router.push(`/cupsel/${matchingId}/lobby`)
+  }, [location?.coords, router, user])
+
   return (
     <>
-      <WalkthroughLayout title="カプセルを作ろう" totalStep={4} currentStep={0}>
+      <WalkthroughLayout
+        title="カプセルを作ろう"
+        totalStep={4}
+        currentStep={0}
+        onClickNext={handleClickNext}
+        onClickPrevOrClose={() => router.push("/")}
+      >
         <CapsulePreview
           capsuleColor={capsuleColor}
           gpsColor={gpsColor}

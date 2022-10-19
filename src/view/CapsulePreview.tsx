@@ -8,7 +8,7 @@ type CapsulePreviewProps = {
 
 const CapsulePreview: React.FC<CapsulePreviewProps> = ({ capsuleColor, gpsColor, emoji }) => {
   return (
-    <Center sx={{ width: "100vw" }}>
+    <Center sx={{ width: "100%" }}>
       <Center
         sx={{
           backgroundColor: capsuleColor,
