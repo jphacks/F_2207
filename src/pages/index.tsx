@@ -92,6 +92,27 @@ const mapSetUp = () => {
         })
       })
   })
+
+  map.on("click", "user2", (e) => {
+    const coordinates = e.features[0].geometry.coordinates.slice()
+    const description = e.features[0].properties.imageID
+
+    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+    }
+
+    // @ts-ignore
+    // 25 is half height of image
+    new mapboxgl.Popup({ offset: 25 }).setLngLat(coordinates).setHTML(description).addTo(map)
+  })
+
+  map.on("mouseenter", "user2", () => {
+    map.getCanvas().style.cursor = "pointer"
+  })
+
+  map.on("mouseleave", "user2", () => {
+    map.getCanvas().style.cursor = ""
+  })
 }
 
 const Index: NextPage = () => {
