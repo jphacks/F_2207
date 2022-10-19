@@ -1,4 +1,4 @@
-import { Box, Text, useMantineTheme } from "@mantine/core"
+import { Box, Button, Text, useMantineTheme } from "@mantine/core"
 
 import ColorSelector from "@/view/ CapsuleColorSelector"
 
@@ -28,6 +28,10 @@ const CapsuleAdd: NextPage = () => {
       <Text color={"white"}>カプセルを作ろう</Text>
       <Text color={"white"}>カプセルの色</Text>
       <ColorSelector colors={capsuleColors} onSelect={() => {}} />
+      <Text color={"white"}>絵文字</Text>
+      <Button fullWidth color="gray">
+        😄カプセル絵文字を変更する
+      </Button>
       <Text color={"white"}>GPSの色</Text>
       <ColorSelector colors={gpsColors} onSelect={() => {}} />
     </Box>
