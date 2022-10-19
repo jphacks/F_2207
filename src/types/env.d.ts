@@ -10,5 +10,6 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_MESSAGINIG_SENDER_ID: string
     readonly NEXT_PUBLIC_APP_ID: string
     readonly NEXT_PUBLIC_MEASUREMENT_ID: string
+    readonly NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY: string
   }
 }
