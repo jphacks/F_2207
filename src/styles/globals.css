@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "nagoda";
+  src: url("/fonts/Nagoda_subset.otf");
+}

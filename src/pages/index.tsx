@@ -1,5 +1,6 @@
 import Head from "next/head"
 import { Avatar, Button, Group } from "@mantine/core"
+import { NextLink } from "@mantine/next"
 
 import { useAuth, useAuthOperation } from "@/auth/useAuth"
 import DefaultLayout from "@/view/layout/default"
@@ -32,6 +33,9 @@ const Index: NextPage = () => {
             <Button onClick={logout}>👋 LOGOUT</Button>
           )}
         </main>
+        <Button component={NextLink} href="/cupsel/create">
+          カプセルを作る
+        </Button>
       </DefaultLayout>
     </>
   )
