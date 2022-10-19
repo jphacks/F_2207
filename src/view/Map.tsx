@@ -4,7 +4,7 @@ import axios from "axios"
 
 import { loadCss } from "@/lib/loadCss"
 import { loadScript } from "@/lib/loadScript"
-import { mapBoxClick } from "@/types/mapBoxClick"
+import { MapBoxClick } from "@/types/mapBoxClick"
 
 const Map: React.FC = () => {
   const userID = "user2"
@@ -118,7 +118,7 @@ const Map: React.FC = () => {
     })
   }
 
-  const onClickCapsule = (map: mapboxgl.Map, e: mapBoxClick) => {
+  const onClickCapsule = (map: mapboxgl.Map, e: MapBoxClick) => {
     if (
       e.features == undefined ||
       e.features[0].properties == null ||

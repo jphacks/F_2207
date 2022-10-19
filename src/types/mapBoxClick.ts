@@ -1,3 +1,3 @@
-export type mapBoxClick = mapboxgl.MapMouseEvent & {
+export type MapBoxClick = mapboxgl.MapMouseEvent & {
   features?: mapboxgl.MapboxGeoJSONFeature[] | undefined
 } & mapboxgl.EventData
