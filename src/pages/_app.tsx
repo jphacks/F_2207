@@ -15,7 +15,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
         withGlobalStyles
         withNormalizeCSS
         theme={{
-          colorScheme: "light",
+          colorScheme: "dark",
           colors: {
             brand: [
               "#f7fde6",
@@ -52,6 +52,18 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
               "#050404",
               "#424242",
               "#212121",
+            ],
+            dark: [
+              "#C1C2C5",
+              "#A6A7AB",
+              "#909296",
+              "#5C5F66",
+              "#373A40",
+              "#2C2E33",
+              "#25262B",
+              "#212121",
+              "#141517",
+              "#101113",
             ],
           },
           primaryColor: "brand",
