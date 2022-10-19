@@ -30,6 +30,7 @@
     "aframe-react": "^4.4.0",
     "classnames": "^2.3.1",
     "dayjs": "^1.11.5",
+    "firebase": "^9.12.1",
     "geolib": "^3.3.3",
     "next": "12.2.4",
     "react": "18.2.0",

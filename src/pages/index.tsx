@@ -1,9 +1,14 @@
 import Head from "next/head"
 import { Button } from "@mantine/core"
 
+import { useAuth, useAuthOperation } from "@/auth/useAuth"
+
 import type { NextPage } from "next"
 
 const Index: NextPage = () => {
+  const { user, isLoading } = useAuth()
+  const { login, logout } = useAuthOperation()
+
   return (
     <>
       <Head>
@@ -13,9 +18,14 @@ const Index: NextPage = () => {
       </Head>
       <main className="p-4">
         <div className="m-4">
-          <p className="text-red-400">Hello, world</p>
+          <p>{isLoading ? "loading" : ""}</p>
+          <p className="text-red-400">{user?.displayName ?? "not logged in"}</p>
         </div>
-        <Button>Hello, from Mantine!</Button>
+        {user == null ? (
+          <Button onClick={login}>👋 LOGIN with Google</Button>
+        ) : (
+          <Button onClick={logout}>👋 LOGOUT</Button>
+        )}
       </main>
     </>
   )
