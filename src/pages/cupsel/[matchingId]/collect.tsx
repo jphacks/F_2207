@@ -1,10 +1,12 @@
-import { Box, Center, FileButton, Image, SimpleGrid, Text } from "@mantine/core"
+import { Box, Center, FileButton, Image, SimpleGrid, Text, useMantineTheme } from "@mantine/core"
 import { NextPage } from "next"
 import React, { useState } from "react"
+import { FiPlusCircle } from "react-icons/fi"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
 
 const Collect: NextPage = () => {
+  const theme = useMantineTheme()
   const [files, setFiles] = useState<File[]>([])
 
   const addFiles = (addedFiles: File[]) => {
@@ -40,7 +42,22 @@ const Collect: NextPage = () => {
         <SimpleGrid className="pt-4" cols={3} spacing={3} verticalSpacing={3}>
           <FileButton key="addButton" onChange={addFiles} accept="image/png,image/jpeg" multiple>
             {(props) => (
-              <Box component="button" {...props} sx={{ height: "30vw", width: "30vw" }} />
+              <Box
+                component="button"
+                {...props}
+                sx={(theme) => ({
+                  height: "30vw",
+                  width: "30vw",
+                  backgroundColor: theme.colors.gray[8],
+                  border: "none",
+                  "&:hover": {
+                    backgroundColor: theme.colors.gray[6],
+                    cursor: "pointer",
+                  },
+                })}
+              >
+                <FiPlusCircle size={36} color={theme.colors.gray[4]} />
+              </Box>
             )}
           </FileButton>
           {previews}
