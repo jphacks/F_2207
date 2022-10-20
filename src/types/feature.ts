@@ -3,7 +3,7 @@ export type Feature = {
   id: string
   geometry: {
     type: string
-    coordinates: [number]
+    coordinates: number[]
   }
   properties: {
     capsuleColor: string

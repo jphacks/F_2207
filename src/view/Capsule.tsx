@@ -10,6 +10,8 @@ type CapsuleProps = {
   gpsColor: string
   emoji: string
   size: CapsuleSize
+  lng: number
+  lat: number
   bgSx?: Sx
   onClick?: MouseEventHandler<HTMLDivElement>
 }
@@ -19,6 +21,8 @@ const Capsule: React.FC<CapsuleProps> = ({
   gpsColor,
   emoji,
   size,
+  lng,
+  lat,
   bgSx,
   onClick,
 }) => {
@@ -91,11 +95,10 @@ const Capsule: React.FC<CapsuleProps> = ({
           textAlign: "center",
           fontFamily: "nagoda",
           textShadow: "0px 0px 3px #ffffff",
+          whiteSpace: "pre-wrap",
         }}
       >
-        {convertLongLat(34.97853204635202, "lng")}
-        {"\n"}
-        {convertLongLat(135.73299472077852, "lat")}
+        {convertLongLat(lng, "lng") + "\n" + convertLongLat(lat, "lat")}
       </Text>
     </Center>
   )
