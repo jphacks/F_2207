@@ -1,10 +1,13 @@
 import { useEffect } from "react"
 import { Box } from "@mantine/core"
 import axios from "axios"
+import ReactDOM from "react-dom"
 
 import { loadCss } from "@/lib/loadCss"
 import { loadScript } from "@/lib/loadScript"
 import { MapBoxClick } from "@/types/mapBoxClick"
+
+import Capsule from "./Capsule"
 
 const Map: React.FC = () => {
   const userID = "user2"
@@ -52,8 +55,7 @@ const Map: React.FC = () => {
     })
 
     map.on("load", () => {
-      showLayer(map, userID)
-      setImage(map, userID)
+      setMarker(map, userID)
     })
 
     map.on("click", userID, (e) => {
@@ -69,15 +71,8 @@ const Map: React.FC = () => {
     })
   }
 
-  // show user's layer
-  // it shows only on UI(not set property in mapquest)
-  const showLayer = (map: mapboxgl.Map, userID: string) => {
-    const layerID = userID
-    map.setLayoutProperty(layerID, "visibility", "visible")
-  }
-
   // set image to mapbox
-  const setImage = (map: mapboxgl.Map, userID: string) => {
+  const setMarker = (map: mapboxgl.Map, userID: string) => {
     // get mapquest layer id
     axios
       .get(
@@ -95,12 +90,21 @@ const Map: React.FC = () => {
               .then((res) => {
                 // @ts-ignore
                 res.data.features.forEach((feature) => {
-                  if (feature.properties.imageSrc && feature.properties.imageID) {
-                    map.loadImage(feature.properties.imageSrc, (error, image) => {
-                      if (error) throw error
-                      map.addImage(feature.properties.imageID, image!)
-                    })
-                  }
+                  const div = document.createElement("div")
+                  ReactDOM.render(
+                    <Capsule
+                      capsuleColor="#d3f36b"
+                      gpsColor="#212121"
+                      emoji="😄"
+                      size="sm"
+                      bgSx={{
+                        boxShadow: "0px 2.7200000286102295px 33.31999969482422px 0px #FFFFFF40",
+                      }}
+                    />,
+                    div,
+                  )
+                  // @ts-ignore
+                  new mapboxgl.Marker(div).setLngLat(feature.geometry.coordinates).addTo(map)
                 })
               })
           }

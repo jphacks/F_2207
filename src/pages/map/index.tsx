@@ -10,7 +10,7 @@ const MapPage: NextPage = () => {
     <Box sx={{ position: "relative" }}>
       <Button
         component={NextLink}
-        href="/map/addCapsule"
+        href="/cupsel/create"
         color="brand.3"
         radius="xl"
         size="xl"
