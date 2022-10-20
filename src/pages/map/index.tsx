@@ -3,6 +3,7 @@ import { NextLink } from "@mantine/next"
 import { FiPlus } from "react-icons/fi"
 
 import DefaultLayout from "@/view/layout/default"
+import SearchBar from "@/view/SearchBar"
 
 import Map from "../../view/map/Map"
 
@@ -12,6 +13,17 @@ const MapPage: NextPage = () => {
   return (
     <DefaultLayout>
       <Box sx={{ position: "relative" }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: 20,
+            left: 16,
+            right: 16,
+            zIndex: 10,
+          }}
+        >
+          <SearchBar />
+        </Box>
         <Button
           component={NextLink}
           href="/cupsel/create"

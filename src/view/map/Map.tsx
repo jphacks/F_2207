@@ -38,10 +38,11 @@ const Map: React.FC = () => {
       container: "map",
       style: "mqplatform://maps-api/styles/v1/18",
       transformRequest: transformRequest,
+      logoPosition: "top-left",
     })
     // @ts-ignore
     // zoom control
-    map.addControl(new mapboxgl.NavigationControl())
+    map.addControl(new mapboxgl.NavigationControl(), "bottom-left")
     // current place control
     map.addControl(
       // @ts-ignore
@@ -49,7 +50,9 @@ const Map: React.FC = () => {
         positionOptions: { enableHighAccuracy: true },
         trackUserLocation: true,
         showUserLocation: true,
+        showUserHeading: true,
       }),
+      "bottom-left",
     )
 
     map.once("data", () => {
