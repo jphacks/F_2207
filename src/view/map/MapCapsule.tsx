@@ -1,12 +1,13 @@
 import { Feature } from "@/types/feature"
 
-import Capsule from "./Capsule"
+import Capsule from "../Capsule"
 
 export type MapCapsuleProps = {
   feature: Feature
 }
 
 const MapCapsule: React.FC<MapCapsuleProps> = ({ feature }) => {
+  // TODO: Click Action
   return (
     <Capsule
       capsuleColor={feature.properties.capsuleColor}
@@ -16,6 +17,7 @@ const MapCapsule: React.FC<MapCapsuleProps> = ({ feature }) => {
       bgSx={{
         boxShadow: "0px 2.7200000286102295px 33.31999969482422px 0px #FFFFFF40",
       }}
+      onClick={() => alert(`clicked on id ${feature.id}`)}
     />
   )
 }

@@ -1,7 +1,7 @@
 import { Box, Button, Text } from "@mantine/core"
 import { NextLink } from "@mantine/next"
 
-import Map from "../../view/Map"
+import Map from "../../view/map/Map"
 
 import type { NextPage } from "next"
 
