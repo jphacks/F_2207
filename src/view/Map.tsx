@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { Box } from "@mantine/core"
+import { Box, RingProgress, Stack, Text } from "@mantine/core"
 import axios from "axios"
 import ReactDOM from "react-dom"
 
@@ -103,6 +103,52 @@ const Map: React.FC = () => {
                     />,
                     div,
                   )
+                  ReactDOM.render(
+                    <RingProgress
+                      size={120}
+                      thickness={12}
+                      sections={[
+                        { value: 100 - (300 / 360) * 100, color: "gray.8" },
+                        { value: (300 / 360) * 100, color: "#6888e8" },
+                      ]}
+                      label={
+                        <Stack
+                          sx={(theme) => ({
+                            backgroundColor: theme.colors.gray[9],
+                            width: 120 - 12 * 4,
+                            height: 120 - 12 * 4,
+                            borderRadius: "50%",
+                            gap: 0,
+                          })}
+                        >
+                          <Text
+                            sx={{
+                              fontSize: 10,
+                              fontWeight: 300,
+                              fontFamily: "Hiragino Sans",
+                              color: "white",
+                              textAlign: "center",
+                            }}
+                          >
+                            残り
+                          </Text>
+                          <Text
+                            sx={{
+                              fontSize: 18,
+                              fontWeight: 600,
+                              fontFamily: "Hiragino Sans",
+                              color: "white",
+                              textAlign: "center",
+                            }}
+                          >
+                            300日
+                          </Text>
+                        </Stack>
+                      }
+                    />,
+                    div,
+                  )
+
                   // @ts-ignore
                   new mapboxgl.Marker(div).setLngLat(feature.geometry.coordinates).addTo(map)
                 })
