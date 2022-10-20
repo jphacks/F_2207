@@ -3,13 +3,14 @@ import { MutableRefObject, useMemo, useRef } from "react"
 import { Canvas, useFrame, ThreeElements } from "@react-three/fiber"
 import THREE from "three"
 import Webcam from "react-webcam"
+import { Button } from "@mantine/core"
 
 import { useGeolocation } from "@/lib/useGeolocation"
 import { useOrientation } from "@/lib/useOrientation"
 import { useSyncCamera } from "@/lib/threejs/useSyncCamera"
 import { calcDistance } from "@/lib/calcDistance"
 
-const Box: React.FC<ThreeElements["mesh"]> = ({ ...props }) => {
+const Box: React.FC<ThreeElements["mesh"] & { color: string }> = ({ color, ...props }) => {
   const ref = useRef<THREE.Mesh | null>(null)
 
   useFrame(() => {
@@ -22,7 +23,27 @@ const Box: React.FC<ThreeElements["mesh"]> = ({ ...props }) => {
   return (
     <mesh {...props} ref={ref}>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="orange" />
+      <meshStandardMaterial color={color} />
+    </mesh>
+  )
+}
+
+const Cylinder: React.FC<ThreeElements["mesh"] & { color: string }> = ({ color, ...props }) => {
+  const ref = useRef<THREE.Mesh | null>(null)
+
+  useFrame(() => {
+    if (ref.current == null) {
+      return
+    }
+    ref.current.rotation.x = 0
+    ref.current.rotation.y += 0.01
+    ref.current.rotation.z = 0
+  })
+
+  return (
+    <mesh {...props} ref={ref}>
+      <cylinderGeometry args={[0.5, 0, 1, 16]} />
+      <meshStandardMaterial color={color} />
     </mesh>
   )
 }
@@ -31,13 +52,36 @@ const ArCanvas: React.FC<{
   orientation: MutableRefObject<{ x: number; y: number }>
   boxPosition: { x: number; y: number; z: number }
 }> = ({ orientation, boxPosition }) => {
-  useSyncCamera(orientation, { x: 0, y: 0, z: 0 })
+  useSyncCamera(orientation, { x: 0, y: 2, z: 0 })
 
   return (
     <>
-      <Box position={[boxPosition.x, boxPosition.y, boxPosition.z]} scale={[10, 10, 10]} />
+      <Box
+        position={[boxPosition.x, boxPosition.y, boxPosition.z]}
+        scale={[10, 10, 10]}
+        color="orange"
+      />
+      <Cylinder
+        position={[boxPosition.x, boxPosition.y + 30, boxPosition.z]}
+        scale={[10, 10, 10]}
+        color="orange"
+      />
+      {Array(10)
+        .fill(null)
+        .map((_, i) => (
+          <Box
+            key={i}
+            position={[
+              Math.sin((i * Math.PI * 2) / 10) * 20,
+              0,
+              Math.cos((i * Math.PI * 2) / 10) * 20,
+            ]}
+            scale={[1, 1, 1]}
+            color={`hsl(${36 * i}, 50%, 50%)`}
+          />
+        ))}
       <ambientLight />
-      <gridHelper />
+      <gridHelper args={[20]} />
       <arrowHelper />
       <pointLight position={[1, 1, 1]} />
     </>
@@ -45,47 +89,39 @@ const ArCanvas: React.FC<{
 }
 
 const ArPage: NextPage = () => {
-  const geolocation = useGeolocation()
   const { orientation, orientationRef, requestPermission } = useOrientation()
+  const geolocation = useGeolocation()
 
-  const distanceAndBearing = useMemo(() => {
-    if (geolocation?.coords == null) {
-      return
+  const geo = useMemo(() => {
+    if (geolocation == null) {
+      return {
+        distance: 0,
+        bearing: 0,
+        deviceBearing: 0,
+      }
     }
-    return calcDistance(
+    const { distance, bearing } = calcDistance(
+      { latitude: geolocation.coords.latitude, longitude: geolocation.coords.longitude },
       {
-        latitude: geolocation.coords.latitude,
-        longitude: geolocation.coords.longitude,
-      },
-      {
-        latitude: 34.864448357843344,
-        longitude: 135.60541331417622,
+        latitude: 34.86412770305309,
+        longitude: 135.6051700426613,
       },
     )
-  }, [geolocation?.coords])
+    return {
+      distance,
+      bearing,
+      deviceBearing: orientation.x - bearing,
+    }
+  }, [geolocation, orientation.x])
 
   const boxPosition = useMemo(() => {
-    if (distanceAndBearing == null) {
-      return { x: -10, y: 0, z: 0 }
-    }
+    const degree = 90 - geo.bearing
     return {
-      x: distanceAndBearing.distance * Math.cos(distanceAndBearing.bearing - 90),
-      // y: distanceAndBearing.distance * 0.1,
+      x: -geo.distance * Math.cos(degree * (Math.PI / 180)),
       y: 0,
-      z: distanceAndBearing.distance * Math.sin(distanceAndBearing.bearing - 90),
+      z: geo.distance * Math.sin(degree * (Math.PI / 180)),
     }
-  }, [distanceAndBearing])
-
-  const distance = 1
-  const a = distance * Math.cos(orientation.x * (Math.PI / 180))
-  const b =
-    -distance *
-    Math.sin(orientation.x * (Math.PI / 180)) *
-    Math.sin((orientation.y - 90) * (Math.PI / 180))
-  const c =
-    -distance *
-    Math.sin(orientation.x * (Math.PI / 180)) *
-    Math.cos((orientation.y - 90) * (Math.PI / 180))
+  }, [geo.bearing, geo.distance])
 
   return (
     <>
@@ -99,25 +135,16 @@ const ArPage: NextPage = () => {
           <ArCanvas orientation={orientationRef} boxPosition={boxPosition} />
         </Canvas>
       </div>
-      <div className="fixed inset-x-0 bottom-0 m-4 rounded bg-white/50 p-4 text-white backdrop-blur">
-        <div>
-          <div>
-            ({geolocation?.coords.latitude}, {geolocation?.coords.longitude},{" "}
-            {geolocation?.coords.altitude})
-          </div>
-          <div>{geolocation != null && new Date(geolocation?.timestamp).toLocaleString()}</div>
-        </div>
-        <div>
-          ({orientation.x.toFixed(2)}, {orientation.y.toFixed(2)})
-        </div>
-        <div>
-          ({a.toFixed(2)}, {b.toFixed(2)}, {c.toFixed(2)})
-        </div>
-        <div>
-          boxLocation: ({boxPosition?.x.toFixed(2)}, {boxPosition?.y.toFixed(2)},{" "}
-          {boxPosition?.z.toFixed(2)})
-        </div>
-        <button onClick={requestPermission}>Device Orientation</button>
+      <div className="fixed inset-0 p-8 text-white" style={{ textShadow: "2px 2px 2px #000000" }}>
+        <p className="text-[48px] font-bold tabular-nums">
+          ({orientation.x.toFixed(2)}, <br /> {orientation.y.toFixed(2)})
+        </p>
+        <p className="text-[24px] font-bold tabular-nums">
+          Distance: {geo.distance}, <br />
+          Bearing: {geo.bearing}, <br />
+          Device Beraing: {geo.deviceBearing}
+        </p>
+        <Button onClick={requestPermission}>grant permission</Button>
       </div>
     </>
   )
