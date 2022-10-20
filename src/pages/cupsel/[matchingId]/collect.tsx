@@ -62,11 +62,13 @@ const Collect: NextPage = () => {
         router.push(`/cupsel/create`)
       }}
     >
-      <Group spacing={10}>
-        {users.map((user) => (
-          <UserAvater key={user.id} user={user} label={8} />
-        ))}
-      </Group>
+      <Box className="pb-16 pt-10">
+        <Group spacing={10}>
+          {users.map((user) => (
+            <UserAvater key={user.id} user={user} label={8} />
+          ))}
+        </Group>
+      </Box>
       <Text color="white" weight="bold" size="sm">
         あなたの写真や動画
       </Text>
