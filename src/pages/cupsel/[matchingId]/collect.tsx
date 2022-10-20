@@ -1,16 +1,36 @@
-import { Box, Center, FileButton, Image, SimpleGrid, Text, useMantineTheme } from "@mantine/core"
+import {
+  Box,
+  Center,
+  FileButton,
+  Group,
+  Image,
+  SimpleGrid,
+  Text,
+  useMantineTheme,
+} from "@mantine/core"
 import { NextPage } from "next"
 import React, { useState } from "react"
 import { FiPlusCircle } from "react-icons/fi"
 import { useRouter } from "next/router"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
+import UserAvater from "@/view/UserAvater"
 
 const Collect: NextPage = () => {
   const router = useRouter()
   const matchingId = router.query.matchingId as string
   const theme = useMantineTheme()
   const [files, setFiles] = useState<File[]>([])
+
+  // TODO:本当はいい感じにとってくる
+  const users = [
+    {
+      id: "test",
+      name: "user name",
+      iconUrl:
+        "https://lh3.googleusercontent.com/a/ALm5wu3m4M-U62i3Z8U7BlyEJX4h4bzX4rIrhz3aI5m3=s96-c",
+    },
+  ]
 
   const addFiles = (addedFiles: File[]) => {
     setFiles((prev) => [...prev, ...addedFiles])
@@ -42,6 +62,11 @@ const Collect: NextPage = () => {
         router.push(`/cupsel/create`)
       }}
     >
+      <Group spacing={10}>
+        {users.map((user) => (
+          <UserAvater key={user.id} user={user} label={8} />
+        ))}
+      </Group>
       <Text color="white" weight="bold" size="sm">
         あなたの写真や動画
       </Text>
