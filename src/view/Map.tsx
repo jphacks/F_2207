@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { Box, RingProgress, Stack, Text } from "@mantine/core"
+import { Box } from "@mantine/core"
 import axios from "axios"
 import ReactDOM from "react-dom"
 
@@ -8,7 +8,8 @@ import { loadScript } from "@/lib/loadScript"
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
 
-import Capsule from "./Capsule"
+import LockedCapsule from "./LockedCapsule"
+import MapCapsule from "./MapCapsule"
 
 const Map: React.FC = () => {
   const userID = "user3"
@@ -93,77 +94,11 @@ const Map: React.FC = () => {
                   const div = document.createElement("div")
                   const today = Date.now()
                   const openDate = Date.parse(feature.properties.openDate)
-                  const addDate = Date.parse(feature.properties.addDate)
 
                   if (today > openDate) {
-                    ReactDOM.render(
-                      <Capsule
-                        capsuleColor={feature.properties.capsuleColor}
-                        gpsColor={feature.properties.gpsColor}
-                        emoji={feature.properties.emoji}
-                        size="sm"
-                        bgSx={{
-                          boxShadow: "0px 2.7200000286102295px 33.31999969482422px 0px #FFFFFF40",
-                        }}
-                      />,
-                      div,
-                    )
+                    ReactDOM.render(<MapCapsule feature={feature} />, div)
                   } else {
-                    ReactDOM.render(
-                      <RingProgress
-                        size={120}
-                        thickness={12}
-                        sections={[
-                          {
-                            value:
-                              100 -
-                              (betweenDays(today, openDate) / betweenDays(addDate, openDate)) * 100,
-                            color: "gray.8",
-                          },
-                          {
-                            value:
-                              (betweenDays(today, openDate) / betweenDays(addDate, openDate)) * 100,
-                            color: feature.properties.capsuleColor,
-                          },
-                        ]}
-                        label={
-                          <Stack
-                            sx={(theme) => ({
-                              backgroundColor: theme.colors.gray[9],
-                              width: 120 - 12 * 4,
-                              height: 120 - 12 * 4,
-                              borderRadius: "50%",
-                              justifyContent: "center",
-                              gap: 0,
-                            })}
-                          >
-                            <Text
-                              sx={{
-                                fontSize: 10,
-                                fontWeight: 300,
-                                fontFamily: "Hiragino Sans",
-                                color: "white",
-                                textAlign: "center",
-                              }}
-                            >
-                              残り
-                            </Text>
-                            <Text
-                              sx={{
-                                fontSize: 18,
-                                fontWeight: 600,
-                                fontFamily: "Hiragino Sans",
-                                color: "white",
-                                textAlign: "center",
-                              }}
-                            >
-                              {betweenDays(today, openDate)}日
-                            </Text>
-                          </Stack>
-                        }
-                      />,
-                      div,
-                    )
+                    ReactDOM.render(<LockedCapsule feature={feature} />, div)
                   }
 
                   // @ts-ignore
@@ -203,10 +138,6 @@ const Map: React.FC = () => {
     // @ts-ignore
     // 25 is half height of image
     new mapboxgl.Popup({ offset: 25 }).setLngLat(coordinates).setHTML(description).addTo(map)
-  }
-
-  const betweenDays = (start: number, end: number) => {
-    return Math.floor((end - start) / 86400000)
   }
 
   return <Box id="map" sx={{ width: "100%", height: "100vh" }} />
