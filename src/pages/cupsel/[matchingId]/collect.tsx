@@ -1,10 +1,30 @@
-import { Box, Center, SimpleGrid, Text } from "@mantine/core"
+import { Box, Center, FileButton, Image, SimpleGrid, Text } from "@mantine/core"
 import { NextPage } from "next"
-import React from "react"
+import React, { useState } from "react"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
 
 const Collect: NextPage = () => {
+  const [files, setFiles] = useState<File[]>([])
+
+  const addFiles = (addedFiles: File[]) => {
+    setFiles((prev) => [...prev, ...addedFiles])
+  }
+
+  const previews = files.map((file, index) => {
+    const imageUrl = URL.createObjectURL(file)
+    return (
+      <Image
+        key={index}
+        alt={file.name}
+        src={imageUrl}
+        imageProps={{ onLoad: () => URL.revokeObjectURL(imageUrl) }}
+        height="30vw"
+        width="30vw"
+      />
+    )
+  })
+
   return (
     <WalkthroughLayout
       title="写真や動画を追加しよう"
@@ -18,13 +38,12 @@ const Collect: NextPage = () => {
       </Text>
       <Center>
         <SimpleGrid className="pt-4" cols={3} spacing={3} verticalSpacing={3}>
-          <Box component="button" sx={{ height: "30vw", width: "30vw" }} />
-          <Box sx={{ height: "30vw", width: "30vw", background: "#ffffff" }} />
-          <Box sx={{ height: "30vw", width: "30vw", background: "#ffffff" }} />
-          <Box sx={{ height: "30vw", width: "30vw", background: "#ffffff" }} />
-          <Box sx={{ height: "30vw", width: "30vw", background: "#ffffff" }} />
-          <Box sx={{ height: "30vw", width: "30vw", background: "#ffffff" }} />
-          <Box sx={{ height: "30vw", width: "30vw", background: "#ffffff" }} />
+          <FileButton key="addButton" onChange={addFiles} accept="image/png,image/jpeg" multiple>
+            {(props) => (
+              <Box component="button" {...props} sx={{ height: "30vw", width: "30vw" }} />
+            )}
+          </FileButton>
+          {previews}
         </SimpleGrid>
       </Center>
     </WalkthroughLayout>
