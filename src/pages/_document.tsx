@@ -11,9 +11,9 @@ export default class _Document extends Document {
       <Html lang="ja">
         <Head prefix="og: http://ogp.me/ns#">
           <meta charSet="utf-8" />
-          <meta name="theme-color" content="#fafaf9" />
+          <meta name="theme-color" content="#212121" />
         </Head>
-        <body>
+        <body className="bg-[#212121]">
           <Main />
           <NextScript />
         </body>

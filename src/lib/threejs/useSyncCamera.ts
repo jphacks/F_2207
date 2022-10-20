@@ -9,13 +9,13 @@ export const useSyncCamera = (
 ) => {
   useFrame(({ camera }) => {
     const orientation = _orientation.current
-    const distance = 5
+    const distance = 1
     camera.position.set(position.x, position.y, position.z)
 
     const a = distance * Math.cos(orientation.x * (Math.PI / 180))
     const b =
       distance *
-      Math.sin(orientation.x * (Math.PI / 180)) *
+      // Math.sin(-orientation.x * (Math.PI / 180)) *
       Math.sin((orientation.y - 90) * (Math.PI / 180))
     const c =
       -distance *
