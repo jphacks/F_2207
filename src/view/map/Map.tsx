@@ -1,13 +1,18 @@
 import { useEffect } from "react"
 import { Box } from "@mantine/core"
 import axios from "axios"
+import ReactDOM from "react-dom"
 
 import { loadCss } from "@/lib/loadCss"
 import { loadScript } from "@/lib/loadScript"
 import { MapBoxClick } from "@/types/mapBoxClick"
+import { Feature } from "@/types/feature"
+
+import LockedCapsule from "./LockedCapsule"
+import MapCapsule from "./MapCapsule"
 
 const Map: React.FC = () => {
-  const userID = "user2"
+  const userID = "user3"
 
   useEffect(() => {
     let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
@@ -52,8 +57,7 @@ const Map: React.FC = () => {
     })
 
     map.on("load", () => {
-      showLayer(map, userID)
-      setImage(map, userID)
+      setMarker(map, userID)
     })
 
     map.on("click", userID, (e) => {
@@ -69,15 +73,8 @@ const Map: React.FC = () => {
     })
   }
 
-  // show user's layer
-  // it shows only on UI(not set property in mapquest)
-  const showLayer = (map: mapboxgl.Map, userID: string) => {
-    const layerID = userID
-    map.setLayoutProperty(layerID, "visibility", "visible")
-  }
-
   // set image to mapbox
-  const setImage = (map: mapboxgl.Map, userID: string) => {
+  const setMarker = (map: mapboxgl.Map, userID: string) => {
     // get mapquest layer id
     axios
       .get(
@@ -93,14 +90,19 @@ const Map: React.FC = () => {
                 `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
               )
               .then((res) => {
-                // @ts-ignore
-                res.data.features.forEach((feature) => {
-                  if (feature.properties.imageSrc && feature.properties.imageID) {
-                    map.loadImage(feature.properties.imageSrc, (error, image) => {
-                      if (error) throw error
-                      map.addImage(feature.properties.imageID, image!)
-                    })
+                res.data.features.forEach((feature: Feature) => {
+                  const div = document.createElement("div")
+                  const today = Date.now()
+                  const openDate = Date.parse(feature.properties.openDate)
+
+                  if (today > openDate) {
+                    ReactDOM.render(<MapCapsule feature={feature} />, div)
+                  } else {
+                    ReactDOM.render(<LockedCapsule feature={feature} />, div)
                   }
+
+                  // @ts-ignore
+                  new mapboxgl.Marker(div).setLngLat(feature.geometry.coordinates).addTo(map)
                 })
               })
           }

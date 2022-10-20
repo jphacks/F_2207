@@ -10,6 +10,8 @@ import { matchingStatus } from "@/repository/matching"
 import { useMatchingWithRedirect } from "@/hooks/useMatching"
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import UserAvater from "@/view/UserAvater"
+import Smartphone from "@/view/icons/Smartphone"
+import Wave from "@/view/icons/Wave"
 
 /**
  * マッチングの参加者情報を購読する
@@ -60,8 +62,16 @@ const Lobby: NextPage = () => {
       onClickPrevOrClose={isOwner ? () => router.push("/cupsel/create") : null}
     >
       <Stack align="center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/communication.png" width="80%" className="my-[60px] max-w-[240px]" alt="" />
+        <div className="my-[60px] flex max-w-[240px] items-center justify-between space-x-8">
+          <div className="flex items-center justify-between space-x-4">
+            <Smartphone />
+            <Wave />
+          </div>
+          <div className="flex items-center justify-between space-x-4">
+            <Wave className="rotate-180" />
+            <Smartphone />
+          </div>
+        </div>
         {isOwner && (
           <Button color="brand.3" onClick={() => {}} fullWidth size="md">
             <Text color="black">近くにいる友だちを招待</Text>
