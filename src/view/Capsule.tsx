@@ -1,4 +1,5 @@
 import { Center, Sx, Text } from "@mantine/core"
+import { MouseEventHandler } from "react"
 
 type CapsuleSize = "sm" | "md"
 
@@ -8,9 +9,17 @@ type CapsuleProps = {
   emoji: string
   size: CapsuleSize
   bgSx?: Sx
+  onClick?: MouseEventHandler<HTMLDivElement>
 }
 
-const Capsule: React.FC<CapsuleProps> = ({ capsuleColor, gpsColor, emoji, size, bgSx }) => {
+const Capsule: React.FC<CapsuleProps> = ({
+  capsuleColor,
+  gpsColor,
+  emoji,
+  size,
+  bgSx,
+  onClick,
+}) => {
   const getDiameter = (size: CapsuleSize) => {
     switch (size) {
       case "sm":
@@ -49,6 +58,7 @@ const Capsule: React.FC<CapsuleProps> = ({ capsuleColor, gpsColor, emoji, size, 
         position: "relative",
         ...bgSx,
       }}
+      onClick={onClick}
     >
       <Text size={getEmojiSize(size)}>{emoji}</Text>
       <Text
