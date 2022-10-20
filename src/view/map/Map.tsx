@@ -140,7 +140,7 @@ const Map: React.FC = () => {
     new mapboxgl.Popup({ offset: 25 }).setLngLat(coordinates).setHTML(description).addTo(map)
   }
 
-  return <Box id="map" sx={{ width: "100%", height: "100vh" }} />
+  return <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }} />
 }
 
 export default Map
