@@ -2,10 +2,13 @@ import { Box, Center, FileButton, Image, SimpleGrid, Text, useMantineTheme } fro
 import { NextPage } from "next"
 import React, { useState } from "react"
 import { FiPlusCircle } from "react-icons/fi"
+import { useRouter } from "next/router"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
 
 const Collect: NextPage = () => {
+  const router = useRouter()
+  const matchingId = router.query.matchingId as string
   const theme = useMantineTheme()
   const [files, setFiles] = useState<File[]>([])
 
@@ -32,8 +35,12 @@ const Collect: NextPage = () => {
       title="写真や動画を追加しよう"
       totalStep={4}
       currentStep={2}
-      onClickNext={() => {}}
-      onClickPrevOrClose={() => {}}
+      onClickNext={() => {
+        router.push(`/cupsel/${matchingId}/register`)
+      }}
+      onClickPrevOrClose={() => {
+        router.push(`/cupsel/create`)
+      }}
     >
       <Text color="white" weight="bold" size="sm">
         あなたの写真や動画
