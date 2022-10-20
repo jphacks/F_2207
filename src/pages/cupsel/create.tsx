@@ -46,7 +46,6 @@ const CapsuleAdd: NextPage = () => {
   }
 
   const handleClickNext = useCallback(async () => {
-    console.log(user, location?.coords)
     if (user == null || location?.coords == null) {
       return
     }
