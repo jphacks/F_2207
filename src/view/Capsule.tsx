@@ -3,6 +3,8 @@ import { MouseEventHandler } from "react"
 
 type CapsuleSize = "sm" | "md"
 
+type LngLat = "lng" | "lat"
+
 type CapsuleProps = {
   capsuleColor: string
   gpsColor: string
@@ -47,6 +49,24 @@ const Capsule: React.FC<CapsuleProps> = ({
     }
   }
 
+  const convertLongLat = (num: number, type: LngLat) => {
+    const degree = Math.floor(num)
+    const minute = Math.floor((num - degree) * 60)
+    const second = ((num - degree - minute / 60) * 3600).toFixed(1)
+    var symbol = ""
+    if (type == "lng" && num < 0) {
+      symbol = "S"
+    } else if (type == "lng" && num >= 0) {
+      symbol = "N"
+    } else if (type == "lat" && num < 0) {
+      symbol = "W"
+    } else if (type == "lat" && num >= 0) {
+      symbol = "E"
+    }
+
+    return `${degree}°${minute}'${second}\"${symbol}`
+  }
+
   return (
     <Center
       sx={{
@@ -73,7 +93,9 @@ const Capsule: React.FC<CapsuleProps> = ({
           textShadow: "0px 0px 3px #ffffff",
         }}
       >
-        {"41°24'12.2\"N 2°10'26.5\"E"}
+        {convertLongLat(34.97853204635202, "lng")}
+        {"\n"}
+        {convertLongLat(135.73299472077852, "lat")}
       </Text>
     </Center>
   )
