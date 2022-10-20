@@ -67,6 +67,8 @@ const CapsuleAdd: NextPage = () => {
           capsuleColor={capsuleColor}
           gpsColor={gpsColor}
           emoji={chosenEmoji ? chosenEmoji.emoji : "😄"}
+          lng={location?.coords.longitude ?? 0}
+          lat={location?.coords.latitude ?? 0}
         />
         <Box className="p-4">
           <Text color="white" weight="bold" size="sm">
