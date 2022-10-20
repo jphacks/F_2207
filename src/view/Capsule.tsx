@@ -56,6 +56,7 @@ const Capsule: React.FC<CapsuleProps> = ({
         height: getDiameter(size),
         borderRadius: "50%",
         position: "relative",
+        cursor: onClick ? "pointer" : "auto",
         ...bgSx,
       }}
       onClick={onClick}
