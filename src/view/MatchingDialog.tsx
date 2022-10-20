@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Button, Drawer } from "@mantine/core"
+import { Button, Drawer, Text, Center } from "@mantine/core"
 import Image from "next/image"
 import { useRouter } from "next/router"
 
@@ -61,24 +61,35 @@ const MatchingDialog: React.FC<MatchingDialogProps> = ({ children }) => {
             cancelMatching({ user, matchingId: matching.id })
           }
         }}
-        title="タイムカプセルに参加する"
+        title={<Text color="white">招待が届きました</Text>}
         padding="xl"
-        size="md"
+        size={300}
         position="bottom"
+        styles={{
+          drawer: {
+            borderRadius: "12px 12px 0 0",
+          },
+        }}
       >
-        <div className="flex items-center space-x-4">
-          {matching != null && (
+        <div className="my-8 flex items-center">
+          <div className="h-20 w-20 shrink-0">
             <Image
               src={matching?.host?.iconUrl ?? ""}
               alt=""
-              width={32}
-              height={32}
-              className="h-8 w-8 rounded-full"
+              width={80}
+              height={80}
+              className="rounded-full"
             />
-          )}
-          <p>{matching?.host?.name}さんのタイムカプセル</p>
+          </div>
+          <Center style={{ width: "100%" }} px={16}>
+            <Text color="white" weight="bold">
+              {matching?.host?.name}さんのカプセル
+            </Text>
+          </Center>
         </div>
-        <Button onClick={handleJoin}>参加する</Button>
+        <Button color="brand.3" onClick={handleJoin} fullWidth size="md">
+          <Text color="black">参加する</Text>
+        </Button>
       </Drawer>
     </>
   )
