@@ -8,7 +8,7 @@ import UserIcon from "./icons/UserIcon"
 
 const BottomBar: React.FC = () => {
   return (
-    <div className="fixed inset-x-0 bottom-0 flex h-[72px] items-center bg-white">
+    <div className="flex h-[72px] w-full items-center bg-white">
       <UnstyledButton px={16} py={12} className="flex-1">
         <Stack align="center" spacing={4}>
           <MapIcon className="h-7 w-7" />

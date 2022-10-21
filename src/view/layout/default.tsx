@@ -9,8 +9,12 @@ export type DefaultLayoutProps = {
 const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
   return (
     <>
-      {children}
-      <BottomBar />
+      <div className="fixed inset-0 flex flex-col">
+        <div className="grow">{children}</div>
+        <div className="w-full shrink-0">
+          <BottomBar />
+        </div>
+      </div>
     </>
   )
 }

@@ -12,7 +12,7 @@ import type { NextPage } from "next"
 const MapPage: NextPage = () => {
   return (
     <DefaultLayout>
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: "relative", height: "100%" }}>
         <Box
           sx={{
             position: "absolute",
