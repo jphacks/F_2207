@@ -1,20 +1,18 @@
-/* eslint-disable unused-imports/no-unused-imports */
 import { NextPage } from "next"
-import { MutableRefObject, Suspense, useEffect, useMemo, useRef } from "react"
+import { MutableRefObject, Suspense, useMemo, useRef } from "react"
 import { Canvas, useFrame, ThreeElements, useLoader } from "@react-three/fiber"
-import THREE, { Color, MeshBasicMaterial, Vector3 } from "three"
+import THREE, { Color, MeshBasicMaterial } from "three"
 import Webcam from "react-webcam"
-import { Button } from "@mantine/core"
-import { useGLTF } from "@react-three/drei"
+import { Button, Modal } from "@mantine/core"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Html } from "@react-three/drei"
-import { add, sub } from "date-fns"
+import { Text } from "@mantine/core"
+import { useRouter } from "next/router"
 
 import { useGeolocation } from "@/lib/useGeolocation"
 import { useOrientation } from "@/lib/useOrientation"
 import { useSyncCamera } from "@/lib/threejs/useSyncCamera"
 import { calcDistance } from "@/lib/calcDistance"
-import LockedCapsule from "@/view/map/LockedCapsule"
 import CapsuleDistance from "@/view/ar/CapsuleDistance"
 
 const CapsuleModel: React.FC<ThreeElements["mesh"] & { color: string; distance: number }> = ({
@@ -104,7 +102,10 @@ const ArCanvas: React.FC<{
 }
 
 const ArPage: NextPage = () => {
-  const { orientation, orientationRef, requestPermission } = useOrientation()
+  const router = useRouter()
+  const isDebugMode = router.query.debug === "true"
+
+  const { orientation, orientationRef, requestPermission, isReady } = useOrientation()
   const geolocation = useGeolocation()
 
   const geo = useMemo(() => {
@@ -140,11 +141,35 @@ const ArPage: NextPage = () => {
 
   return (
     <>
-      <Webcam
-        videoConstraints={{
-          facingMode: { exact: "environment" },
-        }}
-      />
+      <div className="relative">
+        <Webcam
+          videoConstraints={{
+            facingMode: { exact: "environment" },
+          }}
+        />
+        {geolocation != null && (
+          <div className="absolute left-6 bottom-6 flex">
+            <Text
+              sx={{
+                display: "block",
+                fontSize: 24,
+                lineHeight: 1,
+                textAlign: "center",
+                fontFamily: "nagoda",
+                color: "white",
+                textShadow: "0px 0px 3px #0000009f",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              <span className="text-sm">YOU</span>
+              <br />
+              {convertLongLat(geolocation.coords.longitude, "lng") +
+                "\n" +
+                convertLongLat(geolocation.coords.latitude, "lat")}
+            </Text>
+          </div>
+        )}
+      </div>
       <div className="fixed inset-0">
         <Canvas>
           <ArCanvas
@@ -154,19 +179,45 @@ const ArPage: NextPage = () => {
           />
         </Canvas>
       </div>
-      <div className="fixed inset-0 p-8 text-white" style={{ textShadow: "2px 2px 2px #000000" }}>
-        <p className="text-[48px] font-bold tabular-nums">
-          ({orientation.x.toFixed(2)}, <br /> {orientation.y.toFixed(2)})
-        </p>
-        <p className="text-[24px] font-bold tabular-nums">
-          Distance: {geo.distance}, <br />
-          Bearing: {geo.bearing}, <br />
-          Device Beraing: {geo.deviceBearing}
-        </p>
-        <Button onClick={requestPermission}>grant permission</Button>
-      </div>
+      <Modal centered opened={!isReady} onClose={requestPermission} withCloseButton={false}>
+        <div className="flex flex-col items-center">
+          <p>デバイスの姿勢情報にアクセスします</p>
+          <Button onClick={requestPermission}>OK</Button>
+        </div>
+      </Modal>
+      {isDebugMode && (
+        <div className="fixed inset-0 p-8 text-white" style={{ textShadow: "0px 0px 3px #000000" }}>
+          <p className="text-[48px] font-bold tabular-nums">
+            ({orientation.x.toFixed(2)}, <br /> {orientation.y.toFixed(2)})
+          </p>
+          <p className="text-[24px] font-bold tabular-nums">
+            Distance: {geo.distance}, <br />
+            Bearing: {geo.bearing}, <br />
+            Device Beraing: {geo.deviceBearing}
+          </p>
+          <Button onClick={requestPermission}>grant permission</Button>
+        </div>
+      )}
     </>
   )
 }
 
 export default ArPage
+
+const convertLongLat = (num: number, type: "lng" | "lat") => {
+  const degree = Math.floor(num)
+  const minute = Math.floor((num - degree) * 60)
+  const second = ((num - degree - minute / 60) * 3600).toFixed(1)
+  var symbol = ""
+  if (type == "lng" && num < 0) {
+    symbol = "S"
+  } else if (type == "lng" && num >= 0) {
+    symbol = "N"
+  } else if (type == "lat" && num < 0) {
+    symbol = "W"
+  } else if (type == "lat" && num >= 0) {
+    symbol = "E"
+  }
+
+  return `${degree}°${minute}'${second}\"${symbol}`
+}

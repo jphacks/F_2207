@@ -41,8 +41,8 @@ export const useOrientation = () => {
   }, [isReady])
 
   return useMemo(
-    () => ({ orientationRef, orientation, requestPermission }),
-    [requestPermission, orientation],
+    () => ({ orientationRef, orientation, requestPermission, isReady }),
+    [requestPermission, orientation, isReady],
   )
 }
 
