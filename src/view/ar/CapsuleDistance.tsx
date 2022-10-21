@@ -1,21 +1,12 @@
 import { RingProgress, Stack, Text } from "@mantine/core"
 
-import { Feature } from "@/types/feature"
-
-export type LockedCapsuleProps = {
-  feature: Feature
+export type CapsuleDistanceProps = {
+  capsuleColor: string
+  distance: number
   className?: string
 }
 
-const LockedCapsule: React.FC<LockedCapsuleProps> = ({ feature, className }) => {
-  const today = Date.now()
-  const openDate = Date.parse(feature.properties.openDate)
-  const addDate = Date.parse(feature.properties.addDate)
-
-  const betweenDays = (start: number, end: number) => {
-    return Math.floor((end - start) / 86400000)
-  }
-
+const CapsuleDistance: React.FC<CapsuleDistanceProps> = ({ capsuleColor, distance, className }) => {
   return (
     <RingProgress
       size={120}
@@ -23,12 +14,12 @@ const LockedCapsule: React.FC<LockedCapsuleProps> = ({ feature, className }) => 
       className={className}
       sections={[
         {
-          value: 100 - (betweenDays(today, openDate) / betweenDays(addDate, openDate)) * 100,
+          value: (300 - distance) / 3,
           color: "gray.8",
         },
         {
-          value: (betweenDays(today, openDate) / betweenDays(addDate, openDate)) * 100,
-          color: feature.properties.capsuleColor,
+          value: distance / 3,
+          color: capsuleColor,
         },
       ]}
       label={
@@ -62,7 +53,7 @@ const LockedCapsule: React.FC<LockedCapsuleProps> = ({ feature, className }) => 
               textAlign: "center",
             }}
           >
-            {betweenDays(today, openDate)}日
+            {distance}m
           </Text>
         </Stack>
       }
@@ -70,4 +61,4 @@ const LockedCapsule: React.FC<LockedCapsuleProps> = ({ feature, className }) => 
   )
 }
 
-export default LockedCapsule
+export default CapsuleDistance
