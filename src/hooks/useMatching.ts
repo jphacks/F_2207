@@ -2,6 +2,9 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 
 import { listenMatching, Matching, matchingStatus } from "@/repository/matching"
+import { useUser } from "@/auth/useAuth"
+import { AppUser } from "@/types/user"
+import { startMatching } from "@/repository/matchingCreate"
 
 /**
  * マッチング情報を取得する
@@ -42,4 +45,21 @@ export const useMatchingWithRedirect = (matchingId: string) => {
   }, [matching, matchingId, router])
 
   return matching
+}
+
+/**
+ * マッチングの参加者情報を購読する
+ */
+export const useMatchingUsers = (matchingId: string) => {
+  const user = useUser()
+  const [matchingUsers, setMatchingUsers] = useState<AppUser[]>([])
+
+  useEffect(() => {
+    const unsubscribe = startMatching(matchingId, (matchingUser) => {
+      setMatchingUsers((prev) => [...prev, matchingUser])
+    })
+    return unsubscribe
+  }, [matchingId, user?.id])
+
+  return matchingUsers
 }

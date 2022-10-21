@@ -1,4 +1,4 @@
-import { Box, Drawer, Text, useMantineTheme } from "@mantine/core"
+import { Box, Drawer, Text } from "@mantine/core"
 import { useCallback, useState } from "react"
 import Picker, { Theme } from "emoji-picker-react"
 import { useRouter } from "next/router"
@@ -9,6 +9,12 @@ import WalkthroughLayout from "@/view/layout/walkthrough"
 import { createMatching } from "@/repository/matchingCreate"
 import { useUser } from "@/auth/useAuth"
 import { useGeolocation } from "@/lib/useGeolocation"
+import {
+  capsuleColors,
+  cupsuleCreateInputState,
+  gpsColors,
+  useCupsuleCreateInput,
+} from "@/state/cupsuleCreateInput"
 
 import type { NextPage } from "next"
 import type { EmojiClickData } from "emoji-picker-react"
@@ -17,36 +23,23 @@ const CapsuleAdd: NextPage = () => {
   const router = useRouter()
   const location = useGeolocation()
   const user = useUser()
-  const theme = useMantineTheme()
-  const [capsuleColor, setCapsuleColor] = useState(theme.colors["brand"][3])
-  const [gpsColor, setGpsColor] = useState("#000000")
-  const [chosenEmoji, setChosenEmoji] = useState<EmojiClickData | null>(null)
+
+  const cupsuleCreateInput = useCupsuleCreateInput()
+
   const [opened, setOpened] = useState(false)
 
-  const capsuleColors = [
-    theme.colors["brand"][3],
-    "#9581F2",
-    "#F1ABDD",
-    "#EB5040",
-    "#DE6437",
-    "#F8D551",
-    "#6BE58B",
-    "#73E4E3",
-    "#2351D5",
-    "#000000",
-    "#D3DAE1",
-    "#FFFFFF",
-  ]
-
-  const gpsColors = ["#000000", "#FFFFFF"]
-
-  const onEmojiClick = (emoji: EmojiClickData, event: MouseEvent) => {
-    setChosenEmoji(emoji)
+  const onEmojiClick = (emoji: EmojiClickData) => {
+    cupsuleCreateInputState.emoji = emoji.emoji
     setOpened(false)
   }
 
   const handleClickNext = useCallback(async () => {
-    if (user == null || location?.coords == null) {
+    if (user == null) {
+      window.alert("ログインしてください")
+      return
+    }
+    if (location?.coords == null) {
+      window.alert("位置情報の利用を許可してください")
       return
     }
     const matchingId = await createMatching({ user, location: location?.coords })
@@ -63,9 +56,9 @@ const CapsuleAdd: NextPage = () => {
         onClickPrevOrClose={() => router.push("/")}
       >
         <CapsulePreview
-          capsuleColor={capsuleColor}
-          gpsColor={gpsColor}
-          emoji={chosenEmoji ? chosenEmoji.emoji : "😄"}
+          capsuleColor={cupsuleCreateInput.color}
+          gpsColor={cupsuleCreateInput.gpsTextColor}
+          emoji={cupsuleCreateInput.emoji}
           lng={location?.coords.longitude ?? 0}
           lat={location?.coords.latitude ?? 0}
         />
@@ -73,7 +66,12 @@ const CapsuleAdd: NextPage = () => {
           <Text color="white" weight="bold" size="sm">
             カプセルの色
           </Text>
-          <ColorSelector colors={capsuleColors} onSelect={setCapsuleColor} />
+          <ColorSelector
+            colors={capsuleColors}
+            onSelect={(color) => {
+              cupsuleCreateInputState.color = color
+            }}
+          />
         </Box>
         <Box className="p-4">
           <Text color="white" weight="bold" size="sm">
@@ -109,7 +107,12 @@ const CapsuleAdd: NextPage = () => {
           <Text color="white" weight="bold" size="sm">
             GPSロゴの色
           </Text>
-          <ColorSelector colors={gpsColors} onSelect={setGpsColor} />
+          <ColorSelector
+            colors={gpsColors}
+            onSelect={(gpsColor) => {
+              cupsuleCreateInputState.gpsTextColor = gpsColor
+            }}
+          />
         </Box>
       </WalkthroughLayout>
       <Drawer
