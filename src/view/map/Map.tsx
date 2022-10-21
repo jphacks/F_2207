@@ -7,13 +7,14 @@ import { loadCss } from "@/lib/loadCss"
 import { loadScript } from "@/lib/loadScript"
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
+import { useUser } from "@/auth/useAuth"
 
 import LockedCapsule from "./LockedCapsule"
 import MapCapsule from "./MapCapsule"
 
 const Map: React.FC = () => {
-  const userID = "user3"
-
+  const user = useUser()
+  const userID = user?.id ?? ""
   useEffect(() => {
     let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
     let mapboxSrc = "https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
