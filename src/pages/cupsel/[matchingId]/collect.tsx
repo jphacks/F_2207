@@ -84,7 +84,7 @@ const Collect: NextPage = () => {
         あなたの写真や動画
       </Text>
       <Center>
-        <SimpleGrid className="pt-4" cols={3} spacing={3} verticalSpacing={3}>
+        <SimpleGrid className="w-full pt-4" cols={3} spacing={3} verticalSpacing={3}>
           <FileButton key="addButton" onChange={addFiles} accept="image/png,image/jpeg" multiple>
             {(props) => (
               <Box
@@ -95,6 +95,7 @@ const Collect: NextPage = () => {
                   width: "100%",
                   backgroundColor: theme.colors.gray[8],
                   border: "none",
+                  aspectRatio: "1 / 1",
                   "&:hover": {
                     backgroundColor: theme.colors.gray[6],
                     cursor: "pointer",
