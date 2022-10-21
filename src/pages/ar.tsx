@@ -148,7 +148,7 @@ const ArPage: NextPage = () => {
           }}
         />
         {geolocation != null && (
-          <div className="absolute left-6 bottom-6 flex">
+          <div className="absolute flex left-6 bottom-6">
             <Text
               sx={{
                 display: "block",
@@ -163,9 +163,9 @@ const ArPage: NextPage = () => {
             >
               <span className="text-sm">YOU</span>
               <br />
-              {convertLongLat(geolocation.coords.longitude, "lng") +
+              {convertLongLat(geolocation.longitude, "lng") +
                 "\n" +
-                convertLongLat(geolocation.coords.latitude, "lat")}
+                convertLongLat(geolocation.latitude, "lat")}
             </Text>
           </div>
         )}
