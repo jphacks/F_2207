@@ -25,8 +25,8 @@ const Shake: NextPage = () => {
       <Modal centered opened={cleared} onClose={() => {}} withCloseButton={false}>
         <div className="flex flex-col items-center">
           <p className="text-xl font-bold text-white">クリア！</p>
-          <p>動画</p>
-          <Button onClick={() => router.push(`/cupsel/open/${capsuleId}/show`)}>
+          <video src="/capsule_animation.mp4" className="w-full" muted autoPlay playsInline />
+          <Button onClick={() => router.push(`/cupsel/open/${capsuleId}/show`)} className="mt-4">
             思い出を見る
           </Button>
         </div>
@@ -41,7 +41,7 @@ const Shake: NextPage = () => {
         </Text>
         <img
           src="/shake.png"
-          className="relative z-10 mt-8 self-start"
+          className="relative z-10 self-start mt-8"
           style={{ maxWidth: "100%", width: 300 }}
         />
         {!start && (
