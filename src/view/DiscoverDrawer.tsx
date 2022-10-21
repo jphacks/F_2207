@@ -33,8 +33,8 @@ const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
         },
       }}
     >
-      <div className="flex items-center my-8">
-        <div className="w-20 h-20 shrink-0">
+      <div className="my-8 flex items-center">
+        <div className="h-20 w-20 shrink-0">
           <CapsulComponent
             capsuleColor={capsule.color}
             gpsColor={capsule.gpsTextColor}

@@ -52,7 +52,7 @@ const WalkthroughLayout: React.FC<WalkthroughLayoutProps> = ({
               compact
               style={{ cursor: "pointer" }}
               onClick={onClickNext}
-              className="px-4 rounded-full"
+              className="rounded-full px-4"
             >
               <Text weight={600} size="sm" style={{ color: "black" }}>
                 埋める
