@@ -1,6 +1,6 @@
-import { Box, Button } from "@mantine/core"
-import { NextLink } from "@mantine/next"
 import React from "react"
+
+import BottomBar from "../BottomBar"
 
 export type DefaultLayoutProps = {
   children: React.ReactNode
@@ -9,12 +9,12 @@ export type DefaultLayoutProps = {
 const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
   return (
     <>
-      <Box>
-        <Button component={NextLink} href="/">
-          Home
-        </Button>
-      </Box>
-      {children}
+      <div className="fixed inset-0 flex flex-col">
+        <div className="grow">{children}</div>
+        <div className="w-full shrink-0">
+          <BottomBar />
+        </div>
+      </div>
     </>
   )
 }
