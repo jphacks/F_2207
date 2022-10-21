@@ -1,5 +1,5 @@
 import { Box, Drawer, Text, useMantineTheme } from "@mantine/core"
-import { useCallback, useState } from "react"
+import { useCallback, useContext, useState } from "react"
 import Picker, { Theme } from "emoji-picker-react"
 import { useRouter } from "next/router"
 
@@ -10,6 +10,8 @@ import { createMatching } from "@/repository/matchingCreate"
 import { useUser } from "@/auth/useAuth"
 import { useGeolocation } from "@/lib/useGeolocation"
 
+import { CapsuleContext } from "../_app"
+
 import type { NextPage } from "next"
 import type { EmojiClickData } from "emoji-picker-react"
 
@@ -18,6 +20,7 @@ const CapsuleAdd: NextPage = () => {
   const location = useGeolocation()
   const user = useUser()
   const theme = useMantineTheme()
+  const { capsule, setCapsule } = useContext(CapsuleContext)
   const [capsuleColor, setCapsuleColor] = useState(theme.colors["brand"][3])
   const [gpsColor, setGpsColor] = useState("#000000")
   const [chosenEmoji, setChosenEmoji] = useState<EmojiClickData | null>(null)
@@ -49,6 +52,19 @@ const CapsuleAdd: NextPage = () => {
     if (user == null || location?.coords == null) {
       return
     }
+
+    setCapsule({
+      geometry: {
+        coordinates: [location?.coords.latitude, location.coords.longitude],
+      },
+      properties: {
+        capsuleColor: capsuleColor,
+        gpsColor: gpsColor,
+        emoji: chosenEmoji?.emoji ?? "🙂",
+        openDate: "",
+      },
+    })
+
     const matchingId = await createMatching({ user, location: location?.coords })
     await router.push(`/cupsel/${matchingId}/lobby`)
   }, [location?.coords, router, user])

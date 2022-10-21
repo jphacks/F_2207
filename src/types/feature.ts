@@ -1,16 +1,27 @@
-export type Feature = {
-  type: string
-  id: string
+export type FeatureData = {
   geometry: {
-    type: string
     coordinates: number[]
   }
   properties: {
     capsuleColor: string
     gpsColor: string
     emoji: string
-    addDate: string
     openDate: string
-    _revision: number
   }
 }
+export type CreateFeature = {
+  type: string
+  geometry: {
+    type: string
+  }
+  properties: {
+    addDate: string
+  }
+} & FeatureData
+
+export type Feature = {
+  id: string
+  properties: {
+    _revision: number
+  }
+} & CreateFeature

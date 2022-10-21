@@ -1,14 +1,40 @@
 import "../styles/globals.css"
 import { SWRConfig } from "swr"
 import { MantineProvider } from "@mantine/core"
+import React, { useState } from "react"
 
 import { AuthProvider } from "@/auth/useAuth"
 import Loading from "@/auth/Loading"
 import MatchingDialog from "@/view/MatchingDialog"
+import { FeatureData } from "@/types/feature"
 
 import type { AppProps } from "next/app"
 
+type CapsuleContextType = {
+  capsule: FeatureData
+  setCapsule: React.Dispatch<React.SetStateAction<FeatureData>>
+}
+
+const initialCapsuleData: FeatureData = {
+  geometry: {
+    coordinates: [0, 0],
+  },
+  properties: {
+    capsuleColor: "",
+    gpsColor: "",
+    emoji: "",
+    openDate: "",
+  },
+}
+
+export const CapsuleContext = React.createContext<CapsuleContextType>({
+  capsule: initialCapsuleData,
+  setCapsule: () => {},
+})
+
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
+  const [capsule, setCapsule] = useState(initialCapsuleData)
+
   return (
     <SWRConfig>
       <MantineProvider
@@ -70,11 +96,13 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
         }}
       >
         <AuthProvider>
-          <Loading>
-            <MatchingDialog>
-              <Component {...pageProps} />
-            </MatchingDialog>
-          </Loading>
+          <CapsuleContext.Provider value={{ capsule, setCapsule }}>
+            <Loading>
+              <MatchingDialog>
+                <Component {...pageProps} />
+              </MatchingDialog>
+            </Loading>
+          </CapsuleContext.Provider>
         </AuthProvider>
       </MantineProvider>
     </SWRConfig>
