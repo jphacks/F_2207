@@ -1,9 +1,12 @@
+/* eslint-disable unused-imports/no-unused-imports */
 import { NextPage } from "next"
-import { MutableRefObject, useMemo, useRef } from "react"
-import { Canvas, useFrame, ThreeElements } from "@react-three/fiber"
-import THREE from "three"
+import { MutableRefObject, Suspense, useEffect, useMemo, useRef } from "react"
+import { Canvas, useFrame, ThreeElements, useLoader } from "@react-three/fiber"
+import THREE, { Color, MeshBasicMaterial } from "three"
 import Webcam from "react-webcam"
 import { Button } from "@mantine/core"
+import { useGLTF } from "@react-three/drei"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 
 import { useGeolocation } from "@/lib/useGeolocation"
 import { useOrientation } from "@/lib/useOrientation"
@@ -12,19 +15,25 @@ import { calcDistance } from "@/lib/calcDistance"
 
 const Box: React.FC<ThreeElements["mesh"] & { color: string }> = ({ color, ...props }) => {
   const ref = useRef<THREE.Mesh | null>(null)
+  const { nodes, scene, materials } = useLoader(GLTFLoader, "/models/capsule3.glb")
 
   useFrame(() => {
     if (ref.current == null) {
       return
     }
-    ref.current.rotation.x += 0.01
+    ref.current.rotation.z += 0.00075
+    ref.current.rotation.y += 0.0005
   })
 
+  const basicMaterial = new MeshBasicMaterial({ color: new Color("#520B3E") })
+
   return (
-    <mesh {...props} ref={ref}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={color} />
-    </mesh>
+    <Suspense fallback={null}>
+      <mesh material={basicMaterial}>
+        <primitive ref={ref} object={scene} {...props} scale={[0.1, 0.1, 0.1]} />
+        <meshStandardMaterial color="#DD0000" opacity={0.5} />
+      </mesh>
+    </Suspense>
   )
 }
 

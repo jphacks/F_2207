@@ -26,6 +26,7 @@
     "@mantine/hooks": "^5.5.5",
     "@mantine/next": "^5.5.5",
     "@mantine/notifications": "^5.5.5",
+    "@react-three/drei": "^9.36.0",
     "@react-three/fiber": "^8.8.10",
     "aframe-react": "^4.4.0",
     "axios": "^1.1.3",
