@@ -44,8 +44,19 @@ const Collect: NextPage = () => {
         alt={file.name}
         src={imageUrl}
         imageProps={{ onLoad: () => URL.revokeObjectURL(imageUrl) }}
-        height="30vw"
-        width="30vw"
+        styles={{
+          figure: {
+            width: "100%",
+            height: "100%",
+          },
+          imageWrapper: {
+            aspectRatio: "1 / 1",
+            width: "100%",
+            height: "100%",
+          },
+        }}
+        height="100%"
+        width="100%"
       />
     )
   })
@@ -62,10 +73,10 @@ const Collect: NextPage = () => {
         router.push(`/cupsel/create`)
       }}
     >
-      <Box className="pb-16 pt-10">
+      <Box className="pt-10 pb-16">
         <Group spacing={10}>
           {users.map((user) => (
-            <UserAvater key={user.id} user={user} label={8} />
+            <UserAvater key={user.id} user={user} label={12} />
           ))}
         </Group>
       </Box>
@@ -80,13 +91,16 @@ const Collect: NextPage = () => {
                 component="button"
                 {...props}
                 sx={(theme) => ({
-                  height: "30vw",
-                  width: "30vw",
+                  height: "100%",
+                  width: "100%",
                   backgroundColor: theme.colors.gray[8],
                   border: "none",
                   "&:hover": {
                     backgroundColor: theme.colors.gray[6],
                     cursor: "pointer",
+                  },
+                  "&:focus": {
+                    backgroundColor: theme.colors.gray[8],
                   },
                 })}
               >
