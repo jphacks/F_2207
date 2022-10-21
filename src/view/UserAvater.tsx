@@ -23,6 +23,7 @@ const UserAvater: React.FC<UserAvaterProps> = ({ user, label }) => {
             border: "white 2px solid",
             backgroundColor: theme.colors.secondary[5],
             color: theme.colors.gray[9],
+            fontWeight: "bold",
           },
         })}
       >

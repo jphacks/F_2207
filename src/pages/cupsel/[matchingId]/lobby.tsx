@@ -1,34 +1,16 @@
 import { NextPage } from "next"
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { useRouter } from "next/router"
 import { Button, Group, Stack, Text } from "@mantine/core"
 
-import { startMatching, stopMatching } from "@/repository/matchingCreate"
-import { AppUser } from "@/types/user"
+import { stopMatching } from "@/repository/matchingCreate"
 import { useUser } from "@/auth/useAuth"
 import { matchingStatus } from "@/repository/matching"
-import { useMatchingWithRedirect } from "@/hooks/useMatching"
+import { useMatchingUsers, useMatchingWithRedirect } from "@/hooks/useMatching"
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import UserAvater from "@/view/UserAvater"
 import Smartphone from "@/view/icons/Smartphone"
 import Wave from "@/view/icons/Wave"
-
-/**
- * マッチングの参加者情報を購読する
- */
-const useMatchingUsers = (matchingId: string) => {
-  const user = useUser()
-  const [matchingUsers, setMatchingUsers] = useState<AppUser[]>([])
-
-  useEffect(() => {
-    const unsubscribe = startMatching(matchingId, (matchingUser) => {
-      setMatchingUsers((prev) => [...prev, matchingUser])
-    })
-    return unsubscribe
-  }, [matchingId, user?.id])
-
-  return matchingUsers
-}
 
 const Lobby: NextPage = () => {
   const router = useRouter()
