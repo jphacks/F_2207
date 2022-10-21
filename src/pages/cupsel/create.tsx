@@ -55,7 +55,7 @@ const CapsuleAdd: NextPage = () => {
 
     setCapsule({
       geometry: {
-        coordinates: [location?.coords.latitude, location.coords.longitude],
+        coordinates: [location.coords.longitude, location?.coords.latitude],
       },
       properties: {
         capsuleColor: capsuleColor,
