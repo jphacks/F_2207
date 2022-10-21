@@ -22,6 +22,8 @@ const Register: NextPage = () => {
   const [date, setDate] = useState<Date | null>(null)
   const [memo, setMemo] = useState("")
 
+  const matchingId = router.query.matchingId as string
+
   const save = async () => {
     if (user == null || title == "" || date == null) {
       return
@@ -118,7 +120,7 @@ const Register: NextPage = () => {
       totalStep={4}
       currentStep={3}
       onClickNext={save}
-      onClickPrevOrClose={null}
+      onClickPrevOrClose={() => router.push(`/cupsel/${matchingId}/collect`)}
     >
       <CapsulePreview
         capsuleColor={capsule.properties.capsuleColor}
