@@ -78,6 +78,10 @@ const Register: NextPage = () => {
           type: "circle",
           source_type: "geojson",
           db_type: "document",
+          visible: false,
+          layout: {
+            visibility: "none",
+          },
         },
       )
       .then((res) => {
