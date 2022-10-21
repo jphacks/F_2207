@@ -9,6 +9,7 @@ export type WalkthroughLayoutProps = {
   currentStep: number
   onClickNext: (() => void) | null
   onClickPrevOrClose: (() => void) | null
+  nextButtonType?: "default" | "bury"
 }
 
 const WalkthroughLayout: React.FC<WalkthroughLayoutProps> = ({
@@ -18,6 +19,7 @@ const WalkthroughLayout: React.FC<WalkthroughLayoutProps> = ({
   currentStep,
   onClickNext,
   onClickPrevOrClose,
+  nextButtonType = "default",
 }) => {
   return (
     <Box sx={{ minHeight: "100vh", height: "100%", backgroundColor: "#212121" }} p={20}>
@@ -30,18 +32,33 @@ const WalkthroughLayout: React.FC<WalkthroughLayoutProps> = ({
           <div />
         )}
         {onClickNext != null ? (
-          <Button
-            variant="subtle"
-            size="md"
-            color="brand.3"
-            compact
-            style={{ cursor: "pointer" }}
-            onClick={onClickNext}
-          >
-            <Text weight={600} size="md">
-              次へ
-            </Text>
-          </Button>
+          nextButtonType === "default" ? (
+            <Button
+              variant="subtle"
+              size="md"
+              color="brand.3"
+              compact
+              style={{ cursor: "pointer" }}
+              onClick={onClickNext}
+            >
+              <Text weight={600} size="md">
+                次へ
+              </Text>
+            </Button>
+          ) : (
+            <Button
+              size="lg"
+              color="brand.3"
+              compact
+              style={{ cursor: "pointer" }}
+              onClick={onClickNext}
+              className="px-4 rounded-full"
+            >
+              <Text weight={600} size="sm" style={{ color: "black" }}>
+                埋める
+              </Text>
+            </Button>
+          )
         ) : (
           <div />
         )}

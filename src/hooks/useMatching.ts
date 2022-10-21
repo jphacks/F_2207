@@ -42,7 +42,8 @@ export const useMatchingWithRedirect = (matchingId: string) => {
       router.push(`/cupsel/${matchingId}/register`)
       return
     }
-  }, [matching, matchingId, router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matching, matchingId])
 
   return matching
 }

@@ -5,6 +5,7 @@ import { MantineProvider } from "@mantine/core"
 import { AuthProvider } from "@/auth/useAuth"
 import Loading from "@/auth/Loading"
 import MatchingDialog from "@/view/MatchingDialog"
+import GpsProvider from "@/provider/GpsProvider"
 
 import type { AppProps } from "next/app"
 
@@ -70,11 +71,11 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
         }}
       >
         <AuthProvider>
-          <Loading>
-            <MatchingDialog>
+          <GpsProvider>
+            <Inner>
               <Component {...pageProps} />
-            </MatchingDialog>
-          </Loading>
+            </Inner>
+          </GpsProvider>
         </AuthProvider>
       </MantineProvider>
     </SWRConfig>
@@ -82,3 +83,9 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
 }
 
 export default MyApp
+
+export const Inner: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Loading>
+    <MatchingDialog>{children}</MatchingDialog>
+  </Loading>
+)

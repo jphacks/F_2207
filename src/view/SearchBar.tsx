@@ -1,5 +1,6 @@
 import React from "react"
 import Image from "next/image"
+import Link from "next/link"
 
 import { useUser } from "@/auth/useAuth"
 
@@ -10,7 +11,7 @@ const SearchBar: React.FC = () => {
 
   return (
     <div className="w-full">
-      <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2" />
+      <SearchIcon className="absolute -translate-y-1/2 left-4 top-1/2" />
       <input
         type="text"
         className="w-full rounded-md border-transparent py-4 pl-[48px] pr-[56px] focus:outline-none"
@@ -20,14 +21,18 @@ const SearchBar: React.FC = () => {
         placeholder="カプセルを検索"
       />
       {user != null && (
-        <div className="absolute right-4 top-1/2 h-8 w-8 -translate-y-1/2">
-          <Image
-            src={user?.iconUrl}
-            alt=""
-            className="h-8 w-8 rounded-full"
-            width={32}
-            height={32}
-          />
+        <div className="absolute w-8 h-8 -translate-y-1/2 right-4 top-1/2">
+          <Link href="/user">
+            <a>
+              <Image
+                src={user?.iconUrl}
+                alt=""
+                className="w-8 h-8 rounded-full"
+                width={32}
+                height={32}
+              />
+            </a>
+          </Link>
         </div>
       )}
     </div>

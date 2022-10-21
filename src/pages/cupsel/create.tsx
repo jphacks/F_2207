@@ -8,7 +8,7 @@ import ColorSelector from "@/view/CapsuleColorSelector"
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import { createMatching } from "@/repository/matchingCreate"
 import { useUser } from "@/auth/useAuth"
-import { useGeolocation } from "@/lib/useGeolocation"
+import { useGeolocation } from "@/provider/GpsProvider"
 import {
   capsuleColors,
   cupsuleCreateInputState,
@@ -38,13 +38,13 @@ const CapsuleAdd: NextPage = () => {
       window.alert("ログインしてください")
       return
     }
-    if (location?.coords == null) {
+    if (location == null) {
       window.alert("位置情報の利用を許可してください")
       return
     }
-    const matchingId = await createMatching({ user, location: location?.coords })
+    const matchingId = await createMatching({ user, location })
     await router.push(`/cupsel/${matchingId}/lobby`)
-  }, [location?.coords, router, user])
+  }, [location, router, user])
 
   return (
     <>
@@ -59,8 +59,8 @@ const CapsuleAdd: NextPage = () => {
           capsuleColor={cupsuleCreateInput.color}
           gpsColor={cupsuleCreateInput.gpsTextColor}
           emoji={cupsuleCreateInput.emoji}
-          lng={location?.coords.longitude ?? 0}
-          lat={location?.coords.latitude ?? 0}
+          lng={location?.longitude ?? 0}
+          lat={location?.latitude ?? 0}
         />
         <Box className="p-4">
           <Text color="white" weight="bold" size="sm">

@@ -16,7 +16,7 @@ import { useRouter } from "next/router"
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import UserAvater from "@/view/UserAvater"
 import { useMatchingUsers, useMatchingWithRedirect } from "@/hooks/useMatching"
-import { listenItemCount, postItem } from "@/repository/items"
+import { listenItemCount, moveToRegister, postItem } from "@/repository/items"
 import { useUser } from "@/auth/useAuth"
 
 const useItemCount = (matchingId: string) => {
@@ -47,6 +47,8 @@ const Collect: NextPage = () => {
   const matching = useMatchingWithRedirect(matchingId)
   const matchingUsers = useMatchingUsers(matchingId)
   const postedItemCount = useItemCount(matchingId)
+
+  const isOwner = matching != null && user != null && matching.ownerId === user.id
 
   const [files, setFiles] = useState<File[]>([])
   const [previewImages, setPreviewImages] = useState<string[]>([])
@@ -98,12 +100,21 @@ const Collect: NextPage = () => {
       title="写真や動画を追加しよう"
       totalStep={4}
       currentStep={2}
-      onClickNext={() => {
-        router.push(`/cupsel/${matchingId}/register`)
-      }}
-      onClickPrevOrClose={() => {
-        router.push(`/cupsel/create`)
-      }}
+      onClickNext={
+        isOwner
+          ? async () => {
+              await moveToRegister(matchingId)
+              router.push(`/cupsel/${matchingId}/register`)
+            }
+          : null
+      }
+      onClickPrevOrClose={
+        isOwner
+          ? () => {
+              router.push(`/cupsel/create`)
+            }
+          : null
+      }
     >
       <Box className="pt-10 pb-16">
         <Group spacing={10}>

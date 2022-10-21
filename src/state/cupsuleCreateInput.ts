@@ -5,8 +5,13 @@ export type CupsuleCreateInput = {
   emoji: string
   gpsTextColor: typeof gpsColors[number] | string
   title: string
-  unlockedAt: Date | null
+  openDate: Date | null
+  addDate: Date | null
   memo: string
+  geolocation: {
+    latitude: number
+    longitude: number
+  } | null
 }
 
 export const capsuleColors = [
@@ -26,13 +31,27 @@ export const capsuleColors = [
 
 export const gpsColors = ["#000000" as const, "#FFFFFF" as const]
 
-export const cupsuleCreateInputState = proxy<CupsuleCreateInput>({
+const initValue: CupsuleCreateInput = {
   color: capsuleColors[0],
   emoji: "🥩",
   gpsTextColor: gpsColors[0],
   title: "",
-  unlockedAt: null,
+  openDate: null,
+  addDate: null,
   memo: "",
-})
+  geolocation: null,
+}
+
+export const cupsuleCreateInputState = proxy<CupsuleCreateInput>(initValue)
 
 export const useCupsuleCreateInput = () => useSnapshot(cupsuleCreateInputState)
+export const clearCupsuleCreateInput = () => {
+  cupsuleCreateInputState.color = initValue.color
+  cupsuleCreateInputState.emoji = initValue.emoji
+  cupsuleCreateInputState.gpsTextColor = initValue.gpsTextColor
+  cupsuleCreateInputState.title = initValue.title
+  cupsuleCreateInputState.openDate = initValue.openDate
+  cupsuleCreateInputState.addDate = initValue.addDate
+  cupsuleCreateInputState.memo = initValue.memo
+  cupsuleCreateInputState.geolocation = initValue.geolocation
+}

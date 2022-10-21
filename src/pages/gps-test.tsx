@@ -3,7 +3,7 @@ import { Button } from "@mantine/core"
 import { NextPage } from "next"
 
 import { useOrientation } from "@/lib/useOrientation"
-import { useGeolocation } from "@/lib/useGeolocation"
+import { useGeolocation } from "@/provider/GpsProvider"
 import { calcDistance } from "@/lib/calcDistance"
 
 const GpsTest: NextPage = () => {

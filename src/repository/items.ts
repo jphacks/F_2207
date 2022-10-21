@@ -1,9 +1,19 @@
-import { onSnapshot, collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
+import {
+  onSnapshot,
+  collection,
+  doc,
+  writeBatch,
+  serverTimestamp,
+  updateDoc,
+  getDocs,
+} from "firebase/firestore"
 import { getDownloadURL, ref, uploadBytes, UploadResult } from "firebase/storage"
 
 import { db, storage } from "@/lib/firebase/init"
 import { generateId } from "@/lib/generateId"
 import { AppUser } from "@/types/user"
+
+import { matchingStatus } from "./matching"
 
 /**
  * マッチングの中で投稿された画像の枚数
@@ -29,6 +39,9 @@ export const listenItemCount = (
   return unsubscribe
 }
 
+/**
+ * 画像や動画を投稿する
+ */
 export const postItem = async (
   { user, matchingId }: { user: AppUser; matchingId: string },
   files: File[],
@@ -62,4 +75,25 @@ export const postItem = async (
   })
   await batch.commit()
   console.log("batch end")
+}
+
+export const moveToRegister = async (matchingId: string) => {
+  const matchRef = doc(collection(db, "matching"), matchingId)
+  await updateDoc(matchRef, {
+    status: matchingStatus.INFO_REGISTER,
+  })
+}
+
+export const fetchItems = async (capsuleId: string) => {
+  const matchRef = collection(doc(collection(db, "matching"), capsuleId), "items")
+  console.log("matchRef")
+
+  const snapshots = await getDocs(matchRef)
+
+  console.log(snapshots)
+
+  return snapshots.docs.map((snapshot) => ({
+    id: snapshot.id,
+    itemurl: snapshot.data().itemurl,
+  }))
 }

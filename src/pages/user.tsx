@@ -1,24 +1,14 @@
-import Head from "next/head"
 import { Avatar, Button, Group } from "@mantine/core"
-import { useEffect } from "react"
-import { useRouter } from "next/router"
+import { NextPage } from "next"
+import Head from "next/head"
+import React from "react"
 
-import { useAuth, useAuthOperation } from "@/auth/useAuth"
 import DefaultLayout from "@/view/layout/default"
+import { useAuth, useAuthOperation } from "@/auth/useAuth"
 
-import type { NextPage } from "next"
-
-const Index: NextPage = () => {
-  const router = useRouter()
+const User: NextPage = () => {
   const { user, isLoading } = useAuth()
   const { login, logout } = useAuthOperation()
-
-  useEffect(() => {
-    if (user != null) {
-      router.push("/map")
-    }
-  }, [router, user])
-
   return (
     <>
       <Head>
@@ -32,7 +22,7 @@ const Index: NextPage = () => {
             <p>{isLoading ? "loading" : ""}</p>
             <Group>
               <Avatar src={user?.iconUrl} />
-              <p className="text-red-400">{user?.name ?? "not logged in"}</p>
+              <p className="">{user?.name ?? "not logged in"}</p>
             </Group>
           </div>
           {user == null ? (
@@ -41,12 +31,9 @@ const Index: NextPage = () => {
             <Button onClick={logout}>👋 LOGOUT</Button>
           )}
         </main>
-        {/* <Button component={NextLink} href="/cupsel/create">
-          カプセルを作る
-        </Button> */}
       </DefaultLayout>
     </>
   )
 }
 
-export default Index
+export default User

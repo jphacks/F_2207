@@ -4,7 +4,7 @@ import Image from "next/image"
 import { useRouter } from "next/router"
 
 import { useUser } from "@/auth/useAuth"
-import { useGeolocation } from "@/lib/useGeolocation"
+import { useGeolocation } from "@/provider/GpsProvider"
 import {
   listenOngoingMatching,
   joinMatching,
@@ -26,7 +26,7 @@ const MatchingDialog: React.FC<MatchingDialogProps> = ({ children }) => {
     if (user == null || location == null) {
       return
     }
-    const unsubscribe = listenOngoingMatching({ user, location: location.coords }, (matching) => {
+    const unsubscribe = listenOngoingMatching({ user, location }, (matching) => {
       setMatchingQueue((matchings) => [...matchings, matching])
     })
     return unsubscribe
@@ -71,8 +71,8 @@ const MatchingDialog: React.FC<MatchingDialogProps> = ({ children }) => {
           },
         }}
       >
-        <div className="my-8 flex items-center">
-          <div className="h-20 w-20 shrink-0">
+        <div className="flex items-center my-8">
+          <div className="w-20 h-20 shrink-0">
             <Image
               src={matching?.host?.iconUrl ?? ""}
               alt=""

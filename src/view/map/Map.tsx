@@ -2,17 +2,21 @@ import { useEffect } from "react"
 import { Box } from "@mantine/core"
 import axios from "axios"
 import ReactDOM from "react-dom"
+import { useRouter } from "next/router"
 
 import { loadCss } from "@/lib/loadCss"
 import { loadScript } from "@/lib/loadScript"
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
+import { useUser } from "@/auth/useAuth"
 
-import LockedCapsule from "./LockedCapsule"
 import MapCapsule from "./MapCapsule"
 
 const Map: React.FC = () => {
-  const userID = "user3"
+  const user = useUser()
+  const userID = user?.id ?? ""
+
+  const router = useRouter()
 
   useEffect(() => {
     let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
@@ -99,9 +103,22 @@ const Map: React.FC = () => {
                   const openDate = Date.parse(feature.properties.openDate)
 
                   if (today > openDate) {
-                    ReactDOM.render(<MapCapsule feature={feature} />, div)
+                    ReactDOM.render(
+                      <MapCapsule
+                        feature={feature}
+                        onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
+                      />,
+                      div,
+                    )
                   } else {
-                    ReactDOM.render(<LockedCapsule feature={feature} />, div)
+                    ReactDOM.render(
+                      <MapCapsule
+                        feature={feature}
+                        onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
+                      />,
+                      div,
+                    )
+                    // ReactDOM.render(<LockedCapsule feature={feature} />, div)
                   }
 
                   // @ts-ignore

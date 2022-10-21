@@ -1,9 +1,9 @@
 import { NextPage } from "next"
-import { MutableRefObject, Suspense, useMemo, useRef } from "react"
+import { MutableRefObject, Suspense, useEffect, useMemo, useRef, useState } from "react"
 import { Canvas, useFrame, ThreeElements, useLoader } from "@react-three/fiber"
 import THREE, { Color, MeshBasicMaterial } from "three"
 import Webcam from "react-webcam"
-import { Button, Modal } from "@mantine/core"
+import { Button, Loader, Modal } from "@mantine/core"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Html } from "@react-three/drei"
 import { Text } from "@mantine/core"
@@ -14,6 +14,9 @@ import { useOrientation } from "@/lib/useOrientation"
 import { useSyncCamera } from "@/lib/threejs/useSyncCamera"
 import { calcDistance } from "@/lib/calcDistance"
 import CapsuleDistance from "@/view/ar/CapsuleDistance"
+import { useCapsule } from "@/hooks/useCapsule"
+import { Capsule } from "@/types/capsule"
+import DiscoverDrawer from "@/view/DiscoverDrawer"
 
 const CapsuleModel: React.FC<ThreeElements["mesh"] & { color: string; distance: number }> = ({
   color,
@@ -45,7 +48,7 @@ const CapsuleModel: React.FC<ThreeElements["mesh"] & { color: string; distance: 
             // @ts-ignore
             position={[props.position[0], props.position[1] + 15, props.position[2]]}
           >
-            <CapsuleDistance className="scale-[10]" capsuleColor="red" distance={distance} />
+            <CapsuleDistance className="scale-[10]" capsuleColor={color} distance={distance} />
           </Html>
         </mesh>
       </group>
@@ -77,7 +80,8 @@ const ArCanvas: React.FC<{
   orientation: MutableRefObject<{ x: number; y: number }>
   boxPosition: { x: number; y: number; z: number }
   distance: number
-}> = ({ orientation, boxPosition, distance }) => {
+  color: string
+}> = ({ orientation, boxPosition, distance, color }) => {
   useSyncCamera(orientation, { x: 0, y: 10, z: 0 })
 
   return (
@@ -85,7 +89,7 @@ const ArCanvas: React.FC<{
       <CapsuleModel
         position={[boxPosition.x, boxPosition.y, boxPosition.z]}
         scale={[10, 10, 10]}
-        color="orange"
+        color={color}
         distance={distance}
       />
       <Cylinder
@@ -101,7 +105,7 @@ const ArCanvas: React.FC<{
   )
 }
 
-const ArPage: NextPage = () => {
+const ArPage: React.FC<{ capsule: Capsule }> = ({ capsule }) => {
   const router = useRouter()
   const isDebugMode = router.query.debug === "true"
 
@@ -119,8 +123,8 @@ const ArPage: NextPage = () => {
     const { distance, bearing } = calcDistance(
       { latitude: geolocation.latitude, longitude: geolocation.longitude },
       {
-        latitude: 34.86412770305309,
-        longitude: 135.6051700426613,
+        latitude: capsule.latitude + 0.0002,
+        longitude: capsule.longitude,
       },
     )
     return {
@@ -128,7 +132,7 @@ const ArPage: NextPage = () => {
       bearing,
       deviceBearing: orientation.x - bearing,
     }
-  }, [geolocation, orientation.x])
+  }, [capsule.latitude, capsule.longitude, geolocation, orientation.x])
 
   const boxPosition = useMemo(() => {
     const degree = 90 - geo.bearing
@@ -139,6 +143,13 @@ const ArPage: NextPage = () => {
     }
   }, [geo.bearing, geo.distance])
 
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (geo.distance < 30) {
+      setOpen(true)
+    }
+  }, [geo.distance])
+
   return (
     <>
       <div className="relative">
@@ -148,7 +159,7 @@ const ArPage: NextPage = () => {
           }}
         />
         {geolocation != null && (
-          <div className="absolute left-6 bottom-6 flex">
+          <div className="absolute flex left-6 bottom-6">
             <Text
               sx={{
                 display: "block",
@@ -163,9 +174,9 @@ const ArPage: NextPage = () => {
             >
               <span className="text-sm">YOU</span>
               <br />
-              {convertLongLat(geolocation.coords.longitude, "lng") +
+              {convertLongLat(geolocation.longitude, "lng") +
                 "\n" +
-                convertLongLat(geolocation.coords.latitude, "lat")}
+                convertLongLat(geolocation.latitude, "lat")}
             </Text>
           </div>
         )}
@@ -176,6 +187,7 @@ const ArPage: NextPage = () => {
             orientation={orientationRef}
             boxPosition={boxPosition}
             distance={geo.distance}
+            color={capsule.color}
           />
         </Canvas>
       </div>
@@ -198,11 +210,33 @@ const ArPage: NextPage = () => {
           <Button onClick={requestPermission}>grant permission</Button>
         </div>
       )}
+      <DiscoverDrawer
+        onOpenCapsule={() => router.push(`/cupsel/open/${capsule.id}/shake`)}
+        capsule={capsule}
+        open={open}
+        onClose={() => setOpen(false)}
+      />
     </>
   )
 }
 
-export default ArPage
+const CapsulePage: NextPage = () => {
+  const router = useRouter()
+  const capsuleId = router.query.capsuleId as string
+  const capsule = useCapsule(capsuleId)
+
+  if (capsule == null) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <Loader aria-label="ロード中" />
+      </div>
+    )
+  } else {
+    return <ArPage capsule={capsule} />
+  }
+}
+
+export default CapsulePage
 
 const convertLongLat = (num: number, type: "lng" | "lat") => {
   const degree = Math.floor(num)

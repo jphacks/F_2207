@@ -12,7 +12,7 @@ const Loading: React.FC<LoadingProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0">
+      <div className="fixed inset-0 flex items-center justify-center">
         <Loader aria-label="ロード中" />
       </div>
     )
