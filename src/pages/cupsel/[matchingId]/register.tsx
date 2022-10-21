@@ -9,6 +9,7 @@ import CapsulePreview from "@/view/CapsulePreview"
 
 const Register: NextPage = () => {
   const theme = useMantineTheme()
+
   return (
     <WalkthroughLayout
       title="カプセルを作ろう"
@@ -28,11 +29,14 @@ const Register: NextPage = () => {
         variant="filled"
         size="lg"
         iconWidth={48}
+        // @ts-ignore
+        maxlength="18"
       />
       <DatePicker
         className="pb-3"
         placeholder="開封できる日を指定する"
         icon={<AiOutlineLock size={24} color={theme.colors.gray[0]} />}
+        minDate={new Date()}
         dropdownType="modal"
         variant="filled"
         size="lg"
