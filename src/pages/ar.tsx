@@ -37,7 +37,7 @@ const CapsuleModel: React.FC<ThreeElements["mesh"] & { color: string; distance: 
     <Suspense fallback={null}>
       <group>
         <mesh material={basicMaterial}>
-          <primitive ref={ref} object={scene} {...props} scale={[0.03, 0.03, 0.03]} />
+          <primitive ref={ref} object={scene} {...props} scale={[0.008, 0.008, 0.008]} />
           <Html
             className="text-2xl text-red-400"
             center
@@ -148,7 +148,7 @@ const ArPage: NextPage = () => {
           }}
         />
         {geolocation != null && (
-          <div className="absolute flex left-6 bottom-6">
+          <div className="absolute left-6 bottom-6 flex">
             <Text
               sx={{
                 display: "block",
