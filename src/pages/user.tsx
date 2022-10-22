@@ -1,4 +1,4 @@
-import { Avatar, Button, Group } from "@mantine/core"
+import { Avatar, Button, Group, Text } from "@mantine/core"
 import { NextPage } from "next"
 import Head from "next/head"
 import React from "react"
@@ -16,19 +16,30 @@ const User: NextPage = () => {
         <meta name="description" content="sample next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <DefaultLayout>
-        <main className="p-4">
-          <div className="m-4">
-            <p>{isLoading ? "loading" : ""}</p>
-            <Group>
-              <Avatar src={user?.iconUrl} />
-              <p className="">{user?.name ?? "not logged in"}</p>
-            </Group>
-          </div>
+      <DefaultLayout hideBottomBar={user == null}>
+        <main className="relative h-full p-4">
           {user == null ? (
-            <Button onClick={login}>👋 LOGIN with Google</Button>
+            <div className="fixed inset-0 flex flex-col items-center justify-center px-12">
+              <img src="/commet.png" alt="" width={240} height={240} />
+              <Button color="brand.3" onClick={login} fullWidth size="md" mt={48}>
+                <Text color="black">Googleでログイン</Text>
+              </Button>
+            </div>
           ) : (
-            <Button onClick={logout}>👋 LOGOUT</Button>
+            <>
+              <div className="m-4">
+                <p>{isLoading ? "loading" : ""}</p>
+                <Group>
+                  <Avatar src={user?.iconUrl} />
+                  <p className="">{user?.name ?? "not logged in"}</p>
+                </Group>
+              </div>
+              {user == null ? (
+                <Button onClick={login}>👋 LOGIN with Google</Button>
+              ) : (
+                <Button onClick={logout}>👋 LOGOUT</Button>
+              )}
+            </>
           )}
         </main>
       </DefaultLayout>
