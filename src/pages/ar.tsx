@@ -37,7 +37,7 @@ const CapsuleModel: React.FC<ThreeElements["mesh"] & { color: string; distance: 
     <Suspense fallback={null}>
       <group>
         <mesh material={basicMaterial}>
-          <primitive ref={ref} object={scene} {...props} scale={[0.03, 0.03, 0.03]} />
+          <primitive ref={ref} object={scene} {...props} scale={[0.008, 0.008, 0.008]} />
           <Html
             className="text-2xl text-red-400"
             center
