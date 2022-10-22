@@ -1,9 +1,9 @@
 import { Center, Sx, Text } from "@mantine/core"
 import { MouseEventHandler } from "react"
 
-type CapsuleSize = "sm" | "md"
+import { convertLngLat } from "@/lib/convertLngLat"
 
-type LngLat = "lng" | "lat"
+type CapsuleSize = "sm" | "md"
 
 type CapsuleProps = {
   capsuleColor: string
@@ -53,24 +53,6 @@ const Capsule: React.FC<CapsuleProps> = ({
     }
   }
 
-  const convertLongLat = (num: number, type: LngLat) => {
-    const degree = Math.floor(num)
-    const minute = Math.floor((num - degree) * 60)
-    const second = ((num - degree - minute / 60) * 3600).toFixed(1)
-    var symbol = ""
-    if (type == "lng" && num < 0) {
-      symbol = "S"
-    } else if (type == "lng" && num >= 0) {
-      symbol = "N"
-    } else if (type == "lat" && num < 0) {
-      symbol = "W"
-    } else if (type == "lat" && num >= 0) {
-      symbol = "E"
-    }
-
-    return `${degree}°${minute}'${second}\"${symbol}`
-  }
-
   return (
     <Center
       sx={{
@@ -98,7 +80,7 @@ const Capsule: React.FC<CapsuleProps> = ({
           whiteSpace: "pre-wrap",
         }}
       >
-        {convertLongLat(lng, "lng") + "\n" + convertLongLat(lat, "lat")}
+        {convertLngLat(lng, "lng") + "\n" + convertLngLat(lat, "lat")}
       </Text>
     </Center>
   )
