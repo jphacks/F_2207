@@ -145,7 +145,7 @@ const ArPage: React.FC<{ capsule: Capsule }> = ({ capsule }) => {
 
   const [open, setOpen] = useState(false)
   useEffect(() => {
-    if (geo.distance < 30) {
+    if (geo.distance < 10) {
       setOpen(true)
     }
   }, [geo.distance])
