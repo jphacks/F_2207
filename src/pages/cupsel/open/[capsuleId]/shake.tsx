@@ -41,7 +41,7 @@ const Shake: NextPage = () => {
         </Text>
         <img
           src="/shake.png"
-          className="relative z-10 self-start mt-8"
+          className="relative z-10 mt-8 self-start"
           style={{ maxWidth: "100%", width: 300 }}
         />
         {!start && (
