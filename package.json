@@ -14,7 +14,8 @@
     "type-check": "yarn tsc --noEmit",
     "check": "run-p lint format type-check",
     "fix": "run-p lint:fix format:fix type-check",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "dependencies": {
     "@artcom/react-three-arjs": "^0.5.2",
