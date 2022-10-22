@@ -1,6 +1,6 @@
 # タイムカプセルアプリ　リカプセル
 
-[![IMAGE ALT TEXT HERE](https://jphacks.com/wp-content/uploads/2022/08/JPHACKS2022_ogp.jpg)](https://www.youtube.com/watch?v=LUPQFB4QyVo)
+![リカプセル](https://user-images.githubusercontent.com/44559810/197327077-0a20a1e5-6cfb-46ea-92fc-2aa6f9ecce02.png)
 
 ## 製品概要
 
