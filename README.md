@@ -133,4 +133,7 @@ https://user-images.githubusercontent.com/38308823/197379547-97cf8b5a-4d79-461f-
 <img src="https://user-images.githubusercontent.com/38308823/197379721-972fe555-7ae5-4feb-9cfb-3667fec07d34.png" width="300px"/>
 
 ### 3Dモデル、アニメーション動画を作成
+
+  - カプセルに思い出が詰まっている様子を3Dモデルで表現しています
+
 https://user-images.githubusercontent.com/38308823/197379901-0bc25a59-b791-4db7-9688-d106b9005977.mp4
