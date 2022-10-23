@@ -113,23 +113,21 @@
 
 ## 技術的工夫点
 _全てのコードはハッカソン期間中に書いています(事前開発は行っていません)_
+
+### Location-based ARを独自実装
+  - 端末のGPS情報や位置情報をもとにカプセルの表示場所を計算し、カメラ映像に重ねる形でThree.jsで描画 ([実装](https://github.com/jphacks/F_2207/blob/main/src/pages/cupsel/open/%5BcapsuleId%5D/index.tsx))
+
+<img src="https://user-images.githubusercontent.com/38308823/197379813-40c33292-1025-4851-ab4e-40976ef5db16.png" width="300px"/>
+
   
 ### GPSを利用して、近くにいる友達へタイムカプセルの作成を自動通知する
-
-  - 友達を選択するなどの面倒な手順を踏むことなく、ワンタップで参加可能
+  - 友達を選択するなどの面倒な手順を踏むことなく、ワンタップで参加可能 ([実装](https://github.com/jphacks/F_2207/blob/fe13b963dec81b4cb7e1bda45501a26c9aa00dc6/src/view/MatchingDialog.tsx#L29-L31))
   - 友達の入力内容をリアルタイム同期
 
 https://user-images.githubusercontent.com/38308823/197379547-97cf8b5a-4d79-461f-b828-2260ab2439aa.mov
-
-### Location-based ARを独自実装
-
-  - 端末のGPS情報や位置情報をもとにカプセルの表示場所を計算し、カメラ映像に重ねる形でThree.jsで描画
-
-<img src="https://user-images.githubusercontent.com/38308823/197379813-40c33292-1025-4851-ab4e-40976ef5db16.png" width="300px"/>
   
 ### 加速度情報を利用した「スマホを振る」機能
-  
-  - 端末の加速度センサを利用し、「スマホを振るとタイムカプセルが開く」アクションを実現
+  - 端末の加速度センサを利用し、「スマホを振るとタイムカプセルが開く」アクションを実現 ([実装](https://github.com/jphacks/F_2207/blob/main/src/lib/useShakeAmount.ts))
   
 <img src="https://user-images.githubusercontent.com/38308823/197379721-972fe555-7ae5-4feb-9cfb-3667fec07d34.png" width="300px"/>
 
