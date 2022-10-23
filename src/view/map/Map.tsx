@@ -1,35 +1,25 @@
-import { useEffect } from "react"
-import { Box } from "@mantine/core"
+import { useEffect, useState } from "react"
+import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
 import ReactDOM from "react-dom"
 import { useRouter } from "next/router"
 
-import { loadCss } from "@/lib/loadCss"
-import { loadScript } from "@/lib/loadScript"
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
+import { loadCss } from "@/lib/loadCss"
+import { loadScript } from "@/lib/loadScript"
 
 import MapCapsule from "./MapCapsule"
+import LockedCapsule from "./LockedCapsule"
 
 const Map: React.FC = () => {
   const user = useUser()
   const userID = user?.id ?? ""
 
   const router = useRouter()
-
-  useEffect(() => {
-    let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
-    let mapboxSrc = "https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
-    let mapboxCssHref = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
-
-    loadScript(mapquestSrc, () => {
-      loadScript(mapboxSrc, mapSetUp)
-    })
-
-    loadCss(mapboxCssHref)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const [finishScriptLoad, setFinishScriptLoad] = useState(false)
+  const [finishMapLoad, setFinishMapLoad] = useState(false)
 
   const mapSetUp = () => {
     // show map on Box
@@ -111,14 +101,7 @@ const Map: React.FC = () => {
                       div,
                     )
                   } else {
-                    ReactDOM.render(
-                      <MapCapsule
-                        feature={feature}
-                        onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
-                      />,
-                      div,
-                    )
-                    // ReactDOM.render(<LockedCapsule feature={feature} />, div)
+                    ReactDOM.render(<LockedCapsule feature={feature} />, div)
                   }
 
                   // @ts-ignore
@@ -128,6 +111,7 @@ const Map: React.FC = () => {
           }
         })
       })
+      .finally(() => setFinishMapLoad(true))
   }
 
   const setCenterToCurrentPlace = (map: mapboxgl.Map) => {
@@ -160,7 +144,32 @@ const Map: React.FC = () => {
     new mapboxgl.Popup({ offset: 25 }).setLngLat(coordinates).setHTML(description).addTo(map)
   }
 
-  return <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }} />
+  useEffect(() => {
+    let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
+    let mapboxSrc = "https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
+    let mapboxCssHref = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
+
+    loadScript(mapquestSrc, () => {
+      loadScript(mapboxSrc, () => setFinishScriptLoad(true))
+    })
+
+    loadCss(mapboxCssHref)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    console.log(finishScriptLoad)
+    if (finishScriptLoad) {
+      mapSetUp()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finishScriptLoad])
+
+  return (
+    <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
+      <LoadingOverlay visible={!finishMapLoad} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
+    </Box>
+  )
 }
 
 export default Map
