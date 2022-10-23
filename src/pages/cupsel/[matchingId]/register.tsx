@@ -1,8 +1,8 @@
-import { Text, Textarea, TextInput, useMantineTheme } from "@mantine/core"
+import { Box, LoadingOverlay, Text, Textarea, TextInput, useMantineTheme } from "@mantine/core"
 import { DatePicker } from "@mantine/dates"
 import { AiOutlineEdit, AiOutlineLock, AiOutlineMessage } from "react-icons/ai"
 import { NextPage } from "next"
-import React from "react"
+import React, { useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/router"
 import { add } from "date-fns"
@@ -28,15 +28,20 @@ const Register: NextPage = () => {
 
   const cupsuleCreateInput = useCupsuleCreateInput()
 
+  const [isSaving, setIsSaving] = useState(false)
+
   const save = async () => {
+    setIsSaving(true)
     if (user == null) {
       window.alert("ログインしてください")
+      setIsSaving(false)
       return
     }
 
     if (isOwner) {
       if (cupsuleCreateInput.title == "" || cupsuleCreateInput.openDate == null) {
         window.alert("タイトル、開封日を設定してください")
+        setIsSaving(false)
         return
       }
 
@@ -68,11 +73,11 @@ const Register: NextPage = () => {
     postLayer(
       user.id,
       (res) => {
-        postFeature(feature, res.data.id, onSucsessCreateCapsule)
+        postFeature(feature, res.data.id, onSucsessCreateCapsule, () => setIsSaving(false))
       },
       () => {
         searchLayerID(user.id, (id) => {
-          postFeature(feature, id, onSucsessCreateCapsule)
+          postFeature(feature, id, onSucsessCreateCapsule, () => setIsSaving(false))
         })
       },
     )
@@ -125,7 +130,12 @@ const Register: NextPage = () => {
       })
   }
 
-  const postFeature = (feature: CreateFeature, id: number, callback: (res: any) => void) => {
+  const postFeature = (
+    feature: CreateFeature,
+    id: number,
+    callback: (res: any) => void,
+    errorCallback: (error: any) => void,
+  ) => {
     axios
       .post(
         `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
@@ -133,6 +143,9 @@ const Register: NextPage = () => {
       )
       .then((res) => {
         callback(res)
+      })
+      .catch((err) => {
+        errorCallback(err)
       })
   }
 
@@ -145,76 +158,79 @@ const Register: NextPage = () => {
       onClickPrevOrClose={isOwner ? () => router.push(`/cupsel/${matchingId}/collect`) : null}
       nextButtonType="bury"
     >
-      <CapsulePreview
-        capsuleColor={cupsuleCreateInput.color}
-        gpsColor={cupsuleCreateInput.gpsTextColor}
-        emoji={cupsuleCreateInput.emoji}
-        lng={geolocation.longitude ?? 0}
-        lat={geolocation.latitude ?? 0}
-      />
-      <Text className="pb-4" color="white" weight="bold" size="sm">
-        カプセルの情報
-      </Text>
-      {isOwner && (
-        <TextInput
-          className="pb-3"
-          placeholder="タイトルを書く（最大18字）"
-          icon={<AiOutlineEdit size={24} color={theme.colors.gray[0]} />}
-          value={cupsuleCreateInput.title}
+      <Box>
+        <LoadingOverlay visible={isSaving} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
+        <CapsulePreview
+          capsuleColor={cupsuleCreateInput.color}
+          gpsColor={cupsuleCreateInput.gpsTextColor}
+          emoji={cupsuleCreateInput.emoji}
+          lng={geolocation.longitude ?? 0}
+          lat={geolocation.latitude ?? 0}
+        />
+        <Text className="pb-4" color="white" weight="bold" size="sm">
+          カプセルの情報
+        </Text>
+        {isOwner && (
+          <TextInput
+            className="pb-3"
+            placeholder="タイトルを書く（最大18字）"
+            icon={<AiOutlineEdit size={24} color={theme.colors.gray[0]} />}
+            value={cupsuleCreateInput.title}
+            onChange={(e) => {
+              cupsuleCreateInputState.title = e.target.value
+            }}
+            variant="filled"
+            size="lg"
+            iconWidth={48}
+            maxLength={18}
+            styles={{
+              input: {
+                fontSize: 16,
+              },
+            }}
+          />
+        )}
+        {isOwner && (
+          <DatePicker
+            className="pb-3"
+            placeholder="開封できる日を指定する"
+            icon={<AiOutlineLock size={24} color={theme.colors.gray[0]} />}
+            value={cupsuleCreateInput.openDate}
+            onChange={(value) => {
+              cupsuleCreateInputState.openDate = value
+            }}
+            minDate={new Date()}
+            dropdownType="modal"
+            variant="filled"
+            firstDayOfWeek="sunday"
+            inputFormat="YYYY年M月D日"
+            size="lg"
+            iconWidth={48}
+            styles={(theme) => ({
+              input: { fontSize: 16, "&::placeholder": { color: theme.colors.gray[0] } },
+            })}
+          />
+        )}
+        <Textarea
+          placeholder="メモを残す"
+          icon={<AiOutlineMessage size={24} color={theme.colors.gray[0]} />}
+          value={cupsuleCreateInput.memo}
           onChange={(e) => {
-            cupsuleCreateInputState.title = e.target.value
+            cupsuleCreateInputState.memo = e.target.value
           }}
+          minRows={9}
           variant="filled"
           size="lg"
           iconWidth={48}
-          maxLength={18}
-          styles={{
+          styles={() => ({
+            icon: { top: 12, bottom: "initial" },
             input: {
               fontSize: 16,
+              lineHeight: 1.75,
             },
-          }}
-        />
-      )}
-      {isOwner && (
-        <DatePicker
-          className="pb-3"
-          placeholder="開封できる日を指定する"
-          icon={<AiOutlineLock size={24} color={theme.colors.gray[0]} />}
-          value={cupsuleCreateInput.openDate}
-          onChange={(value) => {
-            cupsuleCreateInputState.openDate = value
-          }}
-          minDate={new Date()}
-          dropdownType="modal"
-          variant="filled"
-          firstDayOfWeek="sunday"
-          inputFormat="YYYY年M月D日"
-          size="lg"
-          iconWidth={48}
-          styles={(theme) => ({
-            input: { fontSize: 16, "&::placeholder": { color: theme.colors.gray[0] } },
           })}
         />
-      )}
-      <Textarea
-        placeholder="メモを残す"
-        icon={<AiOutlineMessage size={24} color={theme.colors.gray[0]} />}
-        value={cupsuleCreateInput.memo}
-        onChange={(e) => {
-          cupsuleCreateInputState.memo = e.target.value
-        }}
-        minRows={9}
-        variant="filled"
-        size="lg"
-        iconWidth={48}
-        styles={() => ({
-          icon: { top: 12, bottom: "initial" },
-          input: {
-            fontSize: 16,
-            lineHeight: 1.75,
-          },
-        })}
-      />
+      </Box>
     </WalkthroughLayout>
   )
 }
