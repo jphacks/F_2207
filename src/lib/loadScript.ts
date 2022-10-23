@@ -8,5 +8,7 @@ export const loadScript = (url: string, onload: () => void) => {
     script.addEventListener("load", onload)
 
     head.appendChild(script)
+  } else {
+    onload()
   }
 }
