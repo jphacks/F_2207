@@ -1,4 +1,13 @@
-import { Box, LoadingOverlay, Text, Textarea, TextInput, useMantineTheme } from "@mantine/core"
+import {
+  Box,
+  Button,
+  LoadingOverlay,
+  Modal,
+  Text,
+  Textarea,
+  TextInput,
+  useMantineTheme,
+} from "@mantine/core"
 import { DatePicker } from "@mantine/dates"
 import { AiOutlineEdit, AiOutlineLock, AiOutlineMessage } from "react-icons/ai"
 import { NextPage } from "next"
@@ -29,19 +38,20 @@ const Register: NextPage = () => {
   const cupsuleCreateInput = useCupsuleCreateInput()
 
   const [isSaving, setIsSaving] = useState(false)
+  const [isSaveSuccessed, setIsSaveSuccessed] = useState(false)
 
   const save = async () => {
     setIsSaving(true)
     if (user == null) {
       window.alert("ログインしてください")
-      setIsSaving(false)
+      onFailCreateCapsule()
       return
     }
 
     if (isOwner) {
       if (cupsuleCreateInput.title == "" || cupsuleCreateInput.openDate == null) {
         window.alert("タイトル、開封日を設定してください")
-        setIsSaving(false)
+        onFailCreateCapsule()
         return
       }
 
@@ -73,19 +83,26 @@ const Register: NextPage = () => {
     postLayer(
       user.id,
       (res) => {
-        postFeature(feature, res.data.id, onSucsessCreateCapsule, () => setIsSaving(false))
+        postFeature(feature, res.data.id, onSucsessCreateCapsule, onFailCreateCapsule)
       },
       () => {
         searchLayerID(user.id, (id) => {
-          postFeature(feature, id, onSucsessCreateCapsule, () => setIsSaving(false))
+          postFeature(feature, id, onSucsessCreateCapsule, onFailCreateCapsule)
         })
       },
     )
   }
 
-  const onSucsessCreateCapsule = () => {
-    // TODO: いい感じの何かをだす
+  const moveToMap = () => {
     router.push(`/map`)
+  }
+
+  const onSucsessCreateCapsule = () => {
+    setIsSaveSuccessed(true)
+    setIsSaving(false)
+  }
+  const onFailCreateCapsule = () => {
+    setIsSaving(false)
   }
 
   const postLayer = (
@@ -230,6 +247,12 @@ const Register: NextPage = () => {
             },
           })}
         />
+        <Modal centered opened={isSaveSuccessed} onClose={moveToMap} withCloseButton={false}>
+          <div className="flex flex-col items-center">
+            <p>カプセルを埋めました！</p>
+            <Button onClick={moveToMap}>地図へ戻る</Button>
+          </div>
+        </Modal>
       </Box>
     </WalkthroughLayout>
   )
