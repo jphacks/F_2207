@@ -11,6 +11,7 @@ import { loadCss } from "@/lib/loadCss"
 import { loadScript } from "@/lib/loadScript"
 
 import MapCapsule from "./MapCapsule"
+import LockedCapsule from "./LockedCapsule"
 
 const Map: React.FC = () => {
   const user = useUser()
@@ -99,14 +100,7 @@ const Map: React.FC = () => {
                       div,
                     )
                   } else {
-                    ReactDOM.render(
-                      <MapCapsule
-                        feature={feature}
-                        onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
-                      />,
-                      div,
-                    )
-                    // ReactDOM.render(<LockedCapsule feature={feature} />, div)
+                    ReactDOM.render(<LockedCapsule feature={feature} />, div)
                   }
 
                   // @ts-ignore
