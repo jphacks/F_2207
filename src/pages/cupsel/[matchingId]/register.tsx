@@ -20,7 +20,11 @@ import WalkthroughLayout from "@/view/layout/walkthrough"
 import CapsulePreview from "@/view/CapsulePreview"
 import { useUser } from "@/auth/useAuth"
 import { CreateFeature } from "@/types/feature"
-import { cupsuleCreateInputState, useCupsuleCreateInput } from "@/state/cupsuleCreateInput"
+import {
+  clearCupsuleCreateInput,
+  cupsuleCreateInputState,
+  useCupsuleCreateInput,
+} from "@/state/cupsuleCreateInput"
 import { useGeolocation } from "@/provider/GpsProvider"
 import { useMatchingWithRedirect } from "@/hooks/useMatching"
 import { joinCapsule, postCapsule } from "@/repository/capsule"
@@ -100,6 +104,7 @@ const Register: NextPage = () => {
   const onSucsessCreateCapsule = () => {
     setIsSaveSuccessed(true)
     setIsSaving(false)
+    clearCupsuleCreateInput()
   }
   const onFailCreateCapsule = () => {
     setIsSaving(false)
