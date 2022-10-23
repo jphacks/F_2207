@@ -44,7 +44,7 @@ const initValue: CupsuleCreateInput = {
 
 export const cupsuleCreateInputState = proxy<CupsuleCreateInput>(initValue)
 
-export const useCupsuleCreateInput = () => useSnapshot(cupsuleCreateInputState)
+export const useCupsuleCreateInput = () => useSnapshot(cupsuleCreateInputState, { sync: true })
 export const clearCupsuleCreateInput = () => {
   cupsuleCreateInputState.color = initValue.color
   cupsuleCreateInputState.emoji = initValue.emoji
