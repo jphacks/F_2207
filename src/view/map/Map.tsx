@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Box } from "@mantine/core"
+import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
 import ReactDOM from "react-dom"
 import { useRouter } from "next/router"
@@ -19,6 +19,7 @@ const Map: React.FC = () => {
 
   const router = useRouter()
   const [finishScriptLoad, setFinishScriptLoad] = useState(false)
+  const [finishMapLoad, setFinishMapLoad] = useState(false)
 
   const mapSetUp = () => {
     // show map on Box
@@ -110,6 +111,7 @@ const Map: React.FC = () => {
           }
         })
       })
+      .finally(() => setFinishMapLoad(true))
   }
 
   const setCenterToCurrentPlace = (map: mapboxgl.Map) => {
@@ -163,7 +165,11 @@ const Map: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finishScriptLoad])
 
-  return <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }} />
+  return (
+    <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
+      <LoadingOverlay visible={!finishMapLoad} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
+    </Box>
+  )
 }
 
 export default Map
