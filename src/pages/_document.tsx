@@ -1,5 +1,6 @@
 import { createGetInitialProps } from "@mantine/next"
 import Document, { Head, Html, Main, NextScript } from "next/document"
+import Script from "next/script"
 
 const getInitialProps = createGetInitialProps()
 
@@ -13,6 +14,26 @@ export default class _Document extends Document {
           <meta charSet="utf-8" />
           <meta name="theme-color" content="#212121" />
           <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+          <Script
+            strategy="beforeInteractive"
+            type="text/javascript"
+            src="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
+          />
+          <Script
+            strategy="beforeInteractive"
+            type="text/javascript"
+            src="https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
+          />
+          <Script
+            strategy="beforeInteractive"
+            type="text/javascript"
+            src="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
+          />
+          <Script
+            strategy="beforeInteractive"
+            type="text/javascript"
+            src="https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
+          />
         </Head>
         <body className="bg-[#212121]">
           <Main />

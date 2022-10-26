@@ -8,8 +8,6 @@ import Head from "next/head"
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
-import { loadCss } from "@/lib/loadCss"
-import { loadScript } from "@/lib/loadScript"
 
 import MapCapsule from "./MapCapsule"
 import LockedCapsule from "./LockedCapsule"
@@ -19,7 +17,7 @@ const Map: React.FC = () => {
   const userID = user?.id ?? ""
 
   const router = useRouter()
-  const [finishScriptLoad, setFinishScriptLoad] = useState(false)
+  const [finishScriptLoad, setFinishScriptLoad] = useState(true)
   const [finishMapLoad, setFinishMapLoad] = useState(false)
 
   const mapSetUp = () => {
@@ -145,18 +143,18 @@ const Map: React.FC = () => {
     new mapboxgl.Popup({ offset: 25 }).setLngLat(coordinates).setHTML(description).addTo(map)
   }
 
-  useEffect(() => {
-    let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
-    let mapboxSrc = "https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
-    let mapboxCssHref = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
+  // useEffect(() => {
+  //   let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
+  //   let mapboxSrc = "https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
+  //   let mapboxCssHref = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
 
-    loadScript(mapquestSrc, () => {
-      loadScript(mapboxSrc, () => setTimeout(() => setFinishScriptLoad(true), 3000))
-    })
+  //   loadScript(mapquestSrc, () => {
+  //     loadScript(mapboxSrc, () => setTimeout(() => setFinishScriptLoad(true), 3000))
+  //   })
 
-    loadCss(mapboxCssHref)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  //   loadCss(mapboxCssHref)
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
   useEffect(() => {
     console.log(finishScriptLoad)
@@ -175,8 +173,6 @@ const Map: React.FC = () => {
           rel="prefetch"
           href={`https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`}
         />
-        <link rel="prefetch" href="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js" />
-        <link rel="prefetch" href="https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js" />
         <link rel="prefetch" href="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css" />
       </Head>
       <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
