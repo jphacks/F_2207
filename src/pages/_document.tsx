@@ -19,21 +19,6 @@ export default class _Document extends Document {
             type="text/javascript"
             src="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
           />
-          <Script
-            strategy="beforeInteractive"
-            type="text/javascript"
-            src="https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
-          />
-          <Script
-            strategy="beforeInteractive"
-            type="text/javascript"
-            src="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
-          />
-          <Script
-            strategy="beforeInteractive"
-            type="text/javascript"
-            src="https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
-          />
         </Head>
         <body className="bg-[#212121]">
           <Main />
