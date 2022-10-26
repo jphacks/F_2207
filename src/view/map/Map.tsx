@@ -3,6 +3,7 @@ import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
 import ReactDOM from "react-dom"
 import { useRouter } from "next/router"
+import Head from "next/head"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
@@ -150,7 +151,7 @@ const Map: React.FC = () => {
     let mapboxCssHref = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
 
     loadScript(mapquestSrc, () => {
-      loadScript(mapboxSrc, () => setFinishScriptLoad(true))
+      loadScript(mapboxSrc, () => setTimeout(() => setFinishScriptLoad(true), 3000))
     })
 
     loadCss(mapboxCssHref)
@@ -166,9 +167,26 @@ const Map: React.FC = () => {
   }, [finishScriptLoad])
 
   return (
-    <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
-      <LoadingOverlay visible={!finishMapLoad} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
-    </Box>
+    <>
+      <Head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+        <link
+          rel="prefetch"
+          href={`https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`}
+        />
+        <link rel="prefetch" href="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js" />
+        <link rel="prefetch" href="https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js" />
+        <link rel="prefetch" href="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css" />
+      </Head>
+      <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
+        <LoadingOverlay
+          visible={!finishMapLoad}
+          loaderProps={{ size: "xl" }}
+          overlayOpacity={0.6}
+        />
+      </Box>
+    </>
   )
 }
 
