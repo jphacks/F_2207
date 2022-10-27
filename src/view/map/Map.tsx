@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react"
 import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
-import ReactDOM from "react-dom"
 import { useRouter } from "next/router"
 import Head from "next/head"
+import ReactDOM from "react-dom"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
+import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
 
 import MapCapsule from "./MapCapsule"
 import LockedCapsule from "./LockedCapsule"
@@ -17,14 +18,13 @@ const Map: React.FC = () => {
   const userID = user?.id ?? ""
 
   const router = useRouter()
-  const [finishScriptLoad, setFinishScriptLoad] = useState(true)
   const [finishMapLoad, setFinishMapLoad] = useState(false)
 
   const mapSetUp = () => {
     // show map on Box
-    // @ts-ignore
     const transformRequest = mqplatformTransformRequest(
       process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY,
+      userID,
     )
     // @ts-ignore
     var map = new mapboxgl.Map({
@@ -143,26 +143,10 @@ const Map: React.FC = () => {
     new mapboxgl.Popup({ offset: 25 }).setLngLat(coordinates).setHTML(description).addTo(map)
   }
 
-  // useEffect(() => {
-  //   let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
-  //   let mapboxSrc = "https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
-  //   let mapboxCssHref = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
-
-  //   loadScript(mapquestSrc, () => {
-  //     loadScript(mapboxSrc, () => setTimeout(() => setFinishScriptLoad(true), 3000))
-  //   })
-
-  //   loadCss(mapboxCssHref)
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
-
   useEffect(() => {
-    console.log(finishScriptLoad)
-    if (finishScriptLoad) {
-      mapSetUp()
-    }
+    mapSetUp()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [finishScriptLoad])
+  }, [])
 
   return (
     <>
@@ -173,8 +157,41 @@ const Map: React.FC = () => {
           rel="prefetch"
           href={`https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`}
         />
-        <link rel="prefetch" href="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css" />
+        <link
+          rel="stylesheet prefetch"
+          href="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
+        />
       </Head>
+      {/* <Button
+        onClick={() => {
+          console.log(markers)
+          markers.forEach((res) => {
+            res.data.features.forEach((feature: Feature) => {
+              const div = document.createElement("div")
+              const today = Date.now()
+              const openDate = Date.parse(feature.properties.openDate)
+
+              const root = createRoot(div)
+
+              // @ts-ignore
+              new mapboxgl.Marker(div).setLngLat(feature.geometry.coordinates).addTo(mapRef.current)
+
+              if (today > openDate) {
+                root.render(
+                  <MapCapsule
+                    feature={feature}
+                    onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
+                  />,
+                )
+              } else {
+                root.render(<LockedCapsule feature={feature} />)
+              }
+            })
+          })
+        }}
+      >
+        add
+      </Button> */}
       <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
         <LoadingOverlay
           visible={!finishMapLoad}
