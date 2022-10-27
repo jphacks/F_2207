@@ -4,6 +4,7 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import ReactDOM from "react-dom"
+import mapboxgl from "mapbox-gl"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
@@ -13,7 +14,7 @@ import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
 import MapCapsule from "./MapCapsule"
 import LockedCapsule from "./LockedCapsule"
 
-const Map: React.FC = () => {
+const MapPage: React.FC = () => {
   const user = useUser()
   const userID = user?.id ?? ""
 
@@ -26,19 +27,16 @@ const Map: React.FC = () => {
       process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY,
       userID,
     )
-    // @ts-ignore
-    var map = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: "map",
       style: "mqplatform://maps-api/styles/v1/18",
       transformRequest: transformRequest,
       logoPosition: "top-left",
     })
-    // @ts-ignore
     // zoom control
     map.addControl(new mapboxgl.NavigationControl(), "bottom-left")
     // current place control
     map.addControl(
-      // @ts-ignore
       new mapboxgl.GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
         trackUserLocation: true,
@@ -77,8 +75,7 @@ const Map: React.FC = () => {
         `https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
       )
       .then((res) => {
-        // @ts-ignore
-        res.data.forEach((layer) => {
+        res.data.forEach((layer: any) => {
           if (layer.name == userID) {
             // set Image
             axios
@@ -103,8 +100,9 @@ const Map: React.FC = () => {
                     ReactDOM.render(<LockedCapsule feature={feature} />, div)
                   }
 
-                  // @ts-ignore
-                  new mapboxgl.Marker(div).setLngLat(feature.geometry.coordinates).addTo(map)
+                  new mapboxgl.Marker(div)
+                    .setLngLat(feature.geometry.coordinates as [number, number])
+                    .addTo(map)
                 })
               })
           }
@@ -138,9 +136,11 @@ const Map: React.FC = () => {
       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
     }
 
-    // @ts-ignore
     // 25 is half height of image
-    new mapboxgl.Popup({ offset: 25 }).setLngLat(coordinates).setHTML(description).addTo(map)
+    new mapboxgl.Popup({ offset: 25 })
+      .setLngLat(coordinates as [number, number])
+      .setHTML(description)
+      .addTo(map)
   }
 
   useEffect(() => {
@@ -203,4 +203,4 @@ const Map: React.FC = () => {
   )
 }
 
-export default Map
+export default MapPage
