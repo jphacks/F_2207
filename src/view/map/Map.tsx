@@ -4,7 +4,7 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import ReactDOM from "react-dom"
-import mapboxgl from "mapbox-gl"
+import { Map, NavigationControl, GeolocateControl, Marker, Popup } from "mapbox-gl"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
@@ -27,17 +27,17 @@ const MapPage: React.FC = () => {
       process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY,
       userID,
     )
-    const map = new mapboxgl.Map({
+    const map = new Map({
       container: "map",
       style: "mqplatform://maps-api/styles/v1/18",
       transformRequest: transformRequest,
       logoPosition: "top-left",
     })
     // zoom control
-    map.addControl(new mapboxgl.NavigationControl(), "bottom-left")
+    map.addControl(new NavigationControl(), "bottom-left")
     // current place control
     map.addControl(
-      new mapboxgl.GeolocateControl({
+      new GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
         trackUserLocation: true,
         showUserLocation: true,
@@ -100,7 +100,7 @@ const MapPage: React.FC = () => {
                     ReactDOM.render(<LockedCapsule feature={feature} />, div)
                   }
 
-                  new mapboxgl.Marker(div)
+                  new Marker(div)
                     .setLngLat(feature.geometry.coordinates as [number, number])
                     .addTo(map)
                 })
@@ -137,7 +137,7 @@ const MapPage: React.FC = () => {
     }
 
     // 25 is half height of image
-    new mapboxgl.Popup({ offset: 25 })
+    new Popup({ offset: 25 })
       .setLngLat(coordinates as [number, number])
       .setHTML(description)
       .addTo(map)
@@ -162,36 +162,6 @@ const MapPage: React.FC = () => {
           href="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
         />
       </Head>
-      {/* <Button
-        onClick={() => {
-          console.log(markers)
-          markers.forEach((res) => {
-            res.data.features.forEach((feature: Feature) => {
-              const div = document.createElement("div")
-              const today = Date.now()
-              const openDate = Date.parse(feature.properties.openDate)
-
-              const root = createRoot(div)
-
-              // @ts-ignore
-              new mapboxgl.Marker(div).setLngLat(feature.geometry.coordinates).addTo(mapRef.current)
-
-              if (today > openDate) {
-                root.render(
-                  <MapCapsule
-                    feature={feature}
-                    onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
-                  />,
-                )
-              } else {
-                root.render(<LockedCapsule feature={feature} />)
-              }
-            })
-          })
-        }}
-      >
-        add
-      </Button> */}
       <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
         <LoadingOverlay
           visible={!finishMapLoad}
