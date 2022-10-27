@@ -4,12 +4,13 @@ const mqplatformTransformRequest = (
   subscriptionKey: string,
   userId: string,
 ): TransformRequestFunction => {
+  // @ts-ignore
   return (url: string) => {
     if (
       url.startsWith("mqplatform://maps-api/features/v1/") &&
       url !== `mqplatform://maps-api/features/v1/${userId}`
     ) {
-      return { url: "http://example.com" }
+      return undefined
     }
     if (url.startsWith("mqplatform://")) {
       return {
