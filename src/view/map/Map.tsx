@@ -5,6 +5,7 @@ import { useRouter } from "next/router"
 import Head from "next/head"
 import ReactDOM from "react-dom"
 import { Map, NavigationControl, GeolocateControl, Marker, Popup } from "mapbox-gl"
+import "mapbox-gl/dist/mapbox-gl.css"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
@@ -151,15 +152,11 @@ const MapPage: React.FC = () => {
   return (
     <>
       <Head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         <link
-          rel="prefetch"
+          rel="preload"
           href={`https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`}
-        />
-        <link
-          rel="stylesheet prefetch"
-          href="https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
+          as="fetch"
+          crossOrigin="anonymous"
         />
       </Head>
       <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
