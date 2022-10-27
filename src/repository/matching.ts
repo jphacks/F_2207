@@ -1,6 +1,6 @@
 import { onSnapshot, collection, doc } from "firebase/firestore"
 
-import { db } from "@/lib/firebase/init"
+import { db } from "@/lib/firebase/db"
 
 export type Matching = {
   id: string

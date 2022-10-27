@@ -12,7 +12,7 @@ import {
 import sub from "date-fns/sub"
 
 import { LatLng } from "@/types/location"
-import { db } from "@/lib/firebase/init"
+import { db } from "@/lib/firebase/db"
 import { AppUser } from "@/types/user"
 
 import { isMatchingAlreadyRead, makeMatchingRead } from "./mathcingRead"

@@ -9,7 +9,8 @@ import {
 } from "firebase/firestore"
 import { getDownloadURL, ref, uploadBytes, UploadResult } from "firebase/storage"
 
-import { db, storage } from "@/lib/firebase/init"
+import { db } from "@/lib/firebase/db"
+import { storage } from "@/lib/firebase/storage"
 import { generateId } from "@/lib/generateId"
 import { AppUser } from "@/types/user"
 

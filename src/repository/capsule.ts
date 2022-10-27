@@ -1,6 +1,6 @@
 import { arrayUnion, collection, doc, getDoc, setDoc, Timestamp } from "firebase/firestore"
 
-import { db } from "@/lib/firebase/init"
+import { db } from "@/lib/firebase/db"
 import { CupsuleCreateInput } from "@/state/cupsuleCreateInput"
 import { AppUser } from "@/types/user"
 import { GpsType } from "@/provider/GpsProvider"
