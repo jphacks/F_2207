@@ -6,3 +6,8 @@
   font-family: "nagoda";
   src: url("/fonts/Nagoda_subset.otf");
 }
+
+html,
+body {
+  @apply font-sans;
+}
