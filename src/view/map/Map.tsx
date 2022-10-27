@@ -3,7 +3,7 @@ import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { Map, NavigationControl, GeolocateControl, Marker, Popup } from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 
@@ -86,19 +86,20 @@ const MapPage: React.FC = () => {
               .then((res) => {
                 res.data.features.forEach((feature: Feature) => {
                   const div = document.createElement("div")
+                  const root = createRoot(div)
+
                   const today = Date.now()
                   const openDate = Date.parse(feature.properties.openDate)
 
                   if (today > openDate) {
-                    ReactDOM.render(
+                    root.render(
                       <MapCapsule
                         feature={feature}
                         onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
                       />,
-                      div,
                     )
                   } else {
-                    ReactDOM.render(<LockedCapsule feature={feature} />, div)
+                    root.render(<LockedCapsule feature={feature} />)
                   }
 
                   new Marker(div)
