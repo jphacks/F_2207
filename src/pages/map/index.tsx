@@ -44,7 +44,7 @@ const MapPage: NextPage = () => {
             justifyContent: "center",
           }}
         >
-          <FiPlus className="text-black" size={28} />
+          <FiPlus className="text-black" size={28} aria-label="カプセルの新規作成" />
         </Button>
         <Map />
       </Box>

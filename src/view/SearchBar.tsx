@@ -26,7 +26,7 @@ const SearchBar: React.FC = () => {
             <a>
               <Image
                 src={user?.iconUrl}
-                alt=""
+                alt="プロフィール"
                 className="h-8 w-8 rounded-full"
                 width={32}
                 height={32}
