@@ -119,7 +119,7 @@ _全てのコードはハッカソン期間中に書いています(事前開発
 
 ### Location-based AR を独自実装
 
-- 端末の GPS 情報や位置情報をもとにカプセルの表示場所を計算し、カメラ映像に重ねる形で Three.js で描画 ([実装](https://github.com/jphacks/F_2207/blob/main/src/pages/cupsel/open/%5BcapsuleId%5D/index.tsx))
+- 端末の GPS 情報や姿勢情報をもとにカプセルの表示場所を計算し、カメラ映像に重ねる形で Three.js で描画 ([実装](https://github.com/jphacks/F_2207/blob/main/src/pages/cupsel/open/%5BcapsuleId%5D/index.tsx))
 
 <img src="https://user-images.githubusercontent.com/38308823/197379813-40c33292-1025-4851-ab4e-40976ef5db16.png" width="300px"/>
 
