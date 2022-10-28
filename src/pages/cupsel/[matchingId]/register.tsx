@@ -233,9 +233,9 @@ const Register: NextPage = () => {
               inputFormat="YYYY年M月D日"
               size="lg"
               iconWidth={48}
-              styles={(theme) => ({
-                input: { fontSize: 16, "&::placeholder": { color: theme.colors.gray[0] } },
-              })}
+              styles={{
+                input: { fontSize: 16 },
+              }}
             />
           )}
           <Textarea
