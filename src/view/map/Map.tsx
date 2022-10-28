@@ -22,7 +22,11 @@ const MapPage: React.FC = () => {
   const router = useRouter()
   const [finishMapLoad, setFinishMapLoad] = useState(false)
 
-  const mapSetUp = () => {
+  const mapSetUp = async () => {
+    const geolocation = await new Promise<GeolocationPosition>((resolve) =>
+      navigator.geolocation.getCurrentPosition(resolve),
+    )
+
     // show map on Box
     const transformRequest = mqplatformTransformRequest(
       process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY,
@@ -31,8 +35,13 @@ const MapPage: React.FC = () => {
     const map = new Map({
       container: "map",
       style: "mqplatform://maps-api/styles/v1/18",
-      transformRequest: transformRequest,
+      transformRequest,
       logoPosition: "top-left",
+      center: {
+        lat: geolocation.coords.latitude,
+        lng: geolocation.coords.longitude,
+      },
+      zoom: 15,
     })
     // zoom control
     map.addControl(new NavigationControl(), "bottom-left")
