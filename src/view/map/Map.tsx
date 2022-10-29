@@ -104,7 +104,7 @@ const MapPage: React.FC = () => {
                     root.render(
                       <MapCapsule
                         feature={feature}
-                        onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
+                        onClick={() => router.push(`/capsule/open/${feature.properties.id}`)}
                       />,
                     )
                   } else {

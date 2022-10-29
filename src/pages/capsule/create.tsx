@@ -13,10 +13,11 @@ import { useUser } from "@/auth/useAuth"
 import { useGeolocation } from "@/provider/GpsProvider"
 import {
   capsuleColors,
-  cupsuleCreateInputState,
+  capsuleCreateInputState,
   gpsColors,
-  useCupsuleCreateInput,
-} from "@/state/cupsuleCreateInput"
+  useCapsuleCreateInput,
+} from "@/state/capsuleCreateInput"
+import MetaHeader from "@/view/common/MetaHeader"
 
 import type { NextPage } from "next"
 import type { EmojiClickData } from "emoji-picker-react"
@@ -28,12 +29,12 @@ const CapsuleAdd: NextPage = () => {
   const location = useGeolocation()
   const user = useUser()
 
-  const cupsuleCreateInput = useCupsuleCreateInput()
+  const capsuleCreateInput = useCapsuleCreateInput()
 
   const [opened, setOpened] = useState(false)
 
   const onEmojiClick = (emoji: EmojiClickData) => {
-    cupsuleCreateInputState.emoji = emoji.emoji
+    capsuleCreateInputState.emoji = emoji.emoji
     setOpened(false)
   }
 
@@ -47,7 +48,7 @@ const CapsuleAdd: NextPage = () => {
       return
     }
     const matchingId = await createMatching({ user, location })
-    await router.push(`/cupsel/${matchingId}/lobby`)
+    await router.push(`/capsule/${matchingId}/lobby`)
   }, [location, router, user])
 
   const { data: Theme } = useSWR("emoji-picker-react.Theme", () =>
@@ -56,6 +57,7 @@ const CapsuleAdd: NextPage = () => {
 
   return (
     <>
+      <MetaHeader title="カプセルの作成" />
       <WalkthroughLayout
         title="カプセルを作ろう"
         totalStep={4}
@@ -64,9 +66,9 @@ const CapsuleAdd: NextPage = () => {
         onClickPrevOrClose={() => router.push("/")}
       >
         <CapsulePreview
-          capsuleColor={cupsuleCreateInput.color}
-          gpsColor={cupsuleCreateInput.gpsTextColor}
-          emoji={cupsuleCreateInput.emoji}
+          capsuleColor={capsuleCreateInput.color}
+          gpsColor={capsuleCreateInput.gpsTextColor}
+          emoji={capsuleCreateInput.emoji}
           lng={location?.longitude ?? 0}
           lat={location?.latitude ?? 0}
         />
@@ -77,7 +79,7 @@ const CapsuleAdd: NextPage = () => {
           <ColorSelector
             colors={capsuleColors}
             onSelect={(color) => {
-              cupsuleCreateInputState.color = color
+              capsuleCreateInputState.color = color
             }}
           />
         </Box>
@@ -118,7 +120,7 @@ const CapsuleAdd: NextPage = () => {
           <ColorSelector
             colors={gpsColors}
             onSelect={(gpsColor) => {
-              cupsuleCreateInputState.gpsTextColor = gpsColor
+              capsuleCreateInputState.gpsTextColor = gpsColor
             }}
           />
         </Box>

@@ -4,6 +4,7 @@ import { Button, Modal, Text } from "@mantine/core"
 import { useRouter } from "next/router"
 
 import { useShakeAmount } from "@/lib/useShakeAmount"
+import MetaHeader from "@/view/common/MetaHeader"
 
 const TOTAL_COUNT = 800
 
@@ -22,11 +23,12 @@ const Shake: NextPage = () => {
 
   return (
     <>
+      <MetaHeader title="カプセルを開ける" />
       <Modal centered opened={cleared} onClose={() => {}} withCloseButton={false}>
         <div className="flex flex-col items-center">
           <p className="text-xl font-bold text-white">クリア！</p>
           <video src="/capsule_animation.mp4" className="w-full" muted autoPlay playsInline />
-          <Button onClick={() => router.push(`/cupsel/open/${capsuleId}/show`)} className="mt-4">
+          <Button onClick={() => router.push(`/capsule/open/${capsuleId}/show`)} className="mt-4">
             思い出を見る
           </Button>
         </div>
@@ -39,8 +41,10 @@ const Shake: NextPage = () => {
         <Text color="white" size="xl" weight="bold" className="relative z-10">
           みんなでふってカプセルを開けよう！
         </Text>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/shake.png"
+          alt=""
           className="relative z-10 mt-8 self-start"
           style={{ maxWidth: "100%", width: 300 }}
         />
