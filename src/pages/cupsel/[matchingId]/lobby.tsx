@@ -2,7 +2,6 @@ import { NextPage } from "next"
 import React, { useEffect } from "react"
 import { useRouter } from "next/router"
 import { Button, Group, Stack, Text } from "@mantine/core"
-import Head from "next/head"
 
 import { stopMatching } from "@/repository/matchingCreate"
 import { useUser } from "@/auth/useAuth"
@@ -12,6 +11,7 @@ import WalkthroughLayout from "@/view/layout/walkthrough"
 import UserAvater from "@/view/UserAvater"
 import Smartphone from "@/view/icons/Smartphone"
 import Wave from "@/view/icons/Wave"
+import MetaHeader from "@/view/common/MetaHeader"
 
 const Lobby: NextPage = () => {
   const router = useRouter()
@@ -38,9 +38,9 @@ const Lobby: NextPage = () => {
 
   return (
     <>
-      <Head>
+      <MetaHeader title="友達の選択">
         <link rel="prerender" href={`/cupsel/${matchingId}/collect`} />
-      </Head>
+      </MetaHeader>
       <WalkthroughLayout
         title="友達とシェアしよう"
         totalStep={4}
