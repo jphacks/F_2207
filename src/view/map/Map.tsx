@@ -106,7 +106,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
     })
 
     // parameters to ensure the model is georeferenced correctly on the map
-    const modelOrigin = [135.6042317745411, 34.86210390210311] as const
+    const modelOrigin = [135.6042317745411, 34.86210390210311] as [number, number]
     const modelAltitude = 0
     const modelRotate = [Math.PI / 2, 0, 0]
 
@@ -207,23 +207,6 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       setMarker(map, userID)
       console.log(map)
 
-      // map.addSource("mapbox-dem", {
-      //   type: "raster-dem",
-      //   url: "mapbox://mapbox.mapbox-terrain-dem-v1",
-      //   tileSize: 512,
-      //   maxzoom: 14,
-      // })
-      // add the DEM source as a terrain layer with exaggerated height
-      // map.setTerrain({ source: "structurel-dem", exaggeration: 1.5 })
-
-      // // add sky styling with `setFog` that will show when the map is highly pitched
-      // map.setFog({
-      //   "horizon-blend": 0.3,
-      //   color: "#f8f0e3",
-      //   "high-color": "#add8e6",
-      //   "space-color": "#d8f2ff",
-      //   "star-intensity": 0.0,
-      // })
       const layers = map.getStyle().layers
       const labelLayerId = layers?.find(
         (layer) => layer.type === "symbol" && layer.layout?.["text-field"],
@@ -232,47 +215,6 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       if (labelLayerId == null) {
         return
       }
-
-      // The 'building' layer in the Mapbox Streets
-      // vector tileset contains building height data
-      // from OpenStreetMap.
-      // map.addLayer(
-      //   {
-      //     id: "add-3d-buildings",
-      //     source: "composite",
-      //     "source-layer": "building",
-      //     filter: ["==", "extrude", "true"],
-      //     type: "fill-extrusion",
-      //     minzoom: 15,
-      //     paint: {
-      //       "fill-extrusion-color": "#aaa",
-
-      //       // Use an 'interpolate' expression to
-      //       // add a smooth transition effect to
-      //       // the buildings as the user zooms in.
-      //       "fill-extrusion-height": [
-      //         "interpolate",
-      //         ["linear"],
-      //         ["zoom"],
-      //         15,
-      //         0,
-      //         15.05,
-      //         ["get", "height"],
-      //       ],
-      //       "fill-extrusion-base": [
-      //         "interpolate",
-      //         ["linear"],
-      //         ["zoom"],
-      //         15,
-      //         0,
-      //         15.05,
-      //         ["get", "min_height"],
-      //       ],
-      //       "fill-extrusion-opacity": 0.6,
-      //     },
-      //   },
-      //   labelLayerId,
-      // )
     })
 
     map.on("click", userID, (e) => {
