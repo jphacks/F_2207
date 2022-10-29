@@ -17,6 +17,7 @@ import CapsuleDistance from "@/view/ar/CapsuleDistance"
 import { useCapsule } from "@/hooks/useCapsule"
 import { Capsule } from "@/types/capsule"
 import DiscoverDrawer from "@/view/DiscoverDrawer"
+import MetaHeader from "@/view/common/MetaHeader"
 
 const CapsuleModel: React.FC<ThreeElements["mesh"] & { color: string; distance: number }> = ({
   color,
@@ -152,6 +153,7 @@ const ArPage: React.FC<{ capsule: Capsule }> = ({ capsule }) => {
 
   return (
     <>
+      <MetaHeader title="探す" />
       <div className="relative">
         <Webcam
           videoConstraints={{

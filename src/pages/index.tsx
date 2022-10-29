@@ -1,11 +1,12 @@
 import { Avatar, Button, Group, Text } from "@mantine/core"
 import { NextPage } from "next"
-import Head from "next/head"
 import React, { useEffect } from "react"
 import { useRouter } from "next/router"
+import Image from "next/image"
 
 import DefaultLayout from "@/view/layout/default"
 import { useAuth, useAuthOperation } from "@/auth/useAuth"
+import MetaHeader from "@/view/common/MetaHeader"
 
 const Index: NextPage = () => {
   const router = useRouter()
@@ -20,16 +21,12 @@ const Index: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>リカプセル</title>
-        <meta name="description" content="sample next app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <MetaHeader title="ログイン" />
       <DefaultLayout hideBottomBar={user == null}>
         <main className="relative h-full p-4">
           {user == null ? (
             <div className="fixed inset-0 flex flex-col items-center justify-center px-12">
-              <img src="/commet.png" alt="" width={240} height={240} />
+              <Image src="/commet.png" alt="" width={240} height={240} />
               <Button color="brand.3" onClick={login} fullWidth size="md" mt={48}>
                 <Text color="black">Googleでログイン</Text>
               </Button>

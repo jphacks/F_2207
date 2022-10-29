@@ -12,13 +12,13 @@ import { NextPage } from "next"
 import React, { useEffect, useState } from "react"
 import { FiPlusCircle } from "react-icons/fi"
 import { useRouter } from "next/router"
-import Head from "next/head"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import UserAvater from "@/view/UserAvater"
 import { useMatchingUsers, useMatchingWithRedirect } from "@/hooks/useMatching"
 import { listenItemCount, moveToRegister, postItem } from "@/repository/items"
 import { useUser } from "@/auth/useAuth"
+import MetaHeader from "@/view/common/MetaHeader"
 
 const useItemCount = (matchingId: string) => {
   const [postedItemCount, setPostedItemCount] = useState<Record<string, number>>({})
@@ -98,9 +98,9 @@ const Collect: NextPage = () => {
 
   return (
     <>
-      <Head>
+      <MetaHeader title="写真・動画の選択">
         <link rel="prerender" href={`/capsule/${matchingId}/register`} />
-      </Head>
+      </MetaHeader>
       <WalkthroughLayout
         title="写真や動画を追加しよう"
         totalStep={4}

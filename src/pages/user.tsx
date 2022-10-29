@@ -1,22 +1,18 @@
 import { Avatar, Button, Group, Text } from "@mantine/core"
 import { NextPage } from "next"
-import Head from "next/head"
 import React from "react"
 import Image from "next/image"
 
 import DefaultLayout from "@/view/layout/default"
 import { useAuth, useAuthOperation } from "@/auth/useAuth"
+import MetaHeader from "@/view/common/MetaHeader"
 
 const User: NextPage = () => {
   const { user, isLoading } = useAuth()
   const { login, logout } = useAuthOperation()
   return (
     <>
-      <Head>
-        <title>リカプセル</title>
-        <meta name="description" content="sample next app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <MetaHeader title="マイページ" />
       <DefaultLayout hideBottomBar={user == null}>
         <main className="relative h-full p-4">
           {user == null ? (
