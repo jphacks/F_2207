@@ -39,16 +39,16 @@ const MatchingDialog: React.FC<MatchingDialogProps> = ({ children }) => {
       return
     }
     await joinMatching({ user, matchingId: matching.id })
-    router.push(`/cupsel/${matching.id}/lobby`)
+    router.push(`/capsule/${matching.id}/lobby`)
   }
 
-  const isTimecupselOngoing = router.asPath.startsWith(`/cupsel/`)
+  const isTimecapsuleOngoing = router.asPath.startsWith(`/capsule/`)
 
   return (
     <>
       {children}
       <Drawer
-        opened={matching != null && !isTimecupselOngoing}
+        opened={matching != null && !isTimecapsuleOngoing}
         onClose={() => {
           setMatchingQueue((matchings) => {
             if (matchings.length === 0) {

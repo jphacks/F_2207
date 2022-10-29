@@ -34,12 +34,12 @@ export const useMatchingWithRedirect = (matchingId: string) => {
       return
     }
     if (matching.status === matchingStatus.ITEM_COLLECT) {
-      router.push(`/cupsel/${matchingId}/collect`)
+      router.push(`/capsule/${matchingId}/collect`)
       return
     }
 
     if (matching.status === matchingStatus.INFO_REGISTER) {
-      router.push(`/cupsel/${matchingId}/register`)
+      router.push(`/capsule/${matchingId}/register`)
       return
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

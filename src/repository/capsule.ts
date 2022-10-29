@@ -1,7 +1,7 @@
 import { arrayUnion, collection, doc, getDoc, setDoc, Timestamp } from "firebase/firestore"
 
 import { db } from "@/lib/firebase/db"
-import { CupsuleCreateInput } from "@/state/cupsuleCreateInput"
+import { CapsuleCreateInput } from "@/state/capsuleCreateInput"
 import { AppUser } from "@/types/user"
 import { GpsType } from "@/provider/GpsProvider"
 import { Capsule } from "@/types/capsule"
@@ -11,7 +11,7 @@ import { Capsule } from "@/types/capsule"
  */
 export const postCapsule = async (
   { matchingId, user }: { matchingId: string; user: AppUser },
-  input: CupsuleCreateInput,
+  input: CapsuleCreateInput,
   geolocation: GpsType,
 ) => {
   if (input.openDate == null) {
