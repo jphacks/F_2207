@@ -19,7 +19,7 @@ const MapPage: NextPage = () => {
             top: 20,
             left: 16,
             right: 16,
-            zIndex: 10,
+            zIndex: 500,
           }}
         >
           <SearchBar />
@@ -33,7 +33,7 @@ const MapPage: NextPage = () => {
           compact
           sx={{
             position: "absolute",
-            zIndex: 10,
+            zIndex: 500,
             bottom: 32,
             right: 32,
             boxShadow: "0px 1px 6px 0px #84848442",
