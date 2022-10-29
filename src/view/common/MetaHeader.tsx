@@ -3,9 +3,9 @@ import React from "react"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL!
 
-const serviceName = "サンプルアプリ"
+const serviceName = "リカプセル"
 
-export type MetaProps = {
+export type MetaHeaderProps = {
   title: string
   description?: string
   ogType?: "website" | "article"
@@ -15,9 +15,10 @@ export type MetaProps = {
   canonical?: string
   disableIndex?: boolean
   disableOgp?: boolean
+  children?: React.ReactNode
 }
 
-const Meta: React.FC<MetaProps> = ({
+const MetaHeader: React.FC<MetaHeaderProps> = ({
   title: _title,
   description,
   ogType = "article",
@@ -27,6 +28,7 @@ const Meta: React.FC<MetaProps> = ({
   canonical,
   disableIndex = false,
   disableOgp = false,
+  children,
 }) => {
   const title = `${_title}｜${serviceName}`
   return (
@@ -50,8 +52,9 @@ const Meta: React.FC<MetaProps> = ({
         </>
       )}
       {disableIndex && <meta name="robots" content="noindex, nofollow" />}
+      {children}
     </Head>
   )
 }
 
-export default Meta
+export default MetaHeader

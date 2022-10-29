@@ -15,7 +15,6 @@ import React, { useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/router"
 import { add } from "date-fns"
-import Head from "next/head"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import CapsulePreview from "@/view/CapsulePreview"
@@ -29,6 +28,7 @@ import {
 import { useGeolocation } from "@/provider/GpsProvider"
 import { useMatchingWithRedirect } from "@/hooks/useMatching"
 import { joinCapsule, postCapsule } from "@/repository/capsule"
+import MetaHeader from "@/view/common/MetaHeader"
 
 const Register: NextPage = () => {
   const router = useRouter()
@@ -174,9 +174,9 @@ const Register: NextPage = () => {
 
   return (
     <>
-      <Head>
+      <MetaHeader title="情報の入力">
         <link rel="prerender" href="/map" />
-      </Head>
+      </MetaHeader>
       <WalkthroughLayout
         title="カプセルを作ろう"
         totalStep={4}

@@ -17,6 +17,7 @@ import {
   gpsColors,
   useCupsuleCreateInput,
 } from "@/state/cupsuleCreateInput"
+import MetaHeader from "@/view/common/MetaHeader"
 
 import type { NextPage } from "next"
 import type { EmojiClickData } from "emoji-picker-react"
@@ -56,6 +57,7 @@ const CapsuleAdd: NextPage = () => {
 
   return (
     <>
+      <MetaHeader title="カプセルの作成" />
       <WalkthroughLayout
         title="カプセルを作ろう"
         totalStep={4}
