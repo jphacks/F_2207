@@ -168,6 +168,11 @@ const MapPage: React.FC = () => {
           as="fetch"
           crossOrigin="anonymous"
         />
+        <link
+          rel="preconnect dns-prefetch"
+          href="https://cyberjapandata.gsi.go.jp"
+          crossOrigin="anonymous"
+        />
       </Head>
       <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
         <LoadingOverlay
