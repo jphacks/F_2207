@@ -1,7 +1,9 @@
 import { Box, Drawer, Text } from "@mantine/core"
 import { useCallback, useState } from "react"
-import Picker, { Theme } from "emoji-picker-react"
+import { Props as PickerProps } from "emoji-picker-react"
 import { useRouter } from "next/router"
+import dynamic from "next/dynamic"
+import useSWR from "swr"
 
 import CapsulePreview from "@/view/CapsulePreview"
 import ColorSelector from "@/view/CapsuleColorSelector"
@@ -18,6 +20,8 @@ import {
 
 import type { NextPage } from "next"
 import type { EmojiClickData } from "emoji-picker-react"
+
+const Picker = dynamic<PickerProps>(() => import("emoji-picker-react"))
 
 const CapsuleAdd: NextPage = () => {
   const router = useRouter()
@@ -45,6 +49,10 @@ const CapsuleAdd: NextPage = () => {
     const matchingId = await createMatching({ user, location })
     await router.push(`/cupsel/${matchingId}/lobby`)
   }, [location, router, user])
+
+  const { data: Theme } = useSWR("emoji-picker-react.Theme", () =>
+    import("emoji-picker-react").then(({ Theme }) => Theme),
+  )
 
   return (
     <>
@@ -124,7 +132,7 @@ const CapsuleAdd: NextPage = () => {
         withCloseButton={false}
       >
         <Picker
-          theme={Theme.DARK}
+          theme={Theme?.DARK}
           skinTonesDisabled
           width="100%"
           height="100%"

@@ -1,46 +1,53 @@
 import { useEffect, useState } from "react"
 import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
-import ReactDOM from "react-dom"
 import { useRouter } from "next/router"
+import Head from "next/head"
+import { createRoot } from "react-dom/client"
+import { Map, NavigationControl, GeolocateControl, Marker, Popup } from "mapbox-gl"
+import "mapbox-gl/dist/mapbox-gl.css"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
-import { loadCss } from "@/lib/loadCss"
-import { loadScript } from "@/lib/loadScript"
+import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
 
 import MapCapsule from "./MapCapsule"
 import LockedCapsule from "./LockedCapsule"
 
-const Map: React.FC = () => {
+const MapPage: React.FC = () => {
   const user = useUser()
   const userID = user?.id ?? ""
 
   const router = useRouter()
-  const [finishScriptLoad, setFinishScriptLoad] = useState(false)
   const [finishMapLoad, setFinishMapLoad] = useState(false)
 
-  const mapSetUp = () => {
+  const mapSetUp = async () => {
+    const geolocation = await new Promise<GeolocationPosition>((resolve) =>
+      navigator.geolocation.getCurrentPosition(resolve),
+    )
+
     // show map on Box
-    // @ts-ignore
     const transformRequest = mqplatformTransformRequest(
       process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY,
+      userID,
     )
-    // @ts-ignore
-    var map = new mapboxgl.Map({
+    const map = new Map({
       container: "map",
       style: "mqplatform://maps-api/styles/v1/18",
-      transformRequest: transformRequest,
+      transformRequest,
       logoPosition: "top-left",
+      center: {
+        lat: geolocation.coords.latitude,
+        lng: geolocation.coords.longitude,
+      },
+      zoom: 15,
     })
-    // @ts-ignore
     // zoom control
-    map.addControl(new mapboxgl.NavigationControl(), "bottom-left")
+    map.addControl(new NavigationControl(), "bottom-left")
     // current place control
     map.addControl(
-      // @ts-ignore
-      new mapboxgl.GeolocateControl({
+      new GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
         trackUserLocation: true,
         showUserLocation: true,
@@ -78,8 +85,7 @@ const Map: React.FC = () => {
         `https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
       )
       .then((res) => {
-        // @ts-ignore
-        res.data.forEach((layer) => {
+        res.data.forEach((layer: any) => {
           if (layer.name == userID) {
             // set Image
             axios
@@ -89,23 +95,25 @@ const Map: React.FC = () => {
               .then((res) => {
                 res.data.features.forEach((feature: Feature) => {
                   const div = document.createElement("div")
+                  const root = createRoot(div)
+
                   const today = Date.now()
                   const openDate = Date.parse(feature.properties.openDate)
 
                   if (today > openDate) {
-                    ReactDOM.render(
+                    root.render(
                       <MapCapsule
                         feature={feature}
                         onClick={() => router.push(`/cupsel/open/${feature.properties.id}`)}
                       />,
-                      div,
                     )
                   } else {
-                    ReactDOM.render(<LockedCapsule feature={feature} />, div)
+                    root.render(<LockedCapsule feature={feature} />)
                   }
 
-                  // @ts-ignore
-                  new mapboxgl.Marker(div).setLngLat(feature.geometry.coordinates).addTo(map)
+                  new Marker(div)
+                    .setLngLat(feature.geometry.coordinates as [number, number])
+                    .addTo(map)
                 })
               })
           }
@@ -139,37 +147,42 @@ const Map: React.FC = () => {
       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
     }
 
-    // @ts-ignore
     // 25 is half height of image
-    new mapboxgl.Popup({ offset: 25 }).setLngLat(coordinates).setHTML(description).addTo(map)
+    new Popup({ offset: 25 })
+      .setLngLat(coordinates as [number, number])
+      .setHTML(description)
+      .addTo(map)
   }
 
   useEffect(() => {
-    let mapquestSrc = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.js"
-    let mapboxSrc = "https://prodmqpstorage.z11.web.core.windows.net/mqplatform.js"
-    let mapboxCssHref = "https://api.mapbox.com/mapbox-gl-js/v1.13.2/mapbox-gl.css"
-
-    loadScript(mapquestSrc, () => {
-      loadScript(mapboxSrc, () => setFinishScriptLoad(true))
-    })
-
-    loadCss(mapboxCssHref)
+    mapSetUp()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
-    console.log(finishScriptLoad)
-    if (finishScriptLoad) {
-      mapSetUp()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [finishScriptLoad])
-
   return (
-    <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
-      <LoadingOverlay visible={!finishMapLoad} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
-    </Box>
+    <>
+      <Head>
+        <link
+          rel="preload"
+          href={`https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`}
+          as="fetch"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect dns-prefetch"
+          href="https://cyberjapandata.gsi.go.jp"
+          crossOrigin="anonymous"
+        />
+      </Head>
+      <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
+        <LoadingOverlay
+          visible={!finishMapLoad}
+          loaderProps={{ size: "xl" }}
+          overlayOpacity={0.6}
+        />
+      </Box>
+    </>
   )
 }
 
-export default Map
+export default MapPage

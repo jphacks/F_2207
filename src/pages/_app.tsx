@@ -1,11 +1,13 @@
 import "../styles/globals.css"
 import { SWRConfig } from "swr"
 import { MantineProvider } from "@mantine/core"
+import dynamic from "next/dynamic"
+import { Suspense } from "react"
 
 import { AuthProvider } from "@/auth/useAuth"
 import Loading from "@/auth/Loading"
-import MatchingDialog from "@/view/MatchingDialog"
 import GpsProvider from "@/provider/GpsProvider"
+import { MatchingDialogProps } from "@/view/MatchingDialog"
 
 import type { AppProps } from "next/app"
 
@@ -84,8 +86,16 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
 
 export default MyApp
 
-export const Inner: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Loading>
-    <MatchingDialog>{children}</MatchingDialog>
-  </Loading>
-)
+const MatchingDialog = dynamic<MatchingDialogProps>(() => import("@/view/MatchingDialog"), {
+  suspense: true,
+})
+
+export const Inner: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <Loading>
+      <Suspense fallback={children}>
+        <MatchingDialog>{children}</MatchingDialog>
+      </Suspense>
+    </Loading>
+  )
+}

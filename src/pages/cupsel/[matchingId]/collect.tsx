@@ -12,6 +12,7 @@ import { NextPage } from "next"
 import React, { useEffect, useState } from "react"
 import { FiPlusCircle } from "react-icons/fi"
 import { useRouter } from "next/router"
+import Head from "next/head"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import UserAvater from "@/view/UserAvater"
@@ -96,76 +97,81 @@ const Collect: NextPage = () => {
   })
 
   return (
-    <WalkthroughLayout
-      title="写真や動画を追加しよう"
-      totalStep={4}
-      currentStep={2}
-      onClickNext={
-        isOwner
-          ? async () => {
-              await moveToRegister(matchingId)
-              router.push(`/cupsel/${matchingId}/register`)
-            }
-          : null
-      }
-      onClickPrevOrClose={
-        isOwner
-          ? () => {
-              router.push(`/cupsel/create`)
-            }
-          : null
-      }
-    >
-      <Box className="pt-10 pb-16">
-        <Group spacing={10}>
-          {matchingUsers.map((matchingUser) => (
-            <UserAvater
-              key={matchingUser.id}
-              user={matchingUser}
-              label={postedItemCount[matchingUser.id] ?? 0}
-            />
-          ))}
-        </Group>
-      </Box>
-      <Text color="white" weight="bold" size="sm">
-        あなたの写真や動画
-      </Text>
-      <Center>
-        <SimpleGrid className="w-full pt-4" cols={3} spacing={3} verticalSpacing={3}>
-          <FileButton
-            key="addButton"
-            onChange={handleAddFiles}
-            accept="image/png,image/jpeg"
-            multiple
-          >
-            {(props) => (
-              <Box
-                component="button"
-                {...props}
-                sx={(theme) => ({
-                  height: "100%",
-                  width: "100%",
-                  backgroundColor: theme.colors.gray[8],
-                  border: "none",
-                  aspectRatio: "1 / 1",
-                  transition: "backgroundColor 1s",
-                  "&:hover": {
-                    backgroundColor: theme.colors.gray[6],
-                    cursor: "pointer",
-                  },
-                  "&:focus": {
+    <>
+      <Head>
+        <link rel="prerender" href={`/cupsel/${matchingId}/register`} />
+      </Head>
+      <WalkthroughLayout
+        title="写真や動画を追加しよう"
+        totalStep={4}
+        currentStep={2}
+        onClickNext={
+          isOwner
+            ? async () => {
+                await moveToRegister(matchingId)
+                router.push(`/cupsel/${matchingId}/register`)
+              }
+            : null
+        }
+        onClickPrevOrClose={
+          isOwner
+            ? () => {
+                router.push(`/cupsel/create`)
+              }
+            : null
+        }
+      >
+        <Box className="pt-10 pb-16">
+          <Group spacing={10}>
+            {matchingUsers.map((matchingUser) => (
+              <UserAvater
+                key={matchingUser.id}
+                user={matchingUser}
+                label={postedItemCount[matchingUser.id] ?? 0}
+              />
+            ))}
+          </Group>
+        </Box>
+        <Text color="white" weight="bold" size="sm">
+          あなたの写真や動画
+        </Text>
+        <Center>
+          <SimpleGrid className="w-full pt-4" cols={3} spacing={3} verticalSpacing={3}>
+            <FileButton
+              key="addButton"
+              onChange={handleAddFiles}
+              accept="image/png,image/jpeg"
+              multiple
+            >
+              {(props) => (
+                <Box
+                  component="button"
+                  {...props}
+                  sx={(theme) => ({
+                    height: "100%",
+                    width: "100%",
                     backgroundColor: theme.colors.gray[8],
-                  },
-                })}
-              >
-                <FiPlusCircle size={36} color={theme.colors.gray[4]} />
-              </Box>
-            )}
-          </FileButton>
-          {previews}
-        </SimpleGrid>
-      </Center>
-    </WalkthroughLayout>
+                    border: "none",
+                    aspectRatio: "1 / 1",
+                    transition: "backgroundColor 1s",
+                    "&:hover": {
+                      backgroundColor: theme.colors.gray[6],
+                      cursor: "pointer",
+                    },
+                    "&:focus": {
+                      backgroundColor: theme.colors.gray[8],
+                    },
+                  })}
+                >
+                  <FiPlusCircle size={36} color={theme.colors.gray[4]} />
+                </Box>
+              )}
+            </FileButton>
+            {previews}
+          </SimpleGrid>
+        </Center>
+      </WalkthroughLayout>
+    </>
   )
 }
 

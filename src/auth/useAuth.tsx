@@ -7,7 +7,7 @@ import {
 } from "firebase/auth"
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 
-import { auth } from "@/lib/firebase/init"
+import { auth } from "@/lib/firebase/auth"
 import { AppUser } from "@/types/user"
 
 export type AuthContextType =

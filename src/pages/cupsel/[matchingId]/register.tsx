@@ -15,6 +15,7 @@ import React, { useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/router"
 import { add } from "date-fns"
+import Head from "next/head"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import CapsulePreview from "@/view/CapsulePreview"
@@ -172,94 +173,99 @@ const Register: NextPage = () => {
   }
 
   return (
-    <WalkthroughLayout
-      title="カプセルを作ろう"
-      totalStep={4}
-      currentStep={3}
-      onClickNext={save}
-      onClickPrevOrClose={isOwner ? () => router.push(`/cupsel/${matchingId}/collect`) : null}
-      nextButtonType="bury"
-    >
-      <Box>
-        <LoadingOverlay visible={isSaving} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
-        <CapsulePreview
-          capsuleColor={cupsuleCreateInput.color}
-          gpsColor={cupsuleCreateInput.gpsTextColor}
-          emoji={cupsuleCreateInput.emoji}
-          lng={geolocation.longitude ?? 0}
-          lat={geolocation.latitude ?? 0}
-        />
-        <Text className="pb-4" color="white" weight="bold" size="sm">
-          カプセルの情報
-        </Text>
-        {isOwner && (
-          <TextInput
-            className="pb-3"
-            placeholder="タイトルを書く（最大18字）"
-            icon={<AiOutlineEdit size={24} color={theme.colors.gray[0]} />}
-            value={cupsuleCreateInput.title}
+    <>
+      <Head>
+        <link rel="prerender" href="/map" />
+      </Head>
+      <WalkthroughLayout
+        title="カプセルを作ろう"
+        totalStep={4}
+        currentStep={3}
+        onClickNext={save}
+        onClickPrevOrClose={isOwner ? () => router.push(`/cupsel/${matchingId}/collect`) : null}
+        nextButtonType="bury"
+      >
+        <Box>
+          <LoadingOverlay visible={isSaving} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
+          <CapsulePreview
+            capsuleColor={cupsuleCreateInput.color}
+            gpsColor={cupsuleCreateInput.gpsTextColor}
+            emoji={cupsuleCreateInput.emoji}
+            lng={geolocation.longitude ?? 0}
+            lat={geolocation.latitude ?? 0}
+          />
+          <Text className="pb-4" color="white" weight="bold" size="sm">
+            カプセルの情報
+          </Text>
+          {isOwner && (
+            <TextInput
+              className="pb-3"
+              placeholder="タイトルを書く（最大18字）"
+              icon={<AiOutlineEdit size={24} color={theme.colors.gray[0]} />}
+              value={cupsuleCreateInput.title}
+              onChange={(e) => {
+                cupsuleCreateInputState.title = e.target.value
+              }}
+              variant="filled"
+              size="lg"
+              iconWidth={48}
+              maxLength={18}
+              styles={{
+                input: {
+                  fontSize: 16,
+                },
+              }}
+            />
+          )}
+          {isOwner && (
+            <DatePicker
+              className="pb-3"
+              placeholder="開封できる日を指定する"
+              icon={<AiOutlineLock size={24} color={theme.colors.gray[0]} />}
+              value={cupsuleCreateInput.openDate}
+              onChange={(value) => {
+                cupsuleCreateInputState.openDate = value
+              }}
+              minDate={new Date()}
+              dropdownType="modal"
+              variant="filled"
+              firstDayOfWeek="sunday"
+              inputFormat="YYYY年M月D日"
+              size="lg"
+              iconWidth={48}
+              styles={{
+                input: { fontSize: 16 },
+              }}
+            />
+          )}
+          <Textarea
+            placeholder="メモを残す"
+            icon={<AiOutlineMessage size={24} color={theme.colors.gray[0]} />}
+            value={cupsuleCreateInput.memo}
             onChange={(e) => {
-              cupsuleCreateInputState.title = e.target.value
+              cupsuleCreateInputState.memo = e.target.value
             }}
+            minRows={9}
             variant="filled"
             size="lg"
             iconWidth={48}
-            maxLength={18}
-            styles={{
+            styles={() => ({
+              icon: { top: 12, bottom: "initial" },
               input: {
                 fontSize: 16,
+                lineHeight: 1.75,
               },
-            }}
-          />
-        )}
-        {isOwner && (
-          <DatePicker
-            className="pb-3"
-            placeholder="開封できる日を指定する"
-            icon={<AiOutlineLock size={24} color={theme.colors.gray[0]} />}
-            value={cupsuleCreateInput.openDate}
-            onChange={(value) => {
-              cupsuleCreateInputState.openDate = value
-            }}
-            minDate={new Date()}
-            dropdownType="modal"
-            variant="filled"
-            firstDayOfWeek="sunday"
-            inputFormat="YYYY年M月D日"
-            size="lg"
-            iconWidth={48}
-            styles={(theme) => ({
-              input: { fontSize: 16, "&::placeholder": { color: theme.colors.gray[0] } },
             })}
           />
-        )}
-        <Textarea
-          placeholder="メモを残す"
-          icon={<AiOutlineMessage size={24} color={theme.colors.gray[0]} />}
-          value={cupsuleCreateInput.memo}
-          onChange={(e) => {
-            cupsuleCreateInputState.memo = e.target.value
-          }}
-          minRows={9}
-          variant="filled"
-          size="lg"
-          iconWidth={48}
-          styles={() => ({
-            icon: { top: 12, bottom: "initial" },
-            input: {
-              fontSize: 16,
-              lineHeight: 1.75,
-            },
-          })}
-        />
-        <Modal centered opened={isSaveSuccessed} onClose={moveToMap} withCloseButton={false}>
-          <div className="flex flex-col items-center">
-            <p>カプセルを埋めました！</p>
-            <Button onClick={moveToMap}>地図へ戻る</Button>
-          </div>
-        </Modal>
-      </Box>
-    </WalkthroughLayout>
+          <Modal centered opened={isSaveSuccessed} onClose={moveToMap} withCloseButton={false}>
+            <div className="flex flex-col items-center">
+              <p>カプセルを埋めました！</p>
+              <Button onClick={moveToMap}>地図へ戻る</Button>
+            </div>
+          </Modal>
+        </Box>
+      </WalkthroughLayout>
+    </>
   )
 }
 
