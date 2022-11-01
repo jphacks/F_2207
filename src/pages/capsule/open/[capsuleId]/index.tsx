@@ -213,7 +213,7 @@ const ArPage: React.FC<{ capsule: Capsule }> = ({ capsule }) => {
         </div>
       )}
       <DiscoverDrawer
-        onOpenCapsule={() => router.push(`/cupsel/open/${capsule.id}/shake`)}
+        onOpenCapsule={() => router.push(`/capsule/open/${capsule.id}/shake`)}
         capsule={capsule}
         open={open}
         onClose={() => setOpen(false)}

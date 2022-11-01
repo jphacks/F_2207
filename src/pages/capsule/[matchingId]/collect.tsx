@@ -99,7 +99,7 @@ const Collect: NextPage = () => {
   return (
     <>
       <MetaHeader title="写真・動画の選択">
-        <link rel="prerender" href={`/cupsel/${matchingId}/register`} />
+        <link rel="prerender" href={`/capsule/${matchingId}/register`} />
       </MetaHeader>
       <WalkthroughLayout
         title="写真や動画を追加しよう"
@@ -109,14 +109,14 @@ const Collect: NextPage = () => {
           isOwner
             ? async () => {
                 await moveToRegister(matchingId)
-                router.push(`/cupsel/${matchingId}/register`)
+                router.push(`/capsule/${matchingId}/register`)
               }
             : null
         }
         onClickPrevOrClose={
           isOwner
             ? () => {
-                router.push(`/cupsel/create`)
+                router.push(`/capsule/create`)
               }
             : null
         }

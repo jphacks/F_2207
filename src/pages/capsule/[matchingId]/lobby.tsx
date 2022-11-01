@@ -32,21 +32,21 @@ const Lobby: NextPage = () => {
       return
     }
     if (matching.status === matchingStatus.ITEM_COLLECT) {
-      router.push(`/cupsel/${matchingId}/collect`)
+      router.push(`/capsule/${matchingId}/collect`)
     }
   }, [matching, matchingId, router])
 
   return (
     <>
       <MetaHeader title="友達の選択">
-        <link rel="prerender" href={`/cupsel/${matchingId}/collect`} />
+        <link rel="prerender" href={`/capsule/${matchingId}/collect`} />
       </MetaHeader>
       <WalkthroughLayout
         title="友達とシェアしよう"
         totalStep={4}
         currentStep={1}
         onClickNext={isOwner ? handleConfirmMembers : null}
-        onClickPrevOrClose={isOwner ? () => router.push("/cupsel/create") : null}
+        onClickPrevOrClose={isOwner ? () => router.push("/capsule/create") : null}
       >
         <Stack align="center">
           <div className="my-[60px] flex max-w-[240px] items-center justify-between space-x-8">

@@ -28,7 +28,7 @@ const Shake: NextPage = () => {
         <div className="flex flex-col items-center">
           <p className="text-xl font-bold text-white">クリア！</p>
           <video src="/capsule_animation.mp4" className="w-full" muted autoPlay playsInline />
-          <Button onClick={() => router.push(`/cupsel/open/${capsuleId}/show`)} className="mt-4">
+          <Button onClick={() => router.push(`/capsule/open/${capsuleId}/show`)} className="mt-4">
             思い出を見る
           </Button>
         </div>

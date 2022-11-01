@@ -21,10 +21,10 @@ import CapsulePreview from "@/view/CapsulePreview"
 import { useUser } from "@/auth/useAuth"
 import { CreateFeature } from "@/types/feature"
 import {
-  clearCupsuleCreateInput,
-  cupsuleCreateInputState,
-  useCupsuleCreateInput,
-} from "@/state/cupsuleCreateInput"
+  clearCapsuleCreateInput,
+  capsuleCreateInputState,
+  useCapsuleCreateInput,
+} from "@/state/capsuleCreateInput"
 import { useGeolocation } from "@/provider/GpsProvider"
 import { useMatchingWithRedirect } from "@/hooks/useMatching"
 import { joinCapsule, postCapsule } from "@/repository/capsule"
@@ -40,7 +40,7 @@ const Register: NextPage = () => {
   const matching = useMatchingWithRedirect(matchingId)
   const isOwner = matching != null && user != null && matching.ownerId === user.id
 
-  const cupsuleCreateInput = useCupsuleCreateInput()
+  const capsuleCreateInput = useCapsuleCreateInput()
 
   const [isSaving, setIsSaving] = useState(false)
   const [isSaveSuccessed, setIsSaveSuccessed] = useState(false)
@@ -54,15 +54,15 @@ const Register: NextPage = () => {
     }
 
     if (isOwner) {
-      if (cupsuleCreateInput.title == "" || cupsuleCreateInput.openDate == null) {
+      if (capsuleCreateInput.title == "" || capsuleCreateInput.openDate == null) {
         window.alert("タイトル、開封日を設定してください")
         onFailCreateCapsule()
         return
       }
 
-      await postCapsule({ matchingId, user }, cupsuleCreateInput, geolocation)
+      await postCapsule({ matchingId, user }, capsuleCreateInput, geolocation)
     } else {
-      await joinCapsule({ matchingId, user }, cupsuleCreateInput.memo)
+      await joinCapsule({ matchingId, user }, capsuleCreateInput.memo)
     }
 
     // TODO: オーナーの処理に移す
@@ -74,11 +74,11 @@ const Register: NextPage = () => {
       },
       properties: {
         id: matchingId,
-        capsuleColor: cupsuleCreateInput.color,
-        gpsColor: cupsuleCreateInput.gpsTextColor,
-        emoji: cupsuleCreateInput.emoji,
+        capsuleColor: capsuleCreateInput.color,
+        gpsColor: capsuleCreateInput.gpsTextColor,
+        emoji: capsuleCreateInput.emoji,
         addDate: new Date().toISOString(),
-        openDate: (cupsuleCreateInput.openDate ?? add(new Date(), { years: 1 })).toISOString(),
+        openDate: (capsuleCreateInput.openDate ?? add(new Date(), { years: 1 })).toISOString(),
       },
     }
 
@@ -105,7 +105,7 @@ const Register: NextPage = () => {
   const onSucsessCreateCapsule = () => {
     setIsSaveSuccessed(true)
     setIsSaving(false)
-    clearCupsuleCreateInput()
+    clearCapsuleCreateInput()
   }
   const onFailCreateCapsule = () => {
     setIsSaving(false)
@@ -182,15 +182,15 @@ const Register: NextPage = () => {
         totalStep={4}
         currentStep={3}
         onClickNext={save}
-        onClickPrevOrClose={isOwner ? () => router.push(`/cupsel/${matchingId}/collect`) : null}
+        onClickPrevOrClose={isOwner ? () => router.push(`/capsule/${matchingId}/collect`) : null}
         nextButtonType="bury"
       >
         <Box>
           <LoadingOverlay visible={isSaving} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
           <CapsulePreview
-            capsuleColor={cupsuleCreateInput.color}
-            gpsColor={cupsuleCreateInput.gpsTextColor}
-            emoji={cupsuleCreateInput.emoji}
+            capsuleColor={capsuleCreateInput.color}
+            gpsColor={capsuleCreateInput.gpsTextColor}
+            emoji={capsuleCreateInput.emoji}
             lng={geolocation.longitude ?? 0}
             lat={geolocation.latitude ?? 0}
           />
@@ -202,9 +202,9 @@ const Register: NextPage = () => {
               className="pb-3"
               placeholder="タイトルを書く（最大18字）"
               icon={<AiOutlineEdit size={24} color={theme.colors.gray[0]} />}
-              value={cupsuleCreateInput.title}
+              value={capsuleCreateInput.title}
               onChange={(e) => {
-                cupsuleCreateInputState.title = e.target.value
+                capsuleCreateInputState.title = e.target.value
               }}
               variant="filled"
               size="lg"
@@ -222,9 +222,9 @@ const Register: NextPage = () => {
               className="pb-3"
               placeholder="開封できる日を指定する"
               icon={<AiOutlineLock size={24} color={theme.colors.gray[0]} />}
-              value={cupsuleCreateInput.openDate}
+              value={capsuleCreateInput.openDate}
               onChange={(value) => {
-                cupsuleCreateInputState.openDate = value
+                capsuleCreateInputState.openDate = value
               }}
               minDate={new Date()}
               dropdownType="modal"
@@ -241,9 +241,9 @@ const Register: NextPage = () => {
           <Textarea
             placeholder="メモを残す"
             icon={<AiOutlineMessage size={24} color={theme.colors.gray[0]} />}
-            value={cupsuleCreateInput.memo}
+            value={capsuleCreateInput.memo}
             onChange={(e) => {
-              cupsuleCreateInputState.memo = e.target.value
+              capsuleCreateInputState.memo = e.target.value
             }}
             minRows={9}
             variant="filled"
