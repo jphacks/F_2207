@@ -13,7 +13,16 @@ import {
   MercatorCoordinate,
   LngLatLike,
 } from "mapbox-gl"
-import THREE, { Camera, Scene, DirectionalLight, WebGLRenderer, Matrix4, Vector3 } from "three"
+import THREE, {
+  Scene,
+  DirectionalLight,
+  WebGLRenderer,
+  Matrix4,
+  Vector3,
+  Vector2,
+  PerspectiveCamera,
+  Raycaster,
+} from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
@@ -126,8 +135,10 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       scale: modelAsMercatorCoordinate.meterInMercatorCoordinateUnits(),
     }
 
-    const camera = new Camera()
+    // const camera = new Camera()
+    const camera = new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6)
     const scene = new Scene()
+    const raycaster = new Raycaster()
     let renderer: THREE.WebGLRenderer | null = null
 
     // configuration of the custom layer for a 3D model per the CustomLayerInterface
@@ -199,7 +210,27 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       },
     }
 
+    map.on("click", (e) => {
+      var mouse = new Vector2()
+      // // scale mouse pixel position to a percentage of the screen's width and height
+      mouse.x = (e.point.x / map.transform.width) * 2 - 1
+      mouse.y = 1 - (e.point.y / map.transform.height) * 2
+      const camInverseProjection = camera.projectionMatrix.invert()
+      const cameraPosition = new Vector3().applyMatrix4(camInverseProjection)
+      const mousePosition = new Vector3(mouse.x, mouse.y, 1).applyMatrix4(camInverseProjection)
+      const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
+
+      raycaster.set(cameraPosition, viewDirection)
+
+      // calculate objects intersecting the picking ray
+      var intersects = raycaster.intersectObjects(scene.children, true)
+      if (intersects.length) {
+        console.log(intersects)
+      }
+    })
+
     map.on("style.load", () => {
+      console.log("added layer")
       map.addLayer(customLayer, "EP9PAUebGrNL2Wb3idfvISMwyVt1")
     })
 
