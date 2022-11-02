@@ -16,7 +16,7 @@ export default class _Document extends Document {
           <link rel="preconnect dns-prefetch" href="https://recupsel.firebaseapp.com" />
           <link rel="preconnect dns-prefetch" href="https://apis.google.com" />
         </Head>
-        <body className="bg-[#212121]">
+        <body className="bg-bgcolor">
           <Main />
           <NextScript />
         </body>

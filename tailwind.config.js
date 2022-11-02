@@ -15,6 +15,13 @@ module.exports = {
           "sans-serif",
         ],
       },
+      boxShadow: {
+        main: "0px 1px 6px rgba(132, 132, 132, 0.26)",
+      },
+      colors: {
+        bgcolor: "#212121",
+        primary: "#D3F36B",
+      },
     },
   },
   plugins: [],
