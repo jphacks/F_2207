@@ -3,7 +3,7 @@ import { MouseEventHandler } from "react"
 
 import { convertLngLat } from "@/lib/convertLngLat"
 
-type CapsuleSize = "sm" | "md"
+type CapsuleSize = "xs" | "sm" | "md"
 
 type CapsuleProps = {
   capsuleColor: string
@@ -28,6 +28,8 @@ const Capsule: React.FC<CapsuleProps> = ({
 }) => {
   const getDiameter = (size: CapsuleSize) => {
     switch (size) {
+      case "xs":
+        return 60
       case "sm":
         return 102
       case "md":
@@ -37,6 +39,8 @@ const Capsule: React.FC<CapsuleProps> = ({
 
   const getEmojiSize = (size: CapsuleSize) => {
     switch (size) {
+      case "xs":
+        return 32
       case "sm":
         return 54.5
       case "md":
@@ -46,6 +50,8 @@ const Capsule: React.FC<CapsuleProps> = ({
 
   const getGpsSize = (size: CapsuleSize) => {
     switch (size) {
+      case "xs":
+        return 8
       case "sm":
         return 12.5
       case "md":
