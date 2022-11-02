@@ -15,6 +15,9 @@ module.exports = {
           "sans-serif",
         ],
       },
+      height: {
+        "map-screen": ["calc(100vh - 72px)", "calc(100dvh - 72px)"],
+      },
     },
   },
   plugins: [],
