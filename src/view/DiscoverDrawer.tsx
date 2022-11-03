@@ -1,5 +1,6 @@
 import React from "react"
 import { Button, Drawer, Text, Center } from "@mantine/core"
+import { NextLink } from "@mantine/next"
 
 import { Capsule } from "@/types/capsule"
 
@@ -8,16 +9,11 @@ import CapsulComponent from "./Capsule"
 export type DiscoverDrawerPorps = {
   open: boolean
   onClose: () => void
-  onOpenCapsule: () => void
+  href: string
   capsule: Capsule
 }
 
-const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
-  open,
-  onOpenCapsule,
-  onClose,
-  capsule,
-}) => {
+const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({ open, onClose, capsule, href }) => {
   return (
     <Drawer
       opened={open}
@@ -53,7 +49,15 @@ const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
           </Text>
         </Center>
       </div>
-      <Button color="brand.3" onClick={onOpenCapsule} fullWidth size="md" mt={48}>
+      <Button
+        component={NextLink}
+        href={href}
+        color="brand.3"
+        // onClick={onOpenCapsule}
+        fullWidth
+        size="md"
+        mt={48}
+      >
         <Text color="black">開ける</Text>
       </Button>
     </Drawer>
