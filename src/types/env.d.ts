@@ -11,5 +11,7 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_APP_ID: string
     readonly NEXT_PUBLIC_MEASUREMENT_ID: string
     readonly NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY: string
+    readonly NEXT_PUBLIC_GOO_LAB_API: string
+    readonly NEXT_PUBLIC_GOO_LAB_APP_ID: string
   }
 }

@@ -36,6 +36,7 @@
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.5",
     "emoji-picker-react": "^4.4.2",
+    "fast-fuzzy": "^1.11.2",
     "firebase": "^9.12.1",
     "geolib": "^3.3.3",
     "jest": "^29.2.1",

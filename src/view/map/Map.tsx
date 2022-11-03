@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import { createRoot } from "react-dom/client"
-import { Map, NavigationControl, GeolocateControl, Marker, Popup } from "mapbox-gl"
+import { Map, NavigationControl, GeolocateControl, Marker, Popup, LngLatLike } from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
@@ -15,12 +15,18 @@ import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
 import MapCapsule from "./MapCapsule"
 import LockedCapsule from "./LockedCapsule"
 
-const MapPage: React.FC = () => {
+export type MapPageProps = {
+  selectedCapsuleCenter: LngLatLike | null
+}
+
+const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const user = useUser()
   const userID = user?.id ?? ""
 
   const router = useRouter()
   const [finishMapLoad, setFinishMapLoad] = useState(false)
+
+  const mapRef = useRef<Map | null>(null)
 
   const mapSetUp = async () => {
     const geolocation = await new Promise<GeolocationPosition>((resolve) =>
@@ -43,6 +49,8 @@ const MapPage: React.FC = () => {
       },
       zoom: 15,
     })
+    mapRef.current = map
+
     // zoom control
     map.addControl(new NavigationControl(), "bottom-left")
     // current place control
@@ -158,6 +166,17 @@ const MapPage: React.FC = () => {
     mapSetUp()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (map == null || selectedCapsuleCenter == null) {
+      return
+    }
+    map.flyTo({
+      center: selectedCapsuleCenter,
+      duration: 800,
+    })
+  }, [selectedCapsuleCenter])
 
   return (
     <>
