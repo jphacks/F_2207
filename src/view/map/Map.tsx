@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
@@ -11,6 +11,9 @@ import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
 import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
+import { useGeolocation } from "@/provider/GpsProvider"
+import { useMapElement } from "@/provider/MapElementProvider"
+import { featureSortFunc } from "@/lib/sortCapsule"
 
 import MapCapsule from "./MapCapsule"
 import LockedCapsule from "./LockedCapsule"
@@ -19,14 +22,26 @@ const MapPage: React.FC = () => {
   const user = useUser()
   const userID = user?.id ?? ""
 
+  const geolocation = useGeolocation()
+
   const router = useRouter()
   const [finishMapLoad, setFinishMapLoad] = useState(false)
 
-  const mapSetUp = async () => {
-    const geolocation = await new Promise<GeolocationPosition>((resolve) =>
-      navigator.geolocation.getCurrentPosition(resolve),
-    )
+  const mapRef = useRef<Map | null>(null)
 
+  const {
+    element: mapElement,
+    markers,
+    mapObj,
+    saveElement: saveMapElement,
+    addMarker,
+    clearMarker,
+  } = useMapElement()
+
+  const mapSetUp = async () => {
+    if (mapRef.current != null) {
+      return
+    }
     // show map on Box
     const transformRequest = mqplatformTransformRequest(
       process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY,
@@ -38,11 +53,14 @@ const MapPage: React.FC = () => {
       transformRequest,
       logoPosition: "top-left",
       center: {
-        lat: geolocation.coords.latitude,
-        lng: geolocation.coords.longitude,
+        lat: geolocation.latitude === 0 ? 35.6812 : geolocation.latitude,
+        lng: geolocation.longitude === 0 ? 139.7671 : geolocation.longitude,
       },
       zoom: 15,
     })
+
+    mapRef.current = map
+
     // zoom control
     map.addControl(new NavigationControl(), "bottom-left")
     // current place control
@@ -85,6 +103,8 @@ const MapPage: React.FC = () => {
         `https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
       )
       .then((res) => {
+        markers.forEach((marker) => marker.remove())
+        clearMarker()
         res.data.forEach((layer: any) => {
           if (layer.name == userID) {
             // set Image
@@ -93,7 +113,8 @@ const MapPage: React.FC = () => {
                 `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
               )
               .then((res) => {
-                res.data.features.forEach((feature: Feature) => {
+                const sortedFeatures = res.data.features.sort(featureSortFunc)
+                sortedFeatures.forEach((feature: Feature) => {
                   const div = document.createElement("div")
                   const root = createRoot(div)
 
@@ -111,15 +132,22 @@ const MapPage: React.FC = () => {
                     root.render(<LockedCapsule feature={feature} />)
                   }
 
-                  new Marker(div)
+                  const marker = new Marker(div)
                     .setLngLat(feature.geometry.coordinates as [number, number])
                     .addTo(map)
+                  addMarker(marker)
                 })
               })
           }
         })
       })
-      .finally(() => setFinishMapLoad(true))
+      .finally(() => {
+        setFinishMapLoad(true)
+        const mapElement = document.getElementById("map")
+        if (mapElement != null) {
+          saveMapElement(mapElement as HTMLDivElement, map)
+        }
+      })
   }
 
   const setCenterToCurrentPlace = (map: mapboxgl.Map) => {
@@ -155,7 +183,15 @@ const MapPage: React.FC = () => {
   }
 
   useEffect(() => {
-    mapSetUp()
+    if (mapElement == null) {
+      mapSetUp()
+    } else {
+      const container = document.getElementById("map")
+      container?.appendChild?.(mapElement)
+      if (mapObj != null && user != null) {
+        setMarker(mapObj, user.id)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
