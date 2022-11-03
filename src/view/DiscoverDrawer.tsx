@@ -22,7 +22,6 @@ const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
     <Drawer
       opened={open}
       onClose={onClose}
-      // title={<Text color="white">招待が届きました</Text>}
       padding="xl"
       size={300}
       withCloseButton={false}
