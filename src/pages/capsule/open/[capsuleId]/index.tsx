@@ -92,7 +92,7 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
     const ret = [...capsuleGeoData].sort((a, b) =>
       a.distance > b.distance ? 1 : a.distance === b.distance ? 0 : -1,
     )
-    return ret.slice(0, 5)
+    return ret.slice(0, 5).filter(({ distance }) => distance <= 500)
   }, [capsuleGeoData])
 
   const capsulePositions = useMemo(
@@ -168,7 +168,11 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
       </Modal>
       {discoverCapsule != null && (
         <DiscoverDrawer
-          onOpenCapsule={() => router.push(`/capsule/open/${discoverCapsule.id}/shake`)}
+          // onOpenCapsule={() => {
+          //   window.alert(`/capsule/open/${discoverCapsule.id}/shake`)
+          //   router.push(`/capsule/open/${discoverCapsule.id}/shake`)
+          // }}
+          href={`/capsule/open/${discoverCapsule.id}/shake`}
           capsule={discoverCapsule}
           open={discoverCapsule != null}
           onClose={() => setDiscoverCapsule(null)}
