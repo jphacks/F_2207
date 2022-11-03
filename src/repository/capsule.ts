@@ -1,10 +1,22 @@
-import { arrayUnion, collection, doc, getDoc, setDoc, Timestamp } from "firebase/firestore"
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  Timestamp,
+  where,
+} from "firebase/firestore"
 
 import { db } from "@/lib/firebase/db"
 import { CapsuleCreateInput } from "@/state/capsuleCreateInput"
 import { AppUser } from "@/types/user"
 import { GpsType } from "@/provider/GpsProvider"
 import { Capsule } from "@/types/capsule"
+
+import { extractKeywords } from "./keyword"
 
 /**
  * カプセルの投稿
@@ -20,6 +32,8 @@ export const postCapsule = async (
     return
   }
 
+  const keywords = await extractKeywords(input.title, input.memo)
+
   await setDoc(
     doc(collection(db, "capsules"), matchingId),
     {
@@ -31,6 +45,7 @@ export const postCapsule = async (
       addDate: Timestamp.fromDate(new Date()),
       ownerId: user.id,
       memo: [`${user.id}:${input.memo}`],
+      keywords,
       friendIds: [user.id],
       latitude: geolocation.latitude,
       longitude: geolocation.longitude,
@@ -48,12 +63,14 @@ export const joinCapsule = async (
   { matchingId, user }: { matchingId: string; user: AppUser },
   memo: string,
 ) => {
-  console.log(`${user.id}:${memo}`, user.id)
+  const keywords = await extractKeywords("", memo)
+
   await setDoc(
     doc(collection(db, "capsules"), matchingId),
     {
       memo: arrayUnion([`${user.id}:${memo}`]),
       friendIds: arrayUnion([user.id]),
+      keywords: arrayUnion(...keywords),
     },
     {
       merge: true,
@@ -85,5 +102,35 @@ export const fetchCapsule = async ({ capsuleId }: { capsuleId: string }) => {
     memo: data.memo,
     latitude: data.latitude,
     longitude: data.longitude,
+    keywords: data.keywords,
+    userOpenDate: data.userOpenDate?.toDate() ?? null,
   } as Capsule
+}
+
+export const fetchCapsules = async (user: AppUser) => {
+  const snapshots = await getDocs(
+    query(
+      collection(db, "capsules"),
+      where("ownerId", "==", user.id),
+      // orderBy("addDate", "desc")
+    ),
+  )
+  const capsules = snapshots.docs.map((snapshot) => {
+    const data = snapshot.data()
+    return {
+      id: snapshot.id,
+      color: data.color,
+      emoji: data.emoji,
+      gpsTextColor: data.gpsTextColor,
+      title: data.title,
+      openDate: data.openDate?.toDate() ?? null,
+      addDate: data.addDate.toDate(),
+      memo: data.memo,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      keywords: data.keywords,
+      userOpenDate: data.userOpenDate?.toDate() ?? null,
+    } as Capsule
+  })
+  return capsules
 }

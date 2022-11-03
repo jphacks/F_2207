@@ -7,6 +7,8 @@ export type Capsule = {
   openDate: Date
   addDate: Date
   memo: string[]
+  keywords: string[]
   latitude: number
   longitude: number
+  userOpenDate?: Date
 }

@@ -65,7 +65,6 @@ const Register: NextPage = () => {
       await joinCapsule({ matchingId, user }, capsuleCreateInput.memo)
     }
 
-    // TODO: オーナーの処理に移す
     const feature: CreateFeature = {
       type: "Feature",
       geometry: {
