@@ -193,7 +193,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
           crossOrigin="anonymous"
         />
       </Head>
-      <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
+      <Box
+        id="map"
+        className="h-map-screen" //h-[calc(100vh-72px)]
+        sx={{ width: "100%" /*height: "calc(100vh - 72px)"*/ }}
+      >
         <LoadingOverlay
           visible={!finishMapLoad}
           loaderProps={{ size: "xl" }}
