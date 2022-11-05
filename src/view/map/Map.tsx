@@ -32,6 +32,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const [finishMapLoad, setFinishMapLoad] = useState(false)
 
   const mapRef = useRef<Map | null>(null)
+  const mapInitialized = useRef(false)
 
   const {
     element: mapElement,
@@ -43,9 +44,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   } = useMapElement()
 
   const mapSetUp = async () => {
-    if (mapRef.current != null) {
+    if (mapRef.current != null || mapInitialized.current) {
       return
     }
+
+    mapInitialized.current = true
 
     const currentPosition =
       geolocation.latitude !== 0
@@ -155,8 +158,9 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       .finally(() => {
         setFinishMapLoad(true)
         const mapElement = document.getElementById("map")
-        if (mapElement != null) {
-          saveMapElement(mapElement as HTMLDivElement, map)
+
+        if (mapElement?.children != null) {
+          saveMapElement(mapElement.children, map)
         }
       })
   }
@@ -198,7 +202,10 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       mapSetUp()
     } else {
       const container = document.getElementById("map")
-      container?.appendChild?.(mapElement)
+      for (let i = 0; i < mapElement.length; i++) {
+        container?.appendChild?.(mapElement.item(i))
+      }
+      // container?.appendChild?.(mapElement)
       if (mapObj != null && user != null) {
         setMarker(mapObj, user.id)
       }
@@ -240,7 +247,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       </Head>
       <Box
         id="map"
-        className="h-map-screen" //h-[calc(100vh-72px)]
+        className="mapboxgl-map h-map-screen" //h-[calc(100vh-72px)]
         sx={{ width: "100%" /*height: "calc(100vh - 72px)"*/ }}
       >
         <LoadingOverlay

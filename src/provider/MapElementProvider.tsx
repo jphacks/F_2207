@@ -2,11 +2,11 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
 import { Map, Marker } from "mapbox-gl"
 
 type MapElementContextType = {
-  element: HTMLDivElement | null
+  element: HTMLCollection | null
   mapObj: Map | null
   markers: Marker[]
   addMarker: (marker: Marker) => void
-  saveElement: (element: HTMLDivElement, mapObj: Map) => void
+  saveElement: (element: HTMLCollection, mapObj: Map) => void
   clearMarker: () => void
 }
 
@@ -17,11 +17,11 @@ export type MapElementProviderProps = {
 }
 
 const MapElementProvider: React.FC<MapElementProviderProps> = ({ children }) => {
-  const [element, setElement] = useState<HTMLDivElement | null>(null)
+  const [element, setElement] = useState<HTMLCollection | null>(null)
   const [mapObj, setMapObj] = useState<Map | null>(null)
   const [markers, setMarkers] = useState<Marker[]>([])
 
-  const saveElement = useCallback((element: HTMLDivElement, mapObj: Map) => {
+  const saveElement = useCallback((element: HTMLCollection, mapObj: Map) => {
     setElement(element)
     setMapObj(mapObj)
   }, [])
