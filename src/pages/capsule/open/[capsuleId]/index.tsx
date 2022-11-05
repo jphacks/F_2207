@@ -40,7 +40,9 @@ const CapsuleModel: React.FC<ThreeElements["mesh"] & { color: string; distance: 
   return (
     <Suspense fallback={null}>
       <group>
+        {/* eslint-disable-next-line react/no-unknown-property */}
         <mesh material={basicMaterial}>
+          {/* eslint-disable-next-line react/no-unknown-property */}
           <primitive ref={ref} object={scene} {...props} scale={[0.075, 0.075, 0.075]} />
           <Html
             className="text-2xl text-red-400"
@@ -71,6 +73,7 @@ const Cylinder: React.FC<ThreeElements["mesh"] & { color: string }> = ({ color, 
 
   return (
     <mesh {...props} ref={ref}>
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <cylinderGeometry args={[0.5, 0, 1, 16]} />
       <meshStandardMaterial color={color} />
     </mesh>
@@ -99,8 +102,10 @@ const ArCanvas: React.FC<{
         color="#d8cb52"
       />
       <ambientLight />
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <gridHelper args={[20]} />
       <arrowHelper />
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <pointLight position={[1, 1, 1]} />
     </>
   )

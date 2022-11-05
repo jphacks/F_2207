@@ -4,7 +4,7 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import { createRoot } from "react-dom/client"
-import { Map, NavigationControl, GeolocateControl, Marker, Popup } from "mapbox-gl"
+import { Map, NavigationControl, GeolocateControl, Marker, Popup, LngLatLike } from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
@@ -18,7 +18,11 @@ import { featureSortFunc } from "@/lib/sortCapsule"
 import MapCapsule from "./MapCapsule"
 import LockedCapsule from "./LockedCapsule"
 
-const MapPage: React.FC = () => {
+export type MapPageProps = {
+  selectedCapsuleCenter: LngLatLike | null
+}
+
+const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const user = useUser()
   const userID = user?.id ?? ""
 
@@ -58,7 +62,6 @@ const MapPage: React.FC = () => {
       },
       zoom: 15,
     })
-
     mapRef.current = map
 
     // zoom control
@@ -195,6 +198,17 @@ const MapPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    const map = mapRef.current
+    if (map == null || selectedCapsuleCenter == null) {
+      return
+    }
+    map.flyTo({
+      center: selectedCapsuleCenter,
+      duration: 800,
+    })
+  }, [selectedCapsuleCenter])
+
   return (
     <>
       <Head>
@@ -210,7 +224,11 @@ const MapPage: React.FC = () => {
           crossOrigin="anonymous"
         />
       </Head>
-      <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
+      <Box
+        id="map"
+        className="h-map-screen" //h-[calc(100vh-72px)]
+        sx={{ width: "100%" /*height: "calc(100vh - 72px)"*/ }}
+      >
         <LoadingOverlay
           visible={!finishMapLoad}
           loaderProps={{ size: "xl" }}

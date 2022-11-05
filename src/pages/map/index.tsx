@@ -1,16 +1,71 @@
-import { Box, Button } from "@mantine/core"
+import { Box, Button, UnstyledButton } from "@mantine/core"
 import { NextLink } from "@mantine/next"
 import { FiPlus } from "react-icons/fi"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import classNames from "classnames"
+import { LngLatLike } from "mapbox-gl"
 
 import DefaultLayout from "@/view/layout/default"
 import SearchBar from "@/view/SearchBar"
 import MetaHeader from "@/view/common/MetaHeader"
+import { fetchCapsules } from "@/repository/capsule"
+import { useUser } from "@/auth/useAuth"
+import SearchResult from "@/view/SearchResult"
+import { Capsule } from "@/types/capsule"
+import { useCapsuleFuzzySearch } from "@/lib/capsuleFuzzySearch"
 
 import Map from "../../view/map/Map"
 
 import type { NextPage } from "next"
 
 const MapPage: NextPage = () => {
+  const user = useUser()
+
+  const [capsules, setCapsules] = useState<Capsule[]>([])
+  const [searchInput, setSearchInput] = useState("")
+  const [isFocusSerachBar, setIsFocusSerachBar] = useState(false)
+
+  const [selectedCapsuleCenter, setSelectedCapsuleCenter] = useState<LngLatLike | null>(null)
+
+  const handleSelectCapsule = useCallback(
+    (capsuleId: string) => {
+      setIsFocusSerachBar(false)
+      setSearchInput("")
+
+      const capsule = capsules.find(({ id }) => id === capsuleId)
+      const lat = capsule?.latitude
+      const lng = capsule?.longitude
+      if (lat == null || lng == null) {
+        return
+      }
+      setSelectedCapsuleCenter({ lat, lng })
+    },
+    [capsules],
+  )
+
+  useEffect(() => {
+    if (user == null) {
+      return
+    }
+    ;(async () => {
+      const capsules = await fetchCapsules(user)
+      setCapsules(capsules)
+    })()
+  }, [user])
+
+  const keywords = useMemo(
+    () =>
+      capsules
+        .map(({ keywords }) => keywords)
+        .flat()
+        .filter((keyword) => keyword != null && keyword !== ""),
+    [capsules],
+  )
+
+  const searchResult = useCapsuleFuzzySearch(capsules, searchInput)
+
+  const showSearchPage = isFocusSerachBar || 1 <= searchInput.length
+
   return (
     <>
       <MetaHeader title="マップ" />
@@ -20,12 +75,42 @@ const MapPage: NextPage = () => {
             sx={{
               position: "absolute",
               top: 20,
-              left: 16,
-              right: 16,
-              zIndex: 500,
+              zIndex: 700,
+              width: "100%",
             }}
+            className="transition-all"
           >
-            <SearchBar />
+            <div className="w-full px-4">
+              <div className="relative w-full">
+                <SearchBar
+                  value={searchInput}
+                  onChange={setSearchInput}
+                  onClickBack={
+                    showSearchPage
+                      ? () => {
+                          setIsFocusSerachBar(false)
+                          setSearchInput("")
+                        }
+                      : undefined
+                  }
+                  showProfileIcon={!showSearchPage}
+                  onFocus={() => setIsFocusSerachBar(true)}
+                />
+              </div>
+            </div>
+            {!showSearchPage && (
+              <div className="flex w-full items-center space-x-2 overflow-x-scroll py-2.5 px-4">
+                {keywords.map((keyword) => (
+                  <UnstyledButton
+                    key={keyword}
+                    onClick={() => setSearchInput(`tag:${keyword}`)}
+                    className="shrink-0 rounded-full border-none bg-white px-4 py-2 text-sm font-bold text-gray-900 shadow-main"
+                  >
+                    {keyword}
+                  </UnstyledButton>
+                ))}
+              </div>
+            )}
           </Box>
           <Button
             component={NextLink}
@@ -49,7 +134,19 @@ const MapPage: NextPage = () => {
           >
             <FiPlus className="text-black" size={28} aria-label="カプセルの新規作成" />
           </Button>
-          <Map />
+          <Map selectedCapsuleCenter={selectedCapsuleCenter} />
+          <div
+            className={classNames(
+              showSearchPage ? "" : "pointer-events-none opacity-0",
+              "transition",
+            )}
+          >
+            <SearchResult
+              capsules={searchResult}
+              onClickCapsule={handleSelectCapsule}
+              className="absolute inset-0 z-[600]"
+            />
+          </div>
         </Box>
       </DefaultLayout>
     </>
