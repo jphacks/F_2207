@@ -13,6 +13,7 @@ import { useUser } from "@/auth/useAuth"
 import SearchResult from "@/view/SearchResult"
 import { Capsule } from "@/types/capsule"
 import { useCapsuleFuzzySearch } from "@/lib/capsuleFuzzySearch"
+import { useAuthRouter } from "@/auth/useAuthRouter"
 
 import Map from "../../view/map/Map"
 
@@ -20,6 +21,7 @@ import type { NextPage } from "next"
 
 const MapPage: NextPage = () => {
   const user = useUser()
+  useAuthRouter(true)
 
   const [capsules, setCapsules] = useState<Capsule[]>([])
   const [searchInput, setSearchInput] = useState("")
@@ -104,7 +106,7 @@ const MapPage: NextPage = () => {
                   <UnstyledButton
                     key={keyword}
                     onClick={() => setSearchInput(`tag:${keyword}`)}
-                    className="shrink-0 rounded-full border-none bg-white px-4 py-2 text-sm font-bold text-gray-900 shadow-main"
+                    className="px-4 py-2 text-sm font-bold text-gray-900 bg-white border-none rounded-full shrink-0 shadow-main"
                   >
                     {keyword}
                   </UnstyledButton>

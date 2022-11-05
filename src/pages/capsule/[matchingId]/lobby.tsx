@@ -12,8 +12,10 @@ import UserAvater from "@/view/UserAvater"
 import Smartphone from "@/view/icons/Smartphone"
 import Wave from "@/view/icons/Wave"
 import MetaHeader from "@/view/common/MetaHeader"
+import { useAuthRouter } from "@/auth/useAuthRouter"
 
 const Lobby: NextPage = () => {
+  useAuthRouter(true)
   const router = useRouter()
   const user = useUser()
   const matchingId = router.query.matchingId as string
