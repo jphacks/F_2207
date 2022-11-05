@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 
+import { useAuth } from "@/auth/useAuth"
+
 export type GpsType = {
   latitude: number
   longitude: number
@@ -12,9 +14,13 @@ export type GpsProviderProps = {
 }
 
 const GpsProvider: React.FC<GpsProviderProps> = ({ children }) => {
+  const { user } = useAuth()
   const [position, setPosition] = useState<GpsType | null>({ latitude: 0, longitude: 0 })
 
   useEffect(() => {
+    if (user == null) {
+      return
+    }
     const watchID = navigator.geolocation.watchPosition(
       (position) => {
         setPosition({
@@ -32,7 +38,7 @@ const GpsProvider: React.FC<GpsProviderProps> = ({ children }) => {
     )
 
     return () => navigator.geolocation.clearWatch(watchID)
-  }, [])
+  }, [user])
 
   return <GpsContext.Provider value={position}>{children}</GpsContext.Provider>
 }
