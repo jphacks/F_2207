@@ -34,7 +34,7 @@ const registerServiceWorker = async () => {
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   useEffect(() => {
-    registerServiceWorker()
+    // registerServiceWorker()
   }, [])
 
   return (
