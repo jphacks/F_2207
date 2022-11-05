@@ -19,8 +19,10 @@ import { useMatchingUsers, useMatchingWithRedirect } from "@/hooks/useMatching"
 import { listenItemCount, moveToRegister, postItem } from "@/repository/items"
 import { useUser } from "@/auth/useAuth"
 import MetaHeader from "@/view/common/MetaHeader"
+import { useAuthRouter } from "@/auth/useAuthRouter"
 
 const useItemCount = (matchingId: string) => {
+  useAuthRouter(true)
   const [postedItemCount, setPostedItemCount] = useState<Record<string, number>>({})
 
   useEffect(() => {
