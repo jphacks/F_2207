@@ -227,6 +227,12 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
           crossOrigin="anonymous"
         />
         <link
+          rel="preload"
+          href={`https://prod-mqplatform-api.azure-api.net/maps-api/styles/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`}
+          as="fetch"
+          crossOrigin="anonymous"
+        />
+        <link
           rel="preconnect dns-prefetch"
           href="https://cyberjapandata.gsi.go.jp"
           crossOrigin="anonymous"
