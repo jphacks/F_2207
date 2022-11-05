@@ -11,7 +11,7 @@ import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
 import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
-import { useGeolocation } from "@/provider/GpsProvider"
+import { GpsType, useGeolocation } from "@/provider/GpsProvider"
 import { useMapElement } from "@/provider/MapElementProvider"
 import { featureSortFunc } from "@/lib/sortCapsule"
 
@@ -46,6 +46,14 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
     if (mapRef.current != null) {
       return
     }
+
+    const currentPosition =
+      geolocation.latitude !== 0
+        ? geolocation
+        : await new Promise<GpsType>((resolve) =>
+            navigator.geolocation.getCurrentPosition((position) => resolve(position.coords)),
+          )
+
     // show map on Box
     const transformRequest = mqplatformTransformRequest(
       process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY,
@@ -57,8 +65,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       transformRequest,
       logoPosition: "top-left",
       center: {
-        lat: geolocation.latitude === 0 ? 35.6812 : geolocation.latitude,
-        lng: geolocation.longitude === 0 ? 139.7671 : geolocation.longitude,
+        lat: currentPosition.latitude,
+        lng: currentPosition.longitude,
       },
       zoom: 15,
     })
