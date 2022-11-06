@@ -197,7 +197,7 @@ const CapsulePage: NextPage = () => {
       </div>
     )
   } else {
-    return <ArPage capsules={capsules.slice(0, 4)} />
+    return <ArPage capsules={capsules} />
   }
 }
 

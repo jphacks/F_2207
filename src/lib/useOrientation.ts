@@ -10,7 +10,7 @@ export const useOrientation = () => {
   const [isReady, setIsReady] = useState(false)
 
   const requestPermission = useCallback(async () => {
-    if (detectOs() === "iphone") {
+    if (detectOs() === "iphone" && "requestPermission" in DeviceOrientationEvent) {
       await (DeviceOrientationEvent as any).requestPermission()
     }
     setIsReady(true)
