@@ -8,11 +8,11 @@ const nextConfig = {
   swcMinify: true,
   compiler: {
     removeConsole:
-      process.env.NODE_ENV === "development"
-        ? undefined
-        : {
+      process.env.NODE_ENV === "production"
+        ? {
             exclude: ["error"],
-          },
+          }
+        : undefined,
   },
   images: {
     domains: ["lh3.googleusercontent.com"],
