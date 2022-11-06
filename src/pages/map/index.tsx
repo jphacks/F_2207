@@ -13,6 +13,7 @@ import { useUser } from "@/auth/useAuth"
 import SearchResult from "@/view/SearchResult"
 import { Capsule } from "@/types/capsule"
 import { useCapsuleFuzzySearch } from "@/lib/capsuleFuzzySearch"
+import { useAuthRouter } from "@/auth/useAuthRouter"
 
 import Map from "../../view/map/Map"
 
@@ -20,6 +21,7 @@ import type { NextPage } from "next"
 
 const MapPage: NextPage = () => {
   const user = useUser()
+  useAuthRouter(true)
 
   const [capsules, setCapsules] = useState<Capsule[]>([])
   const [searchInput, setSearchInput] = useState("")

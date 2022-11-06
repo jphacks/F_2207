@@ -18,6 +18,7 @@ import {
   useCapsuleCreateInput,
 } from "@/state/capsuleCreateInput"
 import MetaHeader from "@/view/common/MetaHeader"
+import { useAuthRouter } from "@/auth/useAuthRouter"
 
 import type { NextPage } from "next"
 import type { EmojiClickData } from "emoji-picker-react"
@@ -25,6 +26,7 @@ import type { EmojiClickData } from "emoji-picker-react"
 const Picker = dynamic<PickerProps>(() => import("emoji-picker-react"))
 
 const CapsuleAdd: NextPage = () => {
+  useAuthRouter(true)
   const router = useRouter()
   const location = useGeolocation()
   const user = useUser()
