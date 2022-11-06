@@ -4,26 +4,8 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import { createRoot } from "react-dom/client"
-import {
-  Map,
-  NavigationControl,
-  GeolocateControl,
-  Marker,
-  Popup,
-  MercatorCoordinate,
-  LngLatLike,
-} from "mapbox-gl"
-import THREE, {
-  Scene,
-  DirectionalLight,
-  WebGLRenderer,
-  Matrix4,
-  Vector3,
-  Vector2,
-  PerspectiveCamera,
-  Raycaster,
-} from "three"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { Map, NavigationControl, GeolocateControl, Marker, Popup, LngLatLike } from "mapbox-gl"
+import { Vector3, Vector2, PerspectiveCamera, Raycaster, Scene } from "three"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
@@ -41,6 +23,7 @@ export type MapPageProps = {
 }
 
 import "mapbox-gl/dist/mapbox-gl.css"
+import { show3dOnMap } from "@/lib/show3dOnMap"
 
 const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const user = useUser()
@@ -114,101 +97,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       setCenterToCurrentPlace(map)
     })
 
-    // parameters to ensure the model is georeferenced correctly on the map
-    const modelOrigin = [135.6042317745411, 34.86210390210311] as [number, number]
-    const modelAltitude = 0
-    const modelRotate = [Math.PI / 2, 0, 0]
-
-    const modelAsMercatorCoordinate = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
-
-    // transformation parameters to position, rotate and scale the 3D model onto the map
-    const modelTransform = {
-      translateX: modelAsMercatorCoordinate.x,
-      translateY: modelAsMercatorCoordinate.y,
-      translateZ: modelAsMercatorCoordinate.z,
-      rotateX: modelRotate[0],
-      rotateY: modelRotate[1],
-      rotateZ: modelRotate[2],
-      /* Since the 3D model is in real world meters, a scale transform needs to be
-       * applied since the CustomLayerInterface expects units in MercatorCoordinates.
-       */
-      scale: modelAsMercatorCoordinate.meterInMercatorCoordinateUnits(),
-    }
-
-    // const camera = new Camera()
     const camera = new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6)
     const scene = new Scene()
     const raycaster = new Raycaster()
-    let renderer: THREE.WebGLRenderer | null = null
 
-    // configuration of the custom layer for a 3D model per the CustomLayerInterface
-    const customLayer: mapboxgl.AnyLayer = {
-      id: "3d-model",
-      type: "custom",
-      renderingMode: "3d",
-      onAdd: function (map, gl) {
-        // create two three.js lights to illuminate the model
-        const directionalLight = new DirectionalLight(0xffffff)
-        directionalLight.position.set(0, -70, 100).normalize()
-        scene.add(directionalLight)
-
-        const directionalLight2 = new DirectionalLight(0xffffff)
-        directionalLight2.position.set(0, 70, 100).normalize()
-        scene.add(directionalLight2)
-
-        // use the three.js GLTF loader to add the 3D model to the three.js scene
-        const loader = new GLTFLoader()
-        loader.load("/models/capsule3.glb", (gltf) => {
-          scene.add(gltf.scene)
-        })
-
-        // use the Mapbox GL JS map canvas for three.js
-        renderer = new WebGLRenderer({
-          canvas: map.getCanvas(),
-          context: gl,
-          antialias: true,
-        })
-
-        renderer!.autoClear = false
-      },
-      render: function (gl, matrix) {
-        const rotationX = new Matrix4().makeRotationAxis(
-          new Vector3(1, 0, 0),
-          modelTransform.rotateX,
-        )
-        const rotationY = new Matrix4().makeRotationAxis(
-          new Vector3(0, 1, 0),
-          modelTransform.rotateY,
-        )
-        const rotationZ = new Matrix4().makeRotationAxis(
-          new Vector3(0, 0, 1),
-          modelTransform.rotateZ,
-        )
-
-        const m = new Matrix4().fromArray(matrix)
-        const l = new Matrix4()
-          .makeTranslation(
-            modelTransform.translateX,
-            modelTransform.translateY,
-            modelTransform.translateZ as number,
-          )
-          .scale(
-            new Vector3(
-              modelTransform.scale * 0.5,
-              -modelTransform.scale * 0.5,
-              modelTransform.scale * 0.5,
-            ),
-          )
-          .multiply(rotationX)
-          .multiply(rotationY)
-          .multiply(rotationZ)
-
-        camera.projectionMatrix = m.multiply(l)
-        renderer?.resetState()
-        renderer?.render(scene, camera)
-        map.triggerRepaint()
-      },
-    }
+    const customLayer = show3dOnMap(map, camera, scene, raycaster)
 
     map.on("click", (e) => {
       var mouse = new Vector2()
