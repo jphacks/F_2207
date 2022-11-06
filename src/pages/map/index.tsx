@@ -106,7 +106,7 @@ const MapPage: NextPage = () => {
                   <UnstyledButton
                     key={keyword}
                     onClick={() => setSearchInput(`tag:${keyword}`)}
-                    className="px-4 py-2 text-sm font-bold text-gray-900 bg-white border-none rounded-full shrink-0 shadow-main"
+                    className="shrink-0 rounded-full border-none bg-white px-4 py-2 text-sm font-bold text-gray-900 shadow-main"
                   >
                     {keyword}
                   </UnstyledButton>
