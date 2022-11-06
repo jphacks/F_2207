@@ -19,10 +19,13 @@ import Map from "../../view/map/Map"
 
 import type { NextPage } from "next"
 
+type FilterOption = "all" | "openable" | "opened"
+
 const MapPage: NextPage = () => {
   const user = useUser()
   useAuthRouter(true)
 
+  const [option, setOption] = useState<FilterOption>("all")
   const [capsules, setCapsules] = useState<Capsule[]>([])
   const [searchInput, setSearchInput] = useState("")
   const [isFocusSerachBar, setIsFocusSerachBar] = useState(false)
@@ -92,6 +95,7 @@ const MapPage: NextPage = () => {
                       ? () => {
                           setIsFocusSerachBar(false)
                           setSearchInput("")
+                          setOption("all")
                         }
                       : undefined
                   }
@@ -102,6 +106,24 @@ const MapPage: NextPage = () => {
             </div>
             {!showSearchPage && (
               <div className="flex w-full items-center space-x-2 overflow-x-scroll py-2.5 px-4">
+                <UnstyledButton
+                  onClick={() => {
+                    setOption("openable")
+                    setIsFocusSerachBar(true)
+                  }}
+                  className="shrink-0 rounded-full border-none bg-white px-4 py-2 text-sm font-bold text-gray-900 shadow-main"
+                >
+                  未開封
+                </UnstyledButton>
+                <UnstyledButton
+                  onClick={() => {
+                    setOption("opened")
+                    setIsFocusSerachBar(true)
+                  }}
+                  className="shrink-0 rounded-full border-none bg-white px-4 py-2 text-sm font-bold text-gray-900 shadow-main"
+                >
+                  開封済み
+                </UnstyledButton>
                 {keywords.map((keyword) => (
                   <UnstyledButton
                     key={keyword}
@@ -145,6 +167,8 @@ const MapPage: NextPage = () => {
           >
             <SearchResult
               capsules={searchResult}
+              filterOption={option}
+              onChangeFilterOption={setOption}
               onClickCapsule={handleSelectCapsule}
               className="absolute inset-0 z-[600]"
             />
