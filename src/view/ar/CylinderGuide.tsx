@@ -20,7 +20,9 @@ const CylinderGuide: React.FC<CylinderProps> = ({ position, scale, color }) => {
   })
 
   return (
+    // eslint-disable-next-line react/no-unknown-property
     <mesh ref={ref} position={position} scale={scale}>
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <cylinderGeometry args={[0.5, 0, 1, 16]} />
       <meshStandardMaterial color={color} />
     </mesh>

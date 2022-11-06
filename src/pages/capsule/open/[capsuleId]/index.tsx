@@ -132,7 +132,7 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
           }}
         />
         {geolocation != null && (
-          <div className="absolute flex left-6 bottom-6">
+          <div className="absolute left-6 bottom-6 flex">
             <Text
               sx={{
                 display: "block",
