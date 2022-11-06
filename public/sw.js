@@ -73,9 +73,13 @@ const getResponse = async (evt, useCache, cacheSeconds) => {
 
 self.addEventListener("fetch", async (evt) => {
   const request = evt.request
-  const isLayersApi = request.url.startsWith(
-    "https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=",
-  )
+  const isLayersApi =
+    request.url.startsWith(
+      "https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=",
+    ) ||
+    request.url.startsWith(
+      "https://prod-mqplatform-api.azure-api.net/maps-api/styles/v1/18?subscription_key=63da4d3c414e4ae59b7af3d654fefaff",
+    )
   const isStatic = request.url.startsWith("https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap")
 
   if (request.url.startsWith("mqplatform://")) {

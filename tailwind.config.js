@@ -15,6 +15,9 @@ module.exports = {
           "sans-serif",
         ],
       },
+      height: {
+        "map-screen": ["calc(100vh - 72px)", "calc(100dvh - 72px)"],
+      },
       boxShadow: {
         main: "0px 1px 6px rgba(132, 132, 132, 0.26)",
       },

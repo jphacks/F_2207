@@ -6,8 +6,10 @@ import Image from "next/image"
 import DefaultLayout from "@/view/layout/default"
 import { useAuth, useAuthOperation } from "@/auth/useAuth"
 import MetaHeader from "@/view/common/MetaHeader"
+import { useAuthRouter } from "@/auth/useAuthRouter"
 
 const User: NextPage = () => {
+  useAuthRouter(true)
   const { user, isLoading } = useAuth()
   const { login, logout } = useAuthOperation()
   return (

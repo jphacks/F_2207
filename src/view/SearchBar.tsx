@@ -40,7 +40,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border-transparent py-3 pl-[48px] pr-[56px] focus:outline-none"
+        className="w-full rounded-md border-transparent bg-white py-3 pl-[48px] pr-[56px] text-gray-900 focus:outline-none"
         placeholder="カプセルを検索"
         onFocus={onFocus}
       />

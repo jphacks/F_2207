@@ -1,23 +1,17 @@
-import { Avatar, Button, Group, Text } from "@mantine/core"
+import { Button, Loader, Text } from "@mantine/core"
 import { NextPage } from "next"
-import React, { useEffect } from "react"
-import { useRouter } from "next/router"
+import React from "react"
 import Image from "next/image"
 
 import DefaultLayout from "@/view/layout/default"
 import { useAuth, useAuthOperation } from "@/auth/useAuth"
 import MetaHeader from "@/view/common/MetaHeader"
+import { useAuthRouter } from "@/auth/useAuthRouter"
 
 const Index: NextPage = () => {
-  const router = useRouter()
-  const { user, isLoading } = useAuth()
-  const { login, logout } = useAuthOperation()
-
-  useEffect(() => {
-    if (user != null) {
-      router.push("/map")
-    }
-  }, [router, user])
+  useAuthRouter(false)
+  const { user } = useAuth()
+  const { login } = useAuthOperation()
 
   return (
     <>
@@ -32,20 +26,9 @@ const Index: NextPage = () => {
               </Button>
             </div>
           ) : (
-            <>
-              <div className="m-4">
-                <p>{isLoading ? "loading" : ""}</p>
-                <Group>
-                  <Avatar src={user?.iconUrl} />
-                  <p className="">{user?.name ?? "not logged in"}</p>
-                </Group>
-              </div>
-              {user == null ? (
-                <Button onClick={login}>👋 LOGIN with Google</Button>
-              ) : (
-                <Button onClick={logout}>👋 LOGOUT</Button>
-              )}
-            </>
+            <div className="fixed inset-0 flex items-center justify-center">
+              <Loader aria-label="ロード中" />
+            </div>
           )}
         </main>
       </DefaultLayout>

@@ -53,8 +53,11 @@ const ArCanvas: React.FC<{
         </Fragment>
       ))}
       <ambientLight />
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <gridHelper args={[20]} />
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <pointLight position={[0, 0, 0]} />
+      <arrowHelper />
     </>
   )
 }
@@ -129,7 +132,7 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
           }}
         />
         {geolocation != null && (
-          <div className="absolute left-6 bottom-6 flex">
+          <div className="absolute flex left-6 bottom-6">
             <Text
               sx={{
                 display: "block",

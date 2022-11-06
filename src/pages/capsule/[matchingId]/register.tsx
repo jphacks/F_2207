@@ -29,8 +29,10 @@ import { useGeolocation } from "@/provider/GpsProvider"
 import { useMatchingWithRedirect } from "@/hooks/useMatching"
 import { joinCapsule, postCapsule } from "@/repository/capsule"
 import MetaHeader from "@/view/common/MetaHeader"
+import { useAuthRouter } from "@/auth/useAuthRouter"
 
 const Register: NextPage = () => {
+  useAuthRouter(true)
   const router = useRouter()
   const theme = useMantineTheme()
   const user = useUser()

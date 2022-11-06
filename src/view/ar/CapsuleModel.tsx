@@ -32,7 +32,9 @@ const CapsuleModel: React.FC<CapsuleModelProps> = ({ color, distance, position, 
 
   return (
     <>
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <mesh position={position} scale={[0.05, 0.05, 0.05]} onClick={onClick}>
+        {/* eslint-disable-next-line react/no-unknown-property */}
         <primitive ref={ref} distanceFactor={10} object={copiedScene} />
       </mesh>
       <mesh>

@@ -11,6 +11,9 @@ import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
 import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
+import { GpsType, useGeolocation } from "@/provider/GpsProvider"
+import { useMapElement } from "@/provider/MapElementProvider"
+import { featureSortFunc } from "@/lib/sortCapsule"
 
 import MapCapsule from "./MapCapsule"
 import LockedCapsule from "./LockedCapsule"
@@ -23,15 +26,36 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const user = useUser()
   const userID = user?.id ?? ""
 
+  const geolocation = useGeolocation()
+
   const router = useRouter()
   const [finishMapLoad, setFinishMapLoad] = useState(false)
 
   const mapRef = useRef<Map | null>(null)
+  const mapInitialized = useRef(false)
+
+  const {
+    element: mapElement,
+    markers,
+    mapObj,
+    saveElement: saveMapElement,
+    addMarker,
+    clearMarker,
+  } = useMapElement()
 
   const mapSetUp = async () => {
-    const geolocation = await new Promise<GeolocationPosition>((resolve) =>
-      navigator.geolocation.getCurrentPosition(resolve),
-    )
+    if (mapRef.current != null || mapInitialized.current) {
+      return
+    }
+
+    mapInitialized.current = true
+
+    const currentPosition =
+      geolocation.latitude !== 0
+        ? geolocation
+        : await new Promise<GpsType>((resolve) =>
+            navigator.geolocation.getCurrentPosition((position) => resolve(position.coords)),
+          )
 
     // show map on Box
     const transformRequest = mqplatformTransformRequest(
@@ -44,8 +68,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       transformRequest,
       logoPosition: "top-left",
       center: {
-        lat: geolocation.coords.latitude,
-        lng: geolocation.coords.longitude,
+        lat: currentPosition.latitude,
+        lng: currentPosition.longitude,
       },
       zoom: 15,
     })
@@ -93,6 +117,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         `https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
       )
       .then((res) => {
+        markers.forEach((marker) => marker.remove())
+        clearMarker()
         res.data.forEach((layer: any) => {
           if (layer.name == userID) {
             // set Image
@@ -101,7 +127,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                 `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
               )
               .then((res) => {
-                res.data.features.forEach((feature: Feature) => {
+                const sortedFeatures = res.data.features.sort(featureSortFunc)
+                sortedFeatures.forEach((feature: Feature) => {
                   const div = document.createElement("div")
                   const root = createRoot(div)
 
@@ -119,15 +146,23 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                     root.render(<LockedCapsule feature={feature} />)
                   }
 
-                  new Marker(div)
+                  const marker = new Marker(div)
                     .setLngLat(feature.geometry.coordinates as [number, number])
                     .addTo(map)
+                  addMarker(marker)
                 })
               })
           }
         })
       })
-      .finally(() => setFinishMapLoad(true))
+      .finally(() => {
+        setFinishMapLoad(true)
+        const mapElement = document.getElementById("map")
+
+        if (mapElement?.children != null) {
+          saveMapElement(mapElement.children, map)
+        }
+      })
   }
 
   const setCenterToCurrentPlace = (map: mapboxgl.Map) => {
@@ -163,7 +198,18 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   }
 
   useEffect(() => {
-    mapSetUp()
+    if (mapElement == null) {
+      mapSetUp()
+    } else {
+      const container = document.getElementById("map")
+      for (let i = 0; i < mapElement.length; i++) {
+        container?.appendChild?.(mapElement.item(i))
+      }
+      // container?.appendChild?.(mapElement)
+      if (mapObj != null && user != null) {
+        setMarker(mapObj, user.id)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -188,12 +234,22 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
           crossOrigin="anonymous"
         />
         <link
+          rel="preload"
+          href={`https://prod-mqplatform-api.azure-api.net/maps-api/styles/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`}
+          as="fetch"
+          crossOrigin="anonymous"
+        />
+        <link
           rel="preconnect dns-prefetch"
           href="https://cyberjapandata.gsi.go.jp"
           crossOrigin="anonymous"
         />
       </Head>
-      <Box id="map" sx={{ width: "100%", height: "calc(100vh - 72px)" }}>
+      <Box
+        id="map"
+        className="mapboxgl-map h-map-screen" //h-[calc(100vh-72px)]
+        sx={{ width: "100%" /*height: "calc(100vh - 72px)"*/ }}
+      >
         <LoadingOverlay
           visible={!finishMapLoad}
           loaderProps={{ size: "xl" }}
