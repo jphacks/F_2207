@@ -175,6 +175,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                   camera.current,
                   scene.current,
                 )
+                map.removeLayer("features")
                 map.addLayer(customLayer, layer.name)
                 // sortedFeatures.forEach((feature: Feature) => {
                 //   const camera = new PerspectiveCamera(
@@ -292,9 +293,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
 
   useEffect(() => {
     const map = mapRef.current
+    console.log("HEY", map, selectedCapsuleCenter)
     if (map == null || selectedCapsuleCenter == null) {
       return
     }
+    console.log("FLY")
     map.flyTo({
       center: selectedCapsuleCenter,
       duration: 800,
