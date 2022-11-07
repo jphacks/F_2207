@@ -39,6 +39,7 @@ const addFeatureToScene = (
       -(mc.y - origin.y) / sceneTransform.meterScale,
       ((mc.z as number) - origin.z) / sceneTransform.meterScale,
     )
+    scene.scale.set(0.2, 0.2, 0.2)
     scene.quaternion.setFromEuler(modelRotate)
     scene.name = featureid
     baseScene.add(gltf.scene)
