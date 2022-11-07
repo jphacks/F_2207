@@ -42,7 +42,7 @@ export const show3dOnMap = (
   )
   const meterScale = mc.meterInMercatorCoordinateUnits()
 
-  var sceneTransform = {
+  const sceneTransform = {
     matrix: new Matrix4()
       .makeTranslation(mc.x, mc.y, mc.z as number)
       .scale(new Vector3(meterScale, -meterScale, meterScale)),
@@ -52,12 +52,12 @@ export const show3dOnMap = (
   let renderer: THREE.WebGLRenderer | null = null
 
   // configuration of the custom layer for a 3D model per the CustomLayerInterface
-  const customLayer3: mapboxgl.AnyLayer = {
+  const featureLayer: mapboxgl.AnyLayer = {
     id: id,
     type: "custom",
     renderingMode: "3d",
 
-    onAdd: function (map, gl) {
+    onAdd: (map, gl) => {
       // create two three.js lights to illuminate the model
       const directionalLight = new DirectionalLight(0xffffff)
       directionalLight.position.set(0, -70, 100).normalize()
@@ -67,19 +67,18 @@ export const show3dOnMap = (
       directionalLight2.position.set(0, 70, 100).normalize()
       baseScene.add(directionalLight2)
 
-      var loader = new GLTFLoader()
+      const loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
-      for (var i = 0; i < features.length; i++) {
-        const modelOrigin3 = [
+      for (let i = 0; i < features.length; i++) {
+        const modelOrigin = [
           features[i].geometry.coordinates[0],
           features[i].geometry.coordinates[1],
         ] as [number, number]
-        const modelAltitude3 = 0
-        const modelRotate3 = new Euler(Math.PI / 2, 0, 0, "XYZ")
-        const modelScale = 1
+        const modelAltitude = 0
+        const modelRotate = new Euler(Math.PI / 2, 0, 0, "XYZ")
         const featureid = features[i].properties.id
 
-        const mc = MercatorCoordinate.fromLngLat(modelOrigin3, modelAltitude3)
+        const mc = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
         loader.load("/models/capsule3.glb", (gltf) => {
           const scene = gltf.scene
           const origin = sceneTransform.origin
@@ -88,8 +87,7 @@ export const show3dOnMap = (
             -(mc.y - origin.y) / meterScale,
             ((mc.z as number) - origin.z) / meterScale,
           )
-          scene.quaternion.setFromEuler(modelRotate3)
-          scene.scale.set(modelScale, modelScale, modelScale)
+          scene.quaternion.setFromEuler(modelRotate)
           scene.name = featureid
           baseScene.add(gltf.scene)
         })
@@ -105,7 +103,7 @@ export const show3dOnMap = (
       renderer!.autoClear = false
     },
 
-    render: function (gl, matrix) {
+    render: (_gl, matrix) => {
       camera.projectionMatrix = new Matrix4().fromArray(matrix).multiply(sceneTransform.matrix)
       renderer?.state.reset()
       renderer?.render(baseScene, camera)
@@ -113,5 +111,5 @@ export const show3dOnMap = (
     },
   }
 
-  return customLayer3
+  return featureLayer
 }
