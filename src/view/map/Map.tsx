@@ -4,10 +4,9 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import { Map, NavigationControl, GeolocateControl, Popup, LngLatLike } from "mapbox-gl"
-import { PerspectiveCamera, Scene } from "three"
+import { PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from "three"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
-import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
 import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
 import { GpsType, useGeolocation } from "@/provider/GpsProvider"
@@ -97,21 +96,27 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
     })
 
     map.on("click", (e) => {
-      // const raycaster = new Raycaster()
-      // var mouse = new Vector2()
-      // // // scale mouse pixel position to a percentage of the screen's width and height
-      // mouse.x = (e.point.x / map.transform.width) * 2 - 1
-      // mouse.y = 1 - (e.point.y / map.transform.height) * 2
-      // const camInverseProjection = camera.projectionMatrix.invert()
-      // const cameraPosition = new Vector3().applyMatrix4(camInverseProjection)
-      // const mousePosition = new Vector3(mouse.x, mouse.y, 1).applyMatrix4(camInverseProjection)
-      // const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
-      // raycaster.set(cameraPosition, viewDirection)
-      // // calculate objects intersecting the picking ray
-      // var intersects = raycaster.intersectObjects(scene.children, true)
-      // if (intersects.length) {
-      //   console.log(intersects)
-      // }
+      const raycaster = new Raycaster()
+      var mouse = new Vector2()
+      // // scale mouse pixel position to a percentage of the screen's width and height
+      mouse.x = (e.point.x / map.transform.width) * 2 - 1
+      mouse.y = 1 - (e.point.y / map.transform.height) * 2
+      const camInverseProjection = camera.projectionMatrix.invert()
+      const cameraPosition = new Vector3().applyMatrix4(camInverseProjection)
+      const mousePosition = new Vector3(mouse.x, mouse.y, 1).applyMatrix4(camInverseProjection)
+      const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
+      raycaster.set(cameraPosition, viewDirection)
+      // calculate objects intersecting the picking ray
+      var intersects = raycaster.intersectObjects(scene.children, true)
+      if (intersects.length) {
+        intersects.forEach((intersect) => {
+          if (intersect.object.name == "本体") {
+            console.log(intersect.object.parent!.parent!.parent!.name)
+          }
+        })
+      } else {
+        console.log("no intersects")
+      }
     })
 
     map.on("style.load", () => {
@@ -164,50 +169,59 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
               )
               .then((res) => {
                 const sortedFeatures = res.data.features.sort(featureSortFunc)
-                sortedFeatures.forEach((feature: Feature) => {
-                  const camera = new PerspectiveCamera(
-                    28,
-                    window.innerWidth / window.innerHeight,
-                    0.1,
-                    1e6,
-                  )
-                  const scene = new Scene()
+                // const camera = new PerspectiveCamera(
+                //   28,
+                //   window.innerWidth / window.innerHeight,
+                //   0.1,
+                //   1e6,
+                // )
+                // const scene = new Scene()
+                const customLayer = show3dOnMap(sortedFeatures, "features", map, camera, scene)
+                map.addLayer(customLayer, layer.name)
+                // sortedFeatures.forEach((feature: Feature) => {
+                //   const camera = new PerspectiveCamera(
+                //     28,
+                //     window.innerWidth / window.innerHeight,
+                //     0.1,
+                //     1e6,
+                //   )
+                //   const scene = new Scene()
 
-                  const featureOrigin = [
-                    feature.geometry.coordinates[0],
-                    feature.geometry.coordinates[1],
-                  ] as [number, number]
-                  const customLayer = show3dOnMap(
-                    featureOrigin,
-                    "feature-" + feature.id,
-                    map,
-                    camera,
-                    scene,
-                  )
-                  map.addLayer(customLayer, layer.name)
+                //   const featureOrigin = [
+                //     feature.geometry.coordinates[0],
+                //     feature.geometry.coordinates[1],
+                //   ] as [number, number]
+                //   const customLayer = show3dOnMap(
+                //     featureOrigin,
+                //     "feature-" + feature.id,
+                //     map,
+                //     camera,
+                //     scene,
+                //   )
+                //   map.addLayer(customLayer, layer.name)
 
-                  // const div = document.createElement("div")
-                  // const root = createRoot(div)
+                // const div = document.createElement("div")
+                // const root = createRoot(div)
 
-                  // const today = Date.now()
-                  // const openDate = Date.parse(feature.properties.openDate)
+                // const today = Date.now()
+                // const openDate = Date.parse(feature.properties.openDate)
 
-                  // if (today > openDate) {
-                  //   root.render(
-                  //     <MapCapsule
-                  //       feature={feature}
-                  //       onClick={() => router.push(`/capsule/open/${feature.properties.id}`)}
-                  //     />,
-                  //   )
-                  // } else {
-                  //   root.render(<LockedCapsule feature={feature} />)
-                  // }
+                // if (today > openDate) {
+                //   root.render(
+                //     <MapCapsule
+                //       feature={feature}
+                //       onClick={() => router.push(`/capsule/open/${feature.properties.id}`)}
+                //     />,
+                //   )
+                // } else {
+                //   root.render(<LockedCapsule feature={feature} />)
+                // }
 
-                  // const marker = new Marker(div)
-                  //   .setLngLat(feature.geometry.coordinates as [number, number])
-                  //   .addTo(map)
-                  // addMarker(marker)
-                })
+                // const marker = new Marker(div)
+                //   .setLngLat(feature.geometry.coordinates as [number, number])
+                //   .addTo(map)
+                // addMarker(marker)
+                // })
               })
           }
         })
