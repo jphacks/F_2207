@@ -3,9 +3,8 @@ import { Box, LoadingOverlay } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
-import { createRoot } from "react-dom/client"
-import { Map, NavigationControl, GeolocateControl, Marker, Popup, LngLatLike } from "mapbox-gl"
-import { Vector3, Vector2, PerspectiveCamera, Raycaster, Scene } from "three"
+import { Map, NavigationControl, GeolocateControl, Popup, LngLatLike } from "mapbox-gl"
+import { PerspectiveCamera, Scene } from "three"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { Feature } from "@/types/feature"
@@ -14,16 +13,13 @@ import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
 import { GpsType, useGeolocation } from "@/provider/GpsProvider"
 import { useMapElement } from "@/provider/MapElementProvider"
 import { featureSortFunc } from "@/lib/sortCapsule"
+import { show3dOnMap } from "@/lib/show3dOnMap"
 
-import MapCapsule from "./MapCapsule"
-import LockedCapsule from "./LockedCapsule"
+import "mapbox-gl/dist/mapbox-gl.css"
 
 export type MapPageProps = {
   selectedCapsuleCenter: LngLatLike | null
 }
-
-import "mapbox-gl/dist/mapbox-gl.css"
-import { show3dOnMap } from "@/lib/show3dOnMap"
 
 const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const user = useUser()
@@ -36,6 +32,9 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
 
   const mapRef = useRef<Map | null>(null)
   const mapInitialized = useRef(false)
+
+  const camera = new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6)
+  const scene = new Scene()
 
   const {
     element: mapElement,
@@ -97,34 +96,26 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       setCenterToCurrentPlace(map)
     })
 
-    const camera = new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6)
-    const scene = new Scene()
-    const raycaster = new Raycaster()
-
-    const customLayer = show3dOnMap(map, camera, scene, raycaster)
-
     map.on("click", (e) => {
-      var mouse = new Vector2()
-      // // scale mouse pixel position to a percentage of the screen's width and height
-      mouse.x = (e.point.x / map.transform.width) * 2 - 1
-      mouse.y = 1 - (e.point.y / map.transform.height) * 2
-      const camInverseProjection = camera.projectionMatrix.invert()
-      const cameraPosition = new Vector3().applyMatrix4(camInverseProjection)
-      const mousePosition = new Vector3(mouse.x, mouse.y, 1).applyMatrix4(camInverseProjection)
-      const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
-
-      raycaster.set(cameraPosition, viewDirection)
-
-      // calculate objects intersecting the picking ray
-      var intersects = raycaster.intersectObjects(scene.children, true)
-      if (intersects.length) {
-        console.log(intersects)
-      }
+      // const raycaster = new Raycaster()
+      // var mouse = new Vector2()
+      // // // scale mouse pixel position to a percentage of the screen's width and height
+      // mouse.x = (e.point.x / map.transform.width) * 2 - 1
+      // mouse.y = 1 - (e.point.y / map.transform.height) * 2
+      // const camInverseProjection = camera.projectionMatrix.invert()
+      // const cameraPosition = new Vector3().applyMatrix4(camInverseProjection)
+      // const mousePosition = new Vector3(mouse.x, mouse.y, 1).applyMatrix4(camInverseProjection)
+      // const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
+      // raycaster.set(cameraPosition, viewDirection)
+      // // calculate objects intersecting the picking ray
+      // var intersects = raycaster.intersectObjects(scene.children, true)
+      // if (intersects.length) {
+      //   console.log(intersects)
+      // }
     })
 
     map.on("style.load", () => {
-      console.log("added layer")
-      map.addLayer(customLayer, "EP9PAUebGrNL2Wb3idfvISMwyVt1")
+      // setMarker(map, userID)
     })
 
     map.on("load", (ev) => {
@@ -166,7 +157,6 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         clearMarker()
         res.data.forEach((layer: any) => {
           if (layer.name == userID) {
-            console.log(layer)
             // set Image
             axios
               .get(
@@ -175,27 +165,48 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
               .then((res) => {
                 const sortedFeatures = res.data.features.sort(featureSortFunc)
                 sortedFeatures.forEach((feature: Feature) => {
-                  const div = document.createElement("div")
-                  const root = createRoot(div)
+                  const camera = new PerspectiveCamera(
+                    28,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1e6,
+                  )
+                  const scene = new Scene()
 
-                  const today = Date.now()
-                  const openDate = Date.parse(feature.properties.openDate)
+                  const featureOrigin = [
+                    feature.geometry.coordinates[0],
+                    feature.geometry.coordinates[1],
+                  ] as [number, number]
+                  const customLayer = show3dOnMap(
+                    featureOrigin,
+                    "feature-" + feature.id,
+                    map,
+                    camera,
+                    scene,
+                  )
+                  map.addLayer(customLayer, layer.name)
 
-                  if (today > openDate) {
-                    root.render(
-                      <MapCapsule
-                        feature={feature}
-                        onClick={() => router.push(`/capsule/open/${feature.properties.id}`)}
-                      />,
-                    )
-                  } else {
-                    root.render(<LockedCapsule feature={feature} />)
-                  }
+                  // const div = document.createElement("div")
+                  // const root = createRoot(div)
 
-                  const marker = new Marker(div)
-                    .setLngLat(feature.geometry.coordinates as [number, number])
-                    .addTo(map)
-                  addMarker(marker)
+                  // const today = Date.now()
+                  // const openDate = Date.parse(feature.properties.openDate)
+
+                  // if (today > openDate) {
+                  //   root.render(
+                  //     <MapCapsule
+                  //       feature={feature}
+                  //       onClick={() => router.push(`/capsule/open/${feature.properties.id}`)}
+                  //     />,
+                  //   )
+                  // } else {
+                  //   root.render(<LockedCapsule feature={feature} />)
+                  // }
+
+                  // const marker = new Marker(div)
+                  //   .setLngLat(feature.geometry.coordinates as [number, number])
+                  //   .addTo(map)
+                  // addMarker(marker)
                 })
               })
           }

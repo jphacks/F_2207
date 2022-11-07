@@ -2,13 +2,18 @@ import { Map, MercatorCoordinate } from "mapbox-gl"
 import { DirectionalLight, WebGLRenderer, Matrix4, Vector3, Camera, Scene } from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 
-export const show3dOnMap = (map: Map, camera: Camera, scene: Scene) => {
+export const show3dOnMap = (
+  featureOrigin: [number, number],
+  id: string,
+  map: Map,
+  camera: Camera,
+  scene: Scene,
+) => {
   // parameters to ensure the model is georeferenced correctly on the map
-  const modelOrigin = [135.6042317745411, 34.86210390210311] as [number, number]
   const modelAltitude = 0
   const modelRotate = [Math.PI / 2, 0, 0]
 
-  const modelAsMercatorCoordinate = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
+  const modelAsMercatorCoordinate = MercatorCoordinate.fromLngLat(featureOrigin, modelAltitude)
 
   // transformation parameters to position, rotate and scale the 3D model onto the map
   const modelTransform = {
@@ -29,7 +34,7 @@ export const show3dOnMap = (map: Map, camera: Camera, scene: Scene) => {
 
   // configuration of the custom layer for a 3D model per the CustomLayerInterface
   const customLayer: mapboxgl.AnyLayer = {
-    id: "3d-model",
+    id: id,
     type: "custom",
     renderingMode: "3d",
     onAdd: function (map, gl) {
