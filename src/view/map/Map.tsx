@@ -35,8 +35,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const [open, setOpen] = useState(false)
   const [searchTargetId, setSearchTargetId] = useState("")
 
-  const camera = new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6)
-  const scene = new Scene()
+  const camera = useRef(new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6))
+  const scene = useRef(new Scene())
 
   const {
     element: mapElement,
@@ -75,7 +75,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         lat: currentPosition.latitude,
         lng: currentPosition.longitude,
       },
-      zoom: 17,
+      zoom: 16,
       bearing: -12,
       pitch: 60,
     })
@@ -106,14 +106,14 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       mouse.x = (e.point.x / map.transform.width) * 2 - 1
       // @ts-ignore
       mouse.y = 1 - (e.point.y / map.transform.height) * 2
-      const camInverseProjection = camera.projectionMatrix.invert()
+      const camInverseProjection = camera.current.projectionMatrix.invert()
       const cameraPosition = new Vector3().applyMatrix4(camInverseProjection)
       const mousePosition = new Vector3(mouse.x, mouse.y, 1).applyMatrix4(camInverseProjection)
       const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
       raycaster.set(cameraPosition, viewDirection)
       // calculate objects intersecting the picking ray
       const intersects = raycaster
-        .intersectObjects(scene.children, true)
+        .intersectObjects(scene.current.children, true)
         .filter((i) => i.object.name == "本体")
       if (intersects.length) {
         const id = getSceneFrom3dObject(intersects[0].object).name
@@ -168,7 +168,13 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
               )
               .then((res) => {
                 const sortedFeatures = res.data.features.sort(featureSortFunc)
-                const customLayer = show3dOnMap(sortedFeatures, "features", map, camera, scene)
+                const customLayer = show3dOnMap(
+                  sortedFeatures,
+                  "features",
+                  map,
+                  camera.current,
+                  scene.current,
+                )
                 map.addLayer(customLayer, layer.name)
                 // sortedFeatures.forEach((feature: Feature) => {
                 //   const camera = new PerspectiveCamera(
