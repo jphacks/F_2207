@@ -172,13 +172,6 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
               )
               .then((res) => {
                 const sortedFeatures = res.data.features.sort(featureSortFunc)
-                // const camera = new PerspectiveCamera(
-                //   28,
-                //   window.innerWidth / window.innerHeight,
-                //   0.1,
-                //   1e6,
-                // )
-                // const scene = new Scene()
                 const customLayer = show3dOnMap(sortedFeatures, "features", map, camera, scene)
                 map.addLayer(customLayer, layer.name)
                 // sortedFeatures.forEach((feature: Feature) => {
