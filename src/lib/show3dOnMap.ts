@@ -4,27 +4,37 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 
 import { Feature } from "@/types/feature"
 
-const addFeatureToScene = (feature: Feature, baseScene: Scene, loader: GLTFLoader) => {
+type SceneTransform = {
+  matrix: Matrix4
+  origin: Vector3
+  meterScale: number
+}
+
+const addFeatureToScene = (
+  feature: Feature,
+  sceneTransform: SceneTransform,
+  baseScene: Scene,
+  loader: GLTFLoader,
+) => {
   const modelOrigin = [feature.geometry.coordinates[0], feature.geometry.coordinates[1]] as [
     number,
     number,
   ]
   const modelAltitude = 0
   const modelRotate = new Euler(Math.PI / 2, 0, 0, "XYZ")
+  const featureid = feature.properties.id
 
-  const modelAsMercatorCoordinate = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
-
-  const meterScale = modelAsMercatorCoordinate.meterInMercatorCoordinateUnits()
-
+  const mc = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
   loader.load("/models/capsule3.glb", (gltf) => {
     const scene = gltf.scene
+    const origin = sceneTransform.origin
     scene.position.set(
-      (modelAsMercatorCoordinate.x - modelOrigin[0]) / meterScale,
-      -(modelAsMercatorCoordinate.y - modelOrigin[1]) / meterScale,
-      0,
+      (mc.x - origin.x) / sceneTransform.meterScale,
+      -(mc.y - origin.y) / sceneTransform.meterScale,
+      ((mc.z as number) - origin.z) / sceneTransform.meterScale,
     )
     scene.quaternion.setFromEuler(modelRotate)
-    // scene.scale.set(modelScale, modelScale, modelScale)
+    scene.name = featureid
     baseScene.add(gltf.scene)
   })
 }
@@ -42,11 +52,12 @@ export const show3dOnMap = (
   )
   const meterScale = mc.meterInMercatorCoordinateUnits()
 
-  const sceneTransform = {
+  const sceneTransform: SceneTransform = {
     matrix: new Matrix4()
       .makeTranslation(mc.x, mc.y, mc.z as number)
       .scale(new Vector3(meterScale, -meterScale, meterScale)),
     origin: new Vector3(mc.x, mc.y, mc.z),
+    meterScale: meterScale,
   }
 
   let renderer: THREE.WebGLRenderer | null = null
@@ -70,27 +81,7 @@ export const show3dOnMap = (
       const loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
       for (let i = 0; i < features.length; i++) {
-        const modelOrigin = [
-          features[i].geometry.coordinates[0],
-          features[i].geometry.coordinates[1],
-        ] as [number, number]
-        const modelAltitude = 0
-        const modelRotate = new Euler(Math.PI / 2, 0, 0, "XYZ")
-        const featureid = features[i].properties.id
-
-        const mc = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
-        loader.load("/models/capsule3.glb", (gltf) => {
-          const scene = gltf.scene
-          const origin = sceneTransform.origin
-          scene.position.set(
-            (mc.x - origin.x) / meterScale,
-            -(mc.y - origin.y) / meterScale,
-            ((mc.z as number) - origin.z) / meterScale,
-          )
-          scene.quaternion.setFromEuler(modelRotate)
-          scene.name = featureid
-          baseScene.add(gltf.scene)
-        })
+        addFeatureToScene(features[i], sceneTransform, baseScene, loader)
       }
 
       // use the Mapbox GL JS map canvas for three.js
