@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { Box, LoadingOverlay } from "@mantine/core"
+import { Box, Button, LoadingOverlay, Modal } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
@@ -31,6 +31,9 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
 
   const mapRef = useRef<Map | null>(null)
   const mapInitialized = useRef(false)
+
+  const [open, setOpen] = useState(false)
+  const [searchTargetId, setSearchTargetId] = useState("")
 
   const camera = new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6)
   const scene = new Scene()
@@ -107,13 +110,13 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
       raycaster.set(cameraPosition, viewDirection)
       // calculate objects intersecting the picking ray
-      var intersects = raycaster.intersectObjects(scene.children, true)
+      var intersects = raycaster
+        .intersectObjects(scene.children, true)
+        .filter((i) => i.object.name == "本体")
       if (intersects.length) {
-        intersects.forEach((intersect) => {
-          if (intersect.object.name == "本体") {
-            console.log(intersect.object.parent!.parent!.parent!.name)
-          }
-        })
+        const intersect = intersects[0]
+        setOpen(true)
+        setSearchTargetId(intersect.object.parent!.parent!.parent!.name)
       } else {
         console.log("no intersects")
       }
@@ -327,6 +330,31 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
           overlayOpacity={0.6}
         />
       </Box>
+      <Modal
+        centered
+        opened={open}
+        onClose={() => setOpen(false)}
+        withCloseButton={false}
+        styles={{
+          modal: {
+            background: "#212121",
+            color: "white",
+          },
+        }}
+      >
+        <div className="flex flex-col items-center">
+          <div>このカプセルを探しに行きますか？</div>
+          <Button
+            className="mt-4 bg-[#d3f36b] text-black hover:bg-[#c8e762]"
+            onClick={() => {
+              setOpen(false)
+              router.push(`/capsule/open/${searchTargetId}`)
+            }}
+          >
+            探しに行く
+          </Button>
+        </div>
+      </Modal>
     </>
   )
 }
