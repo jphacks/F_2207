@@ -1,5 +1,5 @@
 import { Map, MercatorCoordinate } from "mapbox-gl"
-import { Scene, Euler, Matrix4, Vector3, AmbientLight, Camera, WebGLRenderer } from "three"
+import { Scene, Euler, Matrix4, Vector3, Camera, WebGLRenderer, DirectionalLight } from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 
 import { Feature } from "@/types/feature"
@@ -163,13 +163,13 @@ export const show3dOnMap = (
 
     onAdd: function (map, gl) {
       // create two three.js lights to illuminate the model
-      var light1 = new AmbientLight(0xffffff)
-      light1.position.set(0, -70, 100).normalize()
-      baseScene.add(light1)
+      const directionalLight = new DirectionalLight(0xffffff)
+      directionalLight.position.set(0, -70, 100).normalize()
+      baseScene.add(directionalLight)
 
-      var light2 = new AmbientLight(0xffffff)
-      light2.position.set(0, 70, 100).normalize()
-      baseScene.add(light2)
+      const directionalLight2 = new DirectionalLight(0xffffff)
+      directionalLight2.position.set(0, 70, 100).normalize()
+      baseScene.add(directionalLight2)
 
       var loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
