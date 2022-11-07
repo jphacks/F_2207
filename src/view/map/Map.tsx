@@ -4,7 +4,7 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import { Map, NavigationControl, GeolocateControl, Popup, LngLatLike } from "mapbox-gl"
-import { PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from "three"
+import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from "three"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { useUser } from "@/auth/useAuth"
@@ -116,9 +116,9 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         .intersectObjects(scene.children, true)
         .filter((i) => i.object.name == "本体")
       if (intersects.length) {
-        const intersect = intersects[0]
+        const id = getSceneFrom3dObject(intersects[0].object).name
         setOpen(true)
-        setSearchTargetId(intersect.object.parent!.parent!.parent!.name)
+        setSearchTargetId(id)
       }
     })
 
@@ -258,6 +258,14 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       .setLngLat(coordinates as [number, number])
       .setHTML(description)
       .addTo(map)
+  }
+
+  const getSceneFrom3dObject = (obj: Object3D): Object3D => {
+    if (obj.type == "Scene" || obj.parent == null) {
+      return obj
+    } else {
+      return getSceneFrom3dObject(obj.parent)
+    }
   }
 
   useEffect(() => {
