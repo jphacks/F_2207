@@ -100,9 +100,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
 
     map.on("click", (e) => {
       const raycaster = new Raycaster()
-      var mouse = new Vector2()
-      // // scale mouse pixel position to a percentage of the screen's width and height
+      const mouse = new Vector2()
+      // scale mouse pixel position to a percentage of the screen's width and height
+      // @ts-ignore
       mouse.x = (e.point.x / map.transform.width) * 2 - 1
+      // @ts-ignore
       mouse.y = 1 - (e.point.y / map.transform.height) * 2
       const camInverseProjection = camera.projectionMatrix.invert()
       const cameraPosition = new Vector3().applyMatrix4(camInverseProjection)
@@ -110,7 +112,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
       raycaster.set(cameraPosition, viewDirection)
       // calculate objects intersecting the picking ray
-      var intersects = raycaster
+      const intersects = raycaster
         .intersectObjects(scene.children, true)
         .filter((i) => i.object.name == "本体")
       if (intersects.length) {
@@ -118,10 +120,6 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         setOpen(true)
         setSearchTargetId(intersect.object.parent!.parent!.parent!.name)
       }
-    })
-
-    map.on("style.load", () => {
-      // setMarker(map, userID)
     })
 
     map.on("load", (ev) => {
