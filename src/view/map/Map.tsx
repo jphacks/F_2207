@@ -117,8 +117,6 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         const intersect = intersects[0]
         setOpen(true)
         setSearchTargetId(intersect.object.parent!.parent!.parent!.name)
-      } else {
-        console.log("no intersects")
       }
     })
 
