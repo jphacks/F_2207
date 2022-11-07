@@ -10,6 +10,12 @@ type SceneTransform = {
   meterScale: number
 }
 
+const addLightToScene = (x: number, y: number, z: number, baseScene: Scene) => {
+  const directionalLight = new DirectionalLight(0xffffff)
+  directionalLight.position.set(x, y, z).normalize()
+  baseScene.add(directionalLight)
+}
+
 const addFeatureToScene = (
   feature: Feature,
   sceneTransform: SceneTransform,
@@ -69,14 +75,8 @@ export const show3dOnMap = (
     renderingMode: "3d",
 
     onAdd: (map, gl) => {
-      // create two three.js lights to illuminate the model
-      const directionalLight = new DirectionalLight(0xffffff)
-      directionalLight.position.set(0, -70, 100).normalize()
-      baseScene.add(directionalLight)
-
-      const directionalLight2 = new DirectionalLight(0xffffff)
-      directionalLight2.position.set(0, 70, 100).normalize()
-      baseScene.add(directionalLight2)
+      addLightToScene(0, -70, 100, baseScene)
+      addLightToScene(0, 70, 100, baseScene)
 
       const loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
