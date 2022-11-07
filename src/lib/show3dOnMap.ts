@@ -184,22 +184,19 @@ export const show3dOnMap = (
         const featureid = features[i].properties.id
 
         const mc = MercatorCoordinate.fromLngLat(modelOrigin3, modelAltitude3)
-        loader.load(
-          "/models/capsule3.glb",
-          function (gltf) {
-            const scene = gltf.scene
-            const origin = sceneTransform.origin
-            scene.position.set(
-              (mc.x - origin.x) / meterScale,
-              -(mc.y - origin.y) / meterScale,
-              ((mc.z as number) - origin.z) / meterScale,
-            )
-            scene.quaternion.setFromEuler(modelRotate3)
-            scene.scale.set(modelScale, modelScale, modelScale)
-            scene.name = featureid
-            baseScene.add(gltf.scene)
-          }.bind(this),
-        )
+        loader.load("/models/capsule3.glb", (gltf) => {
+          const scene = gltf.scene
+          const origin = sceneTransform.origin
+          scene.position.set(
+            (mc.x - origin.x) / meterScale,
+            -(mc.y - origin.y) / meterScale,
+            ((mc.z as number) - origin.z) / meterScale,
+          )
+          scene.quaternion.setFromEuler(modelRotate3)
+          scene.scale.set(modelScale, modelScale, modelScale)
+          scene.name = featureid
+          baseScene.add(gltf.scene)
+        })
       }
 
       // use the Mapbox GL JS map canvas for three.js
