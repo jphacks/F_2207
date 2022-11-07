@@ -38,6 +38,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const camera = useRef(new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6))
   const scene = useRef(new Scene())
 
+  const mapContainerRef = useRef<HTMLDivElement | null>(null)
+
   const {
     element: mapElement,
     markers,
@@ -48,7 +50,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   } = useMapElement()
 
   const mapSetUp = async () => {
-    if (mapRef.current != null || mapInitialized.current) {
+    const mapContainer = mapContainerRef.current
+    if (mapRef.current != null || mapInitialized.current || mapContainer == null) {
       return
     }
 
@@ -67,7 +70,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       userID,
     )
     const map = new Map({
-      container: "map",
+      container: mapContainer,
       style: "mqplatform://maps-api/styles/v1/18",
       transformRequest,
       logoPosition: "top-left",
@@ -279,10 +282,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
     if (mapElement == null) {
       mapSetUp()
     } else {
-      const container = document.getElementById("map")
+      const container = mapContainerRef.current
       for (let i = 0; i < mapElement.length; i++) {
         container?.appendChild?.(mapElement.item(i))
       }
+      mapRef.current = mapObj
       // container?.appendChild?.(mapElement)
       if (mapObj != null && user != null) {
         setMarker(mapObj, user.id)
@@ -293,14 +297,13 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
 
   useEffect(() => {
     const map = mapRef.current
-    console.log("HEY", map, selectedCapsuleCenter)
     if (map == null || selectedCapsuleCenter == null) {
       return
     }
-    console.log("FLY")
     map.flyTo({
       center: selectedCapsuleCenter,
       duration: 800,
+      zoom: 16,
     })
   }, [selectedCapsuleCenter])
 
@@ -327,6 +330,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       </Head>
       <Box
         id="map"
+        ref={mapContainerRef}
         className="mapboxgl-map h-map-screen" //h-[calc(100vh-72px)]
         sx={{ width: "100%" /*height: "calc(100vh - 72px)"*/ }}
       >
