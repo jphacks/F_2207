@@ -3,8 +3,9 @@ import { Box, Button, LoadingOverlay, Modal } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
-import { Map, NavigationControl, GeolocateControl, Popup, LngLatLike } from "mapbox-gl"
+import { Map, NavigationControl, GeolocateControl, Popup, LngLatLike, Marker } from "mapbox-gl"
 import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from "three"
+import { createRoot } from "react-dom/client"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
 import { useUser } from "@/auth/useAuth"
@@ -13,8 +14,12 @@ import { GpsType, useGeolocation } from "@/provider/GpsProvider"
 import { useMapElement } from "@/provider/MapElementProvider"
 import { featureSortFunc } from "@/lib/sortCapsule"
 import { show3dOnMap } from "@/lib/show3dOnMap"
+import { Feature } from "@/types/feature"
 
 import "mapbox-gl/dist/mapbox-gl.css"
+
+import LockedCapsule from "./LockedCapsule"
+import MapCapsule from "./MapCapsule"
 
 export type MapPageProps = {
   selectedCapsuleCenter: LngLatLike | null
@@ -170,7 +175,30 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                 `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
               )
               .then((res) => {
-                const sortedFeatures = res.data.features.sort(featureSortFunc)
+                const sortedFeatures = res.data.features.sort(featureSortFunc).slice(1, 3)
+                sortedFeatures.forEach((feature: Feature) => {
+                  const div = document.createElement("div")
+                  const root = createRoot(div)
+
+                  const today = Date.now()
+                  const openDate = Date.parse(feature.properties.openDate)
+
+                  if (today > openDate) {
+                    root.render(
+                      <MapCapsule
+                        feature={feature}
+                        onClick={() => router.push(`/capsule/open/${feature.properties.id}`)}
+                      />,
+                    )
+                  } else {
+                    root.render(<LockedCapsule feature={feature} />)
+                  }
+
+                  const marker = new Marker(div)
+                    .setLngLat(feature.geometry.coordinates as [number, number])
+                    .addTo(map)
+                  addMarker(marker)
+                })
                 const customLayer = show3dOnMap(
                   sortedFeatures,
                   "features",
@@ -178,53 +206,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                   camera.current,
                   scene.current,
                 )
-                // map.removeLayer("features")
-                map.addLayer(customLayer, layer.name)
-                console.log(scene)
-                // sortedFeatures.forEach((feature: Feature) => {
-                //   const camera = new PerspectiveCamera(
-                //     28,
-                //     window.innerWidth / window.innerHeight,
-                //     0.1,
-                //     1e6,
-                //   )
-                //   const scene = new Scene()
-
-                //   const featureOrigin = [
-                //     feature.geometry.coordinates[0],
-                //     feature.geometry.coordinates[1],
-                //   ] as [number, number]
-                //   const customLayer = show3dOnMap(
-                //     featureOrigin,
-                //     "feature-" + feature.id,
-                //     map,
-                //     camera,
-                //     scene,
-                //   )
-                //   map.addLayer(customLayer, layer.name)
-
-                // const div = document.createElement("div")
-                // const root = createRoot(div)
-
-                // const today = Date.now()
-                // const openDate = Date.parse(feature.properties.openDate)
-
-                // if (today > openDate) {
-                //   root.render(
-                //     <MapCapsule
-                //       feature={feature}
-                //       onClick={() => router.push(`/capsule/open/${feature.properties.id}`)}
-                //     />,
-                //   )
-                // } else {
-                //   root.render(<LockedCapsule feature={feature} />)
-                // }
-
-                // const marker = new Marker(div)
-                //   .setLngLat(feature.geometry.coordinates as [number, number])
-                //   .addTo(map)
-                // addMarker(marker)
-                // })
+                map.removeLayer("features")
+                map.addLayer(customLayer)
               })
           }
         })
