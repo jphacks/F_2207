@@ -1,6 +1,17 @@
 import { Map, MercatorCoordinate } from "mapbox-gl"
-import { Scene, Euler, Matrix4, Vector3, Camera, WebGLRenderer, DirectionalLight } from "three"
+import {
+  Scene,
+  Euler,
+  Matrix4,
+  Vector3,
+  Camera,
+  DirectionalLight,
+  WebGLRenderer,
+  Color,
+  AxesHelper,
+} from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer"
 
 import { Feature } from "@/types/feature"
 
@@ -20,6 +31,7 @@ const addFeatureToScene = (
   feature: Feature,
   sceneTransform: SceneTransform,
   baseScene: Scene,
+  camera: Camera,
   loader: GLTFLoader,
 ) => {
   const modelOrigin = [feature.geometry.coordinates[0], feature.geometry.coordinates[1]] as [
@@ -44,6 +56,23 @@ const addFeatureToScene = (
     scene.name = featureid
     baseScene.add(gltf.scene)
   })
+
+  var element = document.createElement("div")
+  element.style.width = "30px"
+  element.style.height = "30px"
+  element.style.opacity = "0.999"
+  element.style.background = new Color(
+    Math.random() * 0.21568627451 + 0.462745098039,
+    Math.random() * 0.21568627451 + 0.462745098039,
+    Math.random() * 0.21568627451 + 0.462745098039,
+  ).getStyle()
+  element.textContent = "text!"
+
+  var domObject = new CSS3DObject(element)
+  domObject.position.x = Math.random() * 200 - 100
+  domObject.position.y = Math.random() * 200 - 100
+  domObject.position.z = Math.random() * 200 - 100
+  baseScene.add(domObject)
 }
 
 export const show3dOnMap = (
@@ -68,6 +97,7 @@ export const show3dOnMap = (
   }
 
   let renderer: THREE.WebGLRenderer | null = null
+  let renderer2: CSS3DRenderer | null = null
 
   // configuration of the custom layer for a 3D model per the CustomLayerInterface
   const featureLayer: mapboxgl.AnyLayer = {
@@ -82,8 +112,11 @@ export const show3dOnMap = (
       const loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
       for (let i = 0; i < features.length; i++) {
-        addFeatureToScene(features[i], sceneTransform, baseScene, loader)
+        addFeatureToScene(features[i], sceneTransform, baseScene, camera, loader)
       }
+
+      const axesHelper = new AxesHelper(50)
+      baseScene.add(axesHelper)
 
       // use the Mapbox GL JS map canvas for three.js
       renderer = new WebGLRenderer({
@@ -93,12 +126,19 @@ export const show3dOnMap = (
       })
 
       renderer!.autoClear = false
+
+      renderer2 = new CSS3DRenderer()
+      renderer2.setSize(window.innerWidth, window.innerHeight)
+      renderer2.domElement.style.position = "absolute"
+      renderer2.domElement.style.top = "0"
+      document.querySelector("#map").appendChild(renderer2.domElement)
     },
 
     render: (_gl, matrix) => {
       camera.projectionMatrix = new Matrix4().fromArray(matrix).multiply(sceneTransform.matrix)
       renderer?.state.reset()
       renderer?.render(baseScene, camera)
+      renderer2?.render(baseScene, camera)
       map.triggerRepaint()
     },
   }

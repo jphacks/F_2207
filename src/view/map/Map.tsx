@@ -178,8 +178,9 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                   camera.current,
                   scene.current,
                 )
-                map.removeLayer("features")
+                // map.removeLayer("features")
                 map.addLayer(customLayer, layer.name)
+                console.log(scene)
                 // sortedFeatures.forEach((feature: Feature) => {
                 //   const camera = new PerspectiveCamera(
                 //     28,
