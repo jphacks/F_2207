@@ -1,5 +1,5 @@
 import classNames from "classnames"
-import React, { useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import { Text, UnstyledButton } from "@mantine/core"
 
 import { Capsule } from "@/types/capsule"
@@ -28,20 +28,26 @@ export type SerachResultProps = {
   capsules: Capsule[]
   className?: string
   onClickCapsule: (capsuleId: string) => void
+  filterOption: FilterOption
+  onChangeFilterOption: (option: FilterOption) => void
 }
 
-const SearchResult: React.FC<SerachResultProps> = ({ capsules, onClickCapsule, className }) => {
-  const [selected, setSelected] = useState<FilterOption>("all")
-
+const SearchResult: React.FC<SerachResultProps> = ({
+  capsules,
+  onClickCapsule,
+  className,
+  filterOption,
+  onChangeFilterOption,
+}) => {
   const filteredCapsules = useMemo(() => {
-    if (selected === "all") {
+    if (filterOption === "all") {
       return capsules
-    } else if (selected === "openable") {
+    } else if (filterOption === "openable") {
       return capsules.filter((capsule) => capsule.userOpenDate == null)
     } else {
       return capsules.filter((capsule) => capsule.userOpenDate != null)
     }
-  }, [capsules, selected])
+  }, [capsules, filterOption])
 
   return (
     <section
@@ -54,10 +60,10 @@ const SearchResult: React.FC<SerachResultProps> = ({ capsules, onClickCapsule, c
         {FILTER_OPTIONS.map((option) => (
           <button
             key={option.value}
-            onClick={() => setSelected(option.value)}
+            onClick={() => onChangeFilterOption(option.value)}
             className={classNames(
               "rounded-full border-2 border-solid bg-bgcolor px-4 py-1 text-sm font-bold",
-              option.value === selected
+              option.value === filterOption
                 ? "border-primary text-primary"
                 : "border-gray-500 text-gray-500",
             )}
