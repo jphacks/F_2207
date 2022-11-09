@@ -1,22 +1,25 @@
 import { useEffect, useRef, useState } from "react"
-import { Box, LoadingOverlay } from "@mantine/core"
+import { Box, Button, LoadingOverlay, Modal } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
+import { Map, NavigationControl, GeolocateControl, Popup, LngLatLike, Marker } from "mapbox-gl"
+import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from "three"
 import { createRoot } from "react-dom/client"
-import { Map, NavigationControl, GeolocateControl, Marker, Popup, LngLatLike } from "mapbox-gl"
-import "mapbox-gl/dist/mapbox-gl.css"
 
 import { MapBoxClick } from "@/types/mapBoxClick"
-import { Feature } from "@/types/feature"
 import { useUser } from "@/auth/useAuth"
 import mqplatformTransformRequest from "@/lib/mqplatformTransformRequest"
 import { GpsType, useGeolocation } from "@/provider/GpsProvider"
 import { useMapElement } from "@/provider/MapElementProvider"
 import { featureSortFunc } from "@/lib/sortCapsule"
+import { show3dOnMap } from "@/lib/show3dOnMap"
+import { Feature } from "@/types/feature"
 
-import MapCapsule from "./MapCapsule"
+import "mapbox-gl/dist/mapbox-gl.css"
+
 import LockedCapsule from "./LockedCapsule"
+import MapCapsule from "./MapCapsule"
 
 export type MapPageProps = {
   selectedCapsuleCenter: LngLatLike | null
@@ -34,6 +37,14 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   const mapRef = useRef<Map | null>(null)
   const mapInitialized = useRef(false)
 
+  const [open, setOpen] = useState(false)
+  const [searchTargetId, setSearchTargetId] = useState("")
+
+  const camera = useRef(new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6))
+  const scene = useRef(new Scene())
+
+  const mapContainerRef = useRef<HTMLDivElement | null>(null)
+
   const {
     element: mapElement,
     markers,
@@ -44,7 +55,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   } = useMapElement()
 
   const mapSetUp = async () => {
-    if (mapRef.current != null || mapInitialized.current) {
+    const mapContainer = mapContainerRef.current
+    if (mapRef.current != null || mapInitialized.current || mapContainer == null) {
       return
     }
 
@@ -63,7 +75,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       userID,
     )
     const map = new Map({
-      container: "map",
+      container: mapContainer,
       style: "mqplatform://maps-api/styles/v1/18",
       transformRequest,
       logoPosition: "top-left",
@@ -71,7 +83,9 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         lat: currentPosition.latitude,
         lng: currentPosition.longitude,
       },
-      zoom: 15,
+      zoom: 16,
+      bearing: -12,
+      pitch: 60,
     })
     mapRef.current = map
 
@@ -92,8 +106,42 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       setCenterToCurrentPlace(map)
     })
 
-    map.on("load", () => {
+    map.on("click", (e) => {
+      const raycaster = new Raycaster()
+      const mouse = new Vector2()
+      // scale mouse pixel position to a percentage of the screen's width and height
+      // @ts-ignore
+      mouse.x = (e.point.x / map.transform.width) * 2 - 1
+      // @ts-ignore
+      mouse.y = 1 - (e.point.y / map.transform.height) * 2
+      const camInverseProjection = camera.current.projectionMatrix.invert()
+      const cameraPosition = new Vector3().applyMatrix4(camInverseProjection)
+      const mousePosition = new Vector3(mouse.x, mouse.y, 1).applyMatrix4(camInverseProjection)
+      const viewDirection = mousePosition.clone().sub(cameraPosition).normalize()
+      raycaster.set(cameraPosition, viewDirection)
+      // calculate objects intersecting the picking ray
+      const intersects = raycaster
+        .intersectObjects(scene.current.children, true)
+        .filter((i) => i.object.name == "本体")
+      if (intersects.length) {
+        const id = getSceneFrom3dObject(intersects[0].object).name
+        setOpen(true)
+        setSearchTargetId(id)
+      }
+    })
+
+    map.on("load", (ev) => {
       setMarker(map, userID)
+      console.log(map)
+
+      const layers = map.getStyle().layers
+      const labelLayerId = layers?.find(
+        (layer) => layer.type === "symbol" && layer.layout?.["text-field"],
+      )?.id
+
+      if (labelLayerId == null) {
+        return
+      }
     })
 
     map.on("click", userID, (e) => {
@@ -127,7 +175,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                 `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
               )
               .then((res) => {
-                const sortedFeatures = res.data.features.sort(featureSortFunc)
+                const sortedFeatures = res.data.features.sort(featureSortFunc).slice(1, 3)
                 sortedFeatures.forEach((feature: Feature) => {
                   const div = document.createElement("div")
                   const root = createRoot(div)
@@ -151,6 +199,15 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                     .addTo(map)
                   addMarker(marker)
                 })
+                const customLayer = show3dOnMap(
+                  sortedFeatures,
+                  "features",
+                  map,
+                  camera.current,
+                  scene.current,
+                )
+                map.removeLayer("features")
+                map.addLayer(customLayer)
               })
           }
         })
@@ -197,14 +254,23 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       .addTo(map)
   }
 
+  const getSceneFrom3dObject = (obj: Object3D): Object3D => {
+    if (obj.type == "Scene" || obj.parent == null) {
+      return obj
+    } else {
+      return getSceneFrom3dObject(obj.parent)
+    }
+  }
+
   useEffect(() => {
     if (mapElement == null) {
       mapSetUp()
     } else {
-      const container = document.getElementById("map")
+      const container = mapContainerRef.current
       for (let i = 0; i < mapElement.length; i++) {
         container?.appendChild?.(mapElement.item(i))
       }
+      mapRef.current = mapObj
       // container?.appendChild?.(mapElement)
       if (mapObj != null && user != null) {
         setMarker(mapObj, user.id)
@@ -221,6 +287,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
     map.flyTo({
       center: selectedCapsuleCenter,
       duration: 800,
+      zoom: 16,
     })
   }, [selectedCapsuleCenter])
 
@@ -247,6 +314,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       </Head>
       <Box
         id="map"
+        ref={mapContainerRef}
         className="mapboxgl-map h-map-screen" //h-[calc(100vh-72px)]
         sx={{ width: "100%" /*height: "calc(100vh - 72px)"*/ }}
       >
@@ -256,6 +324,31 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
           overlayOpacity={0.6}
         />
       </Box>
+      <Modal
+        centered
+        opened={open}
+        onClose={() => setOpen(false)}
+        withCloseButton={false}
+        styles={{
+          modal: {
+            background: "#212121",
+            color: "white",
+          },
+        }}
+      >
+        <div className="flex flex-col items-center">
+          <div>このカプセルを探しに行きますか？</div>
+          <Button
+            className="mt-4 bg-[#d3f36b] text-black hover:bg-[#c8e762]"
+            onClick={() => {
+              setOpen(false)
+              router.push(`/capsule/open/${searchTargetId}`)
+            }}
+          >
+            探しに行く
+          </Button>
+        </div>
+      </Modal>
     </>
   )
 }

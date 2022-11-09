@@ -173,6 +173,7 @@ const MapPage: NextPage = () => {
               className="absolute inset-0 z-[600]"
             />
           </div>
+          <div id="features"></div>
         </Box>
       </DefaultLayout>
     </>

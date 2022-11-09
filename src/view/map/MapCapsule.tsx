@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import { Button, Modal } from "@mantine/core"
+import { Box, Button, Modal } from "@mantine/core"
 import { useState } from "react"
 
 import { Feature } from "@/types/feature"
@@ -18,7 +18,7 @@ const MapCapsule: React.FC<MapCapsuleProps> = ({ feature, onClick }) => {
 
   // TODO: Click Action
   return (
-    <>
+    <Box className="pb-[150px]">
       <Capsule
         capsuleColor={feature.properties.capsuleColor}
         gpsColor={feature.properties.gpsColor}
@@ -56,7 +56,7 @@ const MapCapsule: React.FC<MapCapsuleProps> = ({ feature, onClick }) => {
           </Button>
         </div>
       </Modal>
-    </>
+    </Box>
   )
 }
 
