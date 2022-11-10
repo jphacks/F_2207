@@ -1,11 +1,11 @@
-import { Indicator, Stack, Avatar, Text } from "@mantine/core"
+import { Avatar, Indicator, Stack, Text } from "@mantine/core"
 import React from "react"
 
 import { AppUser } from "@/types/user"
 
 export type UserAvaterProps = {
   user: AppUser
-  label?: number
+  label?: React.ReactNode
 }
 
 const UserAvater: React.FC<UserAvaterProps> = ({ user, label }) => {
