@@ -30,6 +30,7 @@ import { useMatchingWithRedirect } from "@/hooks/useMatching"
 import { joinCapsule, postCapsule } from "@/repository/capsule"
 import MetaHeader from "@/view/common/MetaHeader"
 import { useAuthRouter } from "@/auth/useAuthRouter"
+import { goCollectPhase } from "@/repository/matchingCreate"
 
 const Register: NextPage = () => {
   useAuthRouter(true)
@@ -183,17 +184,17 @@ const Register: NextPage = () => {
         totalStep={4}
         currentStep={3}
         onClickNext={save}
-        onClickPrevOrClose={isOwner ? () => router.push(`/capsule/${matchingId}/collect`) : null}
+        onClickPrevOrClose={isOwner ? () => goCollectPhase(matchingId) : null}
         nextButtonType="bury"
       >
         <Box>
           <LoadingOverlay visible={isSaving} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
           <CapsulePreview
-            capsuleColor={capsuleCreateInput.color}
-            gpsColor={capsuleCreateInput.gpsTextColor}
-            emoji={capsuleCreateInput.emoji}
-            lng={geolocation.longitude ?? 0}
-            lat={geolocation.latitude ?? 0}
+            capsuleColor={matching?.color ?? capsuleCreateInput.color}
+            gpsColor={matching?.gpsTextColor ?? capsuleCreateInput.gpsTextColor}
+            emoji={matching?.emoji ?? capsuleCreateInput.emoji}
+            lng={matching?.longitude ?? geolocation?.latitude ?? 0}
+            lat={matching?.latitude ?? geolocation?.longitude ?? 0}
           />
           <Text className="pb-4" color="white" weight="bold" size="sm">
             カプセルの情報

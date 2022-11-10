@@ -3,7 +3,7 @@ import React, { useEffect } from "react"
 import { useRouter } from "next/router"
 import { Button, Group, Stack, Text } from "@mantine/core"
 
-import { stopMatching } from "@/repository/matchingCreate"
+import { goCollectPhase } from "@/repository/matchingCreate"
 import { useUser } from "@/auth/useAuth"
 import { matchingStatus } from "@/repository/matching"
 import { useMatchingUsers, useMatchingWithRedirect } from "@/hooks/useMatching"
@@ -16,6 +16,7 @@ import { useAuthRouter } from "@/auth/useAuthRouter"
 
 const Lobby: NextPage = () => {
   useAuthRouter(true)
+
   const router = useRouter()
   const user = useUser()
   const matchingId = router.query.matchingId as string
@@ -26,7 +27,7 @@ const Lobby: NextPage = () => {
   const isOwner = matching != null && user != null && matching.ownerId === user.id
 
   const handleConfirmMembers = async () => {
-    await stopMatching(matchingId)
+    await goCollectPhase(matchingId)
   }
 
   useEffect(() => {

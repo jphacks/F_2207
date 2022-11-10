@@ -11,8 +11,8 @@ import { getDownloadURL, ref, uploadBytes, UploadResult } from "firebase/storage
 
 import { db } from "@/lib/firebase/db"
 import { storage } from "@/lib/firebase/storage"
-import { generateId } from "@/lib/generateId"
 import { AppUser } from "@/types/user"
+import { Item } from "@/types/item"
 
 import { matchingStatus } from "./matching"
 
@@ -20,22 +20,25 @@ import { matchingStatus } from "./matching"
  * マッチングの中で投稿された画像の枚数
  * @returns 購読を止める
  */
-export const listenItemCount = (
-  matchingId: string,
-  onItemAdded: (itemUpdates: Record<string, number>) => void,
-) => {
+export const listenItems = (matchingId: string, onItemAdded: (itemUpdates: Item[]) => void) => {
   const matchRef = collection(doc(collection(db, "matching"), matchingId), "items")
   const unsubscribe = onSnapshot(matchRef, (snapshots) => {
-    snapshots.docChanges().forEach((docChange) => {
-      const itemUpdates: Record<string, number> = {}
-      if (docChange.type === "added") {
-        const data = docChange.doc.data()
-        const createdBy = data.createdBy
-        itemUpdates[createdBy] = (itemUpdates[createdBy] ?? 0) + 1
-      }
-      console.log(itemUpdates)
-      onItemAdded(itemUpdates)
-    })
+    const addedItems = snapshots
+      .docChanges()
+      .map((docChange) => {
+        if (docChange.type === "added") {
+          const data = docChange.doc.data()
+          return {
+            id: docChange.doc.id,
+            createdBy: data.createdBy,
+            createdAt: data.createdAt?.toDate(),
+            itemUrl: data.itemurl,
+            mimeType: data.mimeType,
+          }
+        }
+      })
+      .filter((item): item is Item => item != null)
+    onItemAdded(addedItems)
   })
   return unsubscribe
 }
@@ -45,13 +48,10 @@ export const listenItemCount = (
  */
 export const postItem = async (
   { user, matchingId }: { user: AppUser; matchingId: string },
-  files: File[],
+  files: { id: string; file: File }[],
 ) => {
-  const fileObjects = files.map((file) => ({ id: generateId(), file }))
   const results = await Promise.allSettled(
-    fileObjects.map(({ file, id }) =>
-      uploadBytes(ref(storage, `cupsules/${matchingId}/${id}`), file),
-    ),
+    files.map(({ file, id }) => uploadBytes(ref(storage, `cupsules/${matchingId}/${id}`), file)),
   )
 
   const downloadUrls = await Promise.allSettled(
@@ -59,7 +59,12 @@ export const postItem = async (
       .filter(
         (result): result is PromiseFulfilledResult<UploadResult> => result.status === "fulfilled",
       )
-      .map((result) => getDownloadURL(result.value.ref)),
+      .map((result, i) =>
+        getDownloadURL(result.value.ref).then((url) => ({
+          mimeType: files[i].file.type,
+          url,
+        })),
+      ),
   )
 
   const matchRef = collection(doc(collection(db, "matching"), matchingId), "items")
@@ -67,15 +72,15 @@ export const postItem = async (
   const batch = writeBatch(db)
   downloadUrls.forEach((downloadUrl, i) => {
     if (downloadUrl.status === "fulfilled") {
-      batch.set(doc(matchRef, fileObjects[i].id), {
-        itemurl: downloadUrl.value,
+      batch.set(doc(matchRef, files[i].id), {
+        mimeType: downloadUrl.value.mimeType,
+        itemurl: downloadUrl.value.url,
         createdBy: user.id,
         createdAt: serverTimestamp(),
       })
     }
   })
   await batch.commit()
-  console.log("batch end")
 }
 
 export const moveToRegister = async (matchingId: string) => {

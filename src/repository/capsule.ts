@@ -5,7 +5,7 @@ import {
   getDoc,
   getDocs,
   query,
-  setDoc,
+  runTransaction,
   Timestamp,
   where,
 } from "firebase/firestore"
@@ -34,26 +34,50 @@ export const postCapsule = async (
 
   const keywords = await extractKeywords(input.title, input.memo)
 
-  await setDoc(
-    doc(collection(db, "capsules"), matchingId),
-    {
-      color: input.color,
-      emoji: input.emoji,
-      gpsTextColor: input.gpsTextColor,
-      title: input.title,
-      openDate: Timestamp.fromDate(input.openDate),
-      addDate: Timestamp.fromDate(new Date()),
-      ownerId: user.id,
-      memo: [`${user.id}:${input.memo}`],
-      keywords,
-      friendIds: [user.id],
-      latitude: geolocation.latitude,
-      longitude: geolocation.longitude,
-    },
-    {
-      merge: true,
-    },
-  )
+  const data = {
+    color: input.color,
+    emoji: input.emoji,
+    gpsTextColor: input.gpsTextColor,
+    title: input.title,
+    openDate: Timestamp.fromDate(input.openDate),
+    addDate: Timestamp.fromDate(new Date()),
+    ownerId: user.id,
+    memo: [`${user.id}:${input.memo}`],
+    keywords,
+    friendIds: [user.id],
+    friends: [
+      {
+        id: user.id,
+        iconUrl: user.iconUrl,
+        name: user.name,
+        isOwner: true,
+      },
+    ],
+    latitude: geolocation.latitude,
+    longitude: geolocation.longitude,
+  }
+
+  await runTransaction(db, async (transaction) => {
+    const capsuleSnapshot = await transaction.get(doc(collection(db, "capsules"), matchingId))
+    if (!capsuleSnapshot.exists) {
+      transaction.set(doc(collection(db, "capsules"), matchingId), data, {
+        merge: true,
+      })
+    } else {
+      transaction.set(
+        doc(collection(db, "capsules"), matchingId),
+        {
+          ...data,
+          memo: arrayUnion(...data.memo),
+          friendIds: arrayUnion(...data.friendIds),
+          keywords: arrayUnion(...data.keywords),
+        },
+        {
+          merge: true,
+        },
+      )
+    }
+  })
 }
 
 /**
@@ -65,17 +89,40 @@ export const joinCapsule = async (
 ) => {
   const keywords = await extractKeywords("", memo)
 
-  await setDoc(
-    doc(collection(db, "capsules"), matchingId),
-    {
-      memo: arrayUnion([`${user.id}:${memo}`]),
-      friendIds: arrayUnion([user.id]),
-      keywords: arrayUnion(...keywords),
-    },
-    {
-      merge: true,
-    },
-  )
+  const data = {
+    memo: [`${user.id}:${memo}`],
+    keywords,
+    friendIds: [user.id],
+    friends: [
+      {
+        id: user.id,
+        iconUrl: user.iconUrl,
+        name: user.name,
+        isOwner: true,
+      },
+    ],
+  }
+
+  await runTransaction(db, async (transaction) => {
+    const capsuleSnapshot = await transaction.get(doc(collection(db, "capsules"), matchingId))
+    if (!capsuleSnapshot.exists) {
+      transaction.set(doc(collection(db, "capsules"), matchingId), data, {
+        merge: true,
+      })
+    } else {
+      transaction.set(
+        doc(collection(db, "capsules"), matchingId),
+        {
+          memo: arrayUnion(...data.memo),
+          friendIds: arrayUnion(...data.friendIds),
+          keywords: arrayUnion(...data.keywords),
+        },
+        {
+          merge: true,
+        },
+      )
+    }
+  })
 }
 
 /**
