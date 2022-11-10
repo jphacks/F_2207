@@ -50,6 +50,7 @@ const addFeatureToScene = (
     scene.children
       .filter((mesh) => mesh instanceof Mesh)
       .map((mesh) => {
+        // @ts-ignore
         mesh.material = new MeshStandardMaterial({ color: "rgb(0,255,50)", side: DoubleSide })
         // meshStandardMaterial color="rgb(0,255,50)" side={DoubleSide}
       })
