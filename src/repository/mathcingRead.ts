@@ -30,3 +30,11 @@ export const isMatchingAlreadyRead = ({
 
   return value[user.id].includes(matchingId)
 }
+
+export const getAlreadyReadMatching = (user: AppUser) => {
+  const value = (getItem(READ_MATCHING_IDS) ?? {}) as Record<string, string[]>
+  if (value == null || value[user.id] == null || !Array.isArray(value[user.id])) {
+    return []
+  }
+  return value[user.id]
+}
