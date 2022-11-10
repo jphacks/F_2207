@@ -86,6 +86,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       zoom: 16,
       bearing: -12,
       pitch: 60,
+      // maxZoom: 16.99,
     })
     mapRef.current = map
 
