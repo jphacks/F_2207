@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { Box, LoadingOverlay } from "@mantine/core"
+import { Box, LoadingOverlay, Modal, Button } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
@@ -329,7 +329,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
           overlayOpacity={0.6}
         />
       </Box>
-      {/* <Modal
+      <Modal
         centered
         opened={open}
         onClose={() => setOpen(false)}
@@ -353,7 +353,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
             探しに行く
           </Button>
         </div>
-      </Modal> */}
+      </Modal>
     </>
   )
 }
