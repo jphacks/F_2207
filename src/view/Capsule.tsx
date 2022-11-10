@@ -86,7 +86,11 @@ const Capsule: React.FC<CapsuleProps> = ({
           whiteSpace: "pre-wrap",
         }}
       >
-        {convertLngLat(lng, "lng") + "\n" + convertLngLat(lat, "lat")}
+        {convertLngLat(lng, "lng").split("'")[0] +
+          "'N" +
+          "\n" +
+          convertLngLat(lat, "lat").split("'")[0] +
+          "'E"}
       </Text>
     </Center>
   )
