@@ -46,7 +46,6 @@ const addFeatureToScene = (
   const mc = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
   loader.load("/models/capsule_2nd.glb", (gltf) => {
     const scene = gltf.scene
-    console.log(gltf.scene)
     scene.children
       .filter((mesh) => mesh instanceof Mesh)
       .map((mesh) => {
