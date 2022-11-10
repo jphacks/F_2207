@@ -1,5 +1,17 @@
 import { Map, MercatorCoordinate } from "mapbox-gl"
-import { Scene, Euler, Matrix4, Vector3, Camera, DirectionalLight, WebGLRenderer } from "three"
+import {
+  Scene,
+  Euler,
+  Matrix4,
+  Vector3,
+  Camera,
+  DirectionalLight,
+  WebGLRenderer,
+  Mesh,
+  MeshStandardMaterial,
+  DoubleSide,
+  AmbientLight,
+} from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 
 import { Feature } from "@/types/feature"
@@ -11,8 +23,9 @@ type SceneTransform = {
 }
 
 const addLightToScene = (x: number, y: number, z: number, baseScene: Scene) => {
-  const directionalLight = new DirectionalLight(0xffffff)
+  const directionalLight = new DirectionalLight(0xffffff, 0.3)
   directionalLight.position.set(x, y, z).normalize()
+
   baseScene.add(directionalLight)
 }
 
@@ -31,15 +44,22 @@ const addFeatureToScene = (
   const featureid = feature.properties.id
 
   const mc = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
-  loader.load("/models/capsule3.glb", (gltf) => {
+  loader.load("/models/capsule_2nd.glb", (gltf) => {
     const scene = gltf.scene
+    console.log(gltf.scene)
+    scene.children
+      .filter((mesh) => mesh instanceof Mesh)
+      .map((mesh) => {
+        mesh.material = new MeshStandardMaterial({ color: "rgb(0,255,50)", side: DoubleSide })
+        // meshStandardMaterial color="rgb(0,255,50)" side={DoubleSide}
+      })
     const origin = sceneTransform.origin
     scene.position.set(
       (mc.x - origin.x) / sceneTransform.meterScale,
       -(mc.y - origin.y) / sceneTransform.meterScale,
       ((mc.z as number) - origin.z) / sceneTransform.meterScale,
     )
-    scene.scale.set(0.2, 0.2, 0.2)
+    scene.scale.set(20, 20, 20)
     scene.quaternion.setFromEuler(modelRotate)
     scene.name = featureid
     baseScene.add(gltf.scene)
@@ -96,8 +116,9 @@ export const show3dOnMap = (
     renderingMode: "3d",
 
     onAdd: (map, gl) => {
-      addLightToScene(0, -70, 100, baseScene)
-      addLightToScene(0, 70, 100, baseScene)
+      addLightToScene(1, 0, 1, baseScene)
+      addLightToScene(-1, 0, 1 - 1, baseScene)
+      baseScene.add(new AmbientLight(undefined, 0.5))
 
       const loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
