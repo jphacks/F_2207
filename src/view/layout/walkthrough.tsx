@@ -22,7 +22,7 @@ const WalkthroughLayout: React.FC<WalkthroughLayoutProps> = ({
   nextButtonType = "default",
 }) => {
   return (
-    <Box sx={{ minHeight: "100vh", height: "100%", backgroundColor: "#212121" }} p={20}>
+    <Box className="min-h-screen" sx={{ height: "100%", backgroundColor: "#212121" }} p={20}>
       <Group className="w-full" position="apart">
         {onClickPrevOrClose != null ? (
           <ActionIcon aria-label="Close modal" size="lg" color="dark" onClick={onClickPrevOrClose}>
