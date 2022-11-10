@@ -6,6 +6,8 @@ import {
   serverTimestamp,
   updateDoc,
   getDocs,
+  query,
+  orderBy,
 } from "firebase/firestore"
 import { getDownloadURL, ref, uploadBytes, UploadResult } from "firebase/storage"
 
@@ -21,7 +23,10 @@ import { matchingStatus } from "./matching"
  * @returns 購読を止める
  */
 export const listenItems = (matchingId: string, onItemAdded: (itemUpdates: Item[]) => void) => {
-  const matchRef = collection(doc(collection(db, "matching"), matchingId), "items")
+  const matchRef = query(
+    collection(doc(collection(db, "matching"), matchingId), "items"),
+    orderBy("createdAt", "desc"),
+  )
   const unsubscribe = onSnapshot(matchRef, (snapshots) => {
     const addedItems = snapshots
       .docChanges()

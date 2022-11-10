@@ -1,19 +1,8 @@
-import {
-  Box,
-  Center,
-  FileButton,
-  Group,
-  Image,
-  Loader,
-  SimpleGrid,
-  Text,
-  useMantineTheme,
-} from "@mantine/core"
+import { Box, Center, FileButton, Group, SimpleGrid, Text, useMantineTheme } from "@mantine/core"
 import { NextPage } from "next"
 import React, { useEffect, useState } from "react"
 import { FiPlusCircle } from "react-icons/fi"
 import { useRouter } from "next/router"
-import { AiOutlineVideoCamera } from "react-icons/ai"
 
 import WalkthroughLayout from "@/view/layout/walkthrough"
 import UserAvater from "@/view/UserAvater"
@@ -24,6 +13,7 @@ import MetaHeader from "@/view/common/MetaHeader"
 import { useAuthRouter } from "@/auth/useAuthRouter"
 import { generateId } from "@/lib/generateId"
 import { Item } from "@/types/item"
+import PreviewItem from "@/pages/PreviewItem"
 
 const useItemCount = ({ userId, matchingId }: { userId: string; matchingId: string }) => {
   const [postedItems, setPostedItems] = useState<Item[]>([])
@@ -86,42 +76,8 @@ const Collect: NextPage = () => {
   const previews = previewImages.map(({ id, url }) => {
     const postedItem = postedItems.find((item) => item.id === id)
     const postCompleted = postedItem != null
-    return (
-      <div key={id} className="relative">
-        <Image
-          alt=""
-          src={url}
-          imageProps={{ onLoad: () => URL.revokeObjectURL(url) }}
-          styles={{
-            figure: {
-              width: "100%",
-              height: "100%",
-            },
-            imageWrapper: {
-              aspectRatio: "1 / 1",
-              width: "100%",
-              height: "100%",
-            },
-          }}
-          height="100%"
-          width="100%"
-        />
-        {postedItem?.mimeType?.startsWith("video") && (
-          <div className="absolute top-2 right-2 text-white">
-            <AiOutlineVideoCamera />
-          </div>
-        )}
-        {!postCompleted && (
-          <>
-            <div className="absolute inset-0 animate-pulse bg-gray-900/50" />
-            <Loader
-              color="white"
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50"
-            />
-          </>
-        )}
-      </div>
-    )
+    const isVideo = postedItem?.mimeType?.startsWith("video") ?? false
+    return <PreviewItem key={id} url={url} isLoading={!postCompleted} isVideo={isVideo} />
   })
 
   const previousPostedPreviews = postedItems
@@ -133,43 +89,7 @@ const Collect: NextPage = () => {
       }
       const isVideo = item?.mimeType?.startsWith("video")
 
-      return (
-        <div key={item.id} className="relative">
-          {isVideo ? (
-            <video
-              src={item.itemUrl}
-              className="aspect-square h-full w-full object-cover"
-              muted
-              playsInline
-              autoPlay
-            />
-          ) : (
-            <Image
-              alt=""
-              src={item.itemUrl}
-              imageProps={{ onLoad: () => URL.revokeObjectURL(item.itemUrl) }}
-              styles={{
-                figure: {
-                  width: "100%",
-                  height: "100%",
-                },
-                imageWrapper: {
-                  aspectRatio: "1 / 1",
-                  width: "100%",
-                  height: "100%",
-                },
-              }}
-              height="100%"
-              width="100%"
-            />
-          )}
-          {isVideo && (
-            <div className="absolute top-2 right-2 text-white">
-              <AiOutlineVideoCamera />
-            </div>
-          )}
-        </div>
-      )
+      return <PreviewItem key={item.id} url={item.itemUrl} isVideo={isVideo} />
     })
 
   return (
