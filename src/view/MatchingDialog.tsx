@@ -87,7 +87,7 @@ const MatchingDialog: React.FC<MatchingDialogProps> = ({ children }) => {
             </Text>
           </Center>
         </div>
-        <Button color="brand.3" onClick={handleJoin} fullWidth size="md">
+        <Button color="brand.3" onClick={handleJoin} fullWidth size="md" data-autofocus>
           <Text color="black">参加する</Text>
         </Button>
       </Drawer>

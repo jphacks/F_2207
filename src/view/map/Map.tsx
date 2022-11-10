@@ -86,6 +86,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       zoom: 16,
       bearing: -12,
       pitch: 60,
+      // maxZoom: 16.99,
     })
     mapRef.current = map
 
@@ -175,7 +176,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                 `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
               )
               .then((res) => {
-                const sortedFeatures = res.data.features.sort(featureSortFunc).slice(1, 3)
+                const sortedFeatures = res.data.features.sort(featureSortFunc)
+                if (sortedFeatures.length === 0) {
+                  return
+                }
+
                 sortedFeatures.forEach((feature: Feature) => {
                   const div = document.createElement("div")
                   const root = createRoot(div)

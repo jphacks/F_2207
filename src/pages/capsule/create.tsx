@@ -49,9 +49,22 @@ const CapsuleAdd: NextPage = () => {
       window.alert("位置情報の利用を許可してください")
       return
     }
-    const matchingId = await createMatching({ user, location })
+
+    const matchingId = await createMatching(user, {
+      location,
+      emoji: capsuleCreateInput.emoji,
+      color: capsuleCreateInput.color,
+      gpsTextColor: capsuleCreateInput.gpsTextColor,
+    })
     await router.push(`/capsule/${matchingId}/lobby`)
-  }, [location, router, user])
+  }, [
+    capsuleCreateInput.color,
+    capsuleCreateInput.emoji,
+    capsuleCreateInput.gpsTextColor,
+    location,
+    router,
+    user,
+  ])
 
   const { data: Theme } = useSWR("emoji-picker-react.Theme", () =>
     import("emoji-picker-react").then(({ Theme }) => Theme),

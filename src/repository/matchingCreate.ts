@@ -22,7 +22,15 @@ import { matchingStatus } from "./matching"
  * マッチングを作成する
  * @returns マッチングID
  */
-export const createMatching = async ({ user, location }: { user: AppUser; location: LatLng }) => {
+export const createMatching = async (
+  user: AppUser,
+  {
+    location,
+    emoji,
+    color,
+    gpsTextColor,
+  }: { location: LatLng; emoji: string; color: string; gpsTextColor: string },
+) => {
   const matchingRef = await addDoc(collection(db, "matching"), {
     id: user.id,
     name: user.name,
@@ -31,6 +39,9 @@ export const createMatching = async ({ user, location }: { user: AppUser; locati
     longitude: location.longitude,
     createdAt: serverTimestamp(),
     status: matchingStatus.MEMBER_JOIN,
+    emoji,
+    color,
+    gpsTextColor,
   })
 
   await setDoc(doc(collection(doc(collection(db, "matching"), matchingRef.id), "users"), user.id), {
@@ -134,7 +145,7 @@ export const listenOngoingMatching = (
   return unsubscribe
 }
 
-export const stopMatching = async (matchingId: string) => {
+export const goCollectPhase = async (matchingId: string) => {
   await updateDoc(doc(collection(db, "matching"), matchingId), {
     status: matchingStatus.ITEM_COLLECT,
   })

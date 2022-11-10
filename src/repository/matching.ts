@@ -6,6 +6,11 @@ export type Matching = {
   id: string
   status: MatchingStatus
   ownerId: string
+  emoji: string
+  color: string
+  gpsTextColor: string
+  longitude: number
+  latitude: number
 }
 
 export const matchingStatus = {
@@ -31,6 +36,11 @@ export const listenMatching = (
       id,
       status: data.status,
       ownerId: data.id,
+      emoji: data.emoji,
+      color: data.color,
+      gpsTextColor: data.gpsTextColor,
+      longitude: data.longitude,
+      latitude: data.latitude,
     })
   })
 }

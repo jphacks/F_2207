@@ -30,6 +30,7 @@ import { useMatchingWithRedirect } from "@/hooks/useMatching"
 import { joinCapsule, postCapsule } from "@/repository/capsule"
 import MetaHeader from "@/view/common/MetaHeader"
 import { useAuthRouter } from "@/auth/useAuthRouter"
+import { goCollectPhase } from "@/repository/matchingCreate"
 
 const Register: NextPage = () => {
   useAuthRouter(true)
@@ -48,55 +49,59 @@ const Register: NextPage = () => {
   const [isSaveSuccessed, setIsSaveSuccessed] = useState(false)
 
   const save = async () => {
-    setIsSaving(true)
     if (user == null) {
       window.alert("ログインしてください")
-      onFailCreateCapsule()
       return
     }
 
-    if (isOwner) {
-      if (capsuleCreateInput.title == "" || capsuleCreateInput.openDate == null) {
-        window.alert("タイトル、開封日を設定してください")
-        onFailCreateCapsule()
-        return
+    if (isOwner && (capsuleCreateInput.title == "" || capsuleCreateInput.openDate == null)) {
+      window.alert("タイトル、開封日を設定してください")
+      return
+    }
+
+    try {
+      setIsSaving(true)
+
+      if (isOwner) {
+        await postCapsule({ matchingId, user }, capsuleCreateInput, geolocation)
+      } else {
+        await joinCapsule({ matchingId, user }, capsuleCreateInput.memo)
       }
 
-      await postCapsule({ matchingId, user }, capsuleCreateInput, geolocation)
-    } else {
-      await joinCapsule({ matchingId, user }, capsuleCreateInput.memo)
-    }
+      const feature: CreateFeature = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [geolocation.longitude, geolocation.latitude],
+        },
+        properties: {
+          id: matchingId,
+          capsuleColor: capsuleCreateInput.color,
+          gpsColor: capsuleCreateInput.gpsTextColor,
+          emoji: capsuleCreateInput.emoji,
+          addDate: new Date().toISOString(),
+          openDate: (capsuleCreateInput.openDate ?? add(new Date(), { years: 1 })).toISOString(),
+        },
+      }
 
-    const feature: CreateFeature = {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [geolocation.longitude, geolocation.latitude],
-      },
-      properties: {
-        id: matchingId,
-        capsuleColor: capsuleCreateInput.color,
-        gpsColor: capsuleCreateInput.gpsTextColor,
-        emoji: capsuleCreateInput.emoji,
-        addDate: new Date().toISOString(),
-        openDate: (capsuleCreateInput.openDate ?? add(new Date(), { years: 1 })).toISOString(),
-      },
+      // レイヤーを作る
+      // 既にある(=エラー)なら正しいレイヤーを探す
+      // 物件を追加
+      try {
+        const layerId = await postLayer(user.id)
+        await postFeature(feature, layerId)
+      } catch (e: any) {
+        if (e.message === "ALREADY_EXISTS") {
+          const layers = await searchLayerID(user.id)
+          await Promise.all(layers.map((layer) => postFeature(feature, layer.id)))
+        } else {
+          throw e
+        }
+      }
+      onSucsessCreateCapsule()
+    } finally {
+      setIsSaving(false)
     }
-
-    // レイヤーを作る
-    // 既にある(=エラー)なら正しいレイヤーを探す
-    // 物件を追加
-    postLayer(
-      user.id,
-      (res) => {
-        postFeature(feature, res.data.id, onSucsessCreateCapsule, onFailCreateCapsule)
-      },
-      () => {
-        searchLayerID(user.id, (id) => {
-          postFeature(feature, id, onSucsessCreateCapsule, onFailCreateCapsule)
-        })
-      },
-    )
   }
 
   const moveToMap = () => {
@@ -105,20 +110,12 @@ const Register: NextPage = () => {
 
   const onSucsessCreateCapsule = () => {
     setIsSaveSuccessed(true)
-    setIsSaving(false)
     clearCapsuleCreateInput()
   }
-  const onFailCreateCapsule = () => {
-    setIsSaving(false)
-  }
 
-  const postLayer = (
-    name: string,
-    callback: (res: any) => void,
-    errorCallback: (err: any) => void,
-  ) => {
-    axios
-      .post(
+  const postLayer = async (name: string) => {
+    try {
+      const res = await axios.post<{ id: number }>(
         `https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
         {
           name: name,
@@ -131,46 +128,27 @@ const Register: NextPage = () => {
           },
         },
       )
-      .then((res) => {
-        callback(res)
-      })
-      .catch((err) => {
-        errorCallback(err)
-      })
+      return res.data.id
+    } catch (e) {
+      console.error(e)
+      throw new Error("ALREADY_EXISTS")
+    }
   }
 
-  const searchLayerID = (name: string, callback: (res: any) => void) => {
-    axios
-      .get(
-        `https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
-      )
-      .then((res) => {
-        // @ts-ignore
-        res.data.forEach((layer) => {
-          if (layer.name == name) {
-            callback(layer.id)
-          }
-        })
-      })
+  const searchLayerID = async (name: string) => {
+    const res = await axios.get<{ id: number }[]>(
+      `https://prod-mqplatform-api.azure-api.net/maps-api/layers/v1/18?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
+    )
+
+    return res.data.filter((layer: any) => layer.name == name)
   }
 
-  const postFeature = (
-    feature: CreateFeature,
-    id: number,
-    callback: (res: any) => void,
-    errorCallback: (error: any) => void,
-  ) => {
-    axios
-      .post(
-        `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
-        feature,
-      )
-      .then((res) => {
-        callback(res)
-      })
-      .catch((err) => {
-        errorCallback(err)
-      })
+  const postFeature = async (feature: CreateFeature, id: number) => {
+    const res = await axios.post(
+      `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
+      feature,
+    )
+    return res.data
   }
 
   return (
@@ -183,17 +161,17 @@ const Register: NextPage = () => {
         totalStep={4}
         currentStep={3}
         onClickNext={save}
-        onClickPrevOrClose={isOwner ? () => router.push(`/capsule/${matchingId}/collect`) : null}
+        onClickPrevOrClose={isOwner ? () => goCollectPhase(matchingId) : null}
         nextButtonType="bury"
       >
         <Box>
           <LoadingOverlay visible={isSaving} loaderProps={{ size: "xl" }} overlayOpacity={0.6} />
           <CapsulePreview
-            capsuleColor={capsuleCreateInput.color}
-            gpsColor={capsuleCreateInput.gpsTextColor}
-            emoji={capsuleCreateInput.emoji}
-            lng={geolocation.longitude ?? 0}
-            lat={geolocation.latitude ?? 0}
+            capsuleColor={matching?.color ?? capsuleCreateInput.color}
+            gpsColor={matching?.gpsTextColor ?? capsuleCreateInput.gpsTextColor}
+            emoji={matching?.emoji ?? capsuleCreateInput.emoji}
+            lng={matching?.longitude ?? geolocation?.latitude ?? 0}
+            lat={matching?.latitude ?? geolocation?.longitude ?? 0}
           />
           <Text className="pb-4" color="white" weight="bold" size="sm">
             カプセルの情報
