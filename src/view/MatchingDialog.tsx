@@ -23,14 +23,15 @@ const MatchingDialog: React.FC<MatchingDialogProps> = ({ children }) => {
   const [matchingQueue, setMatchingQueue] = useState<Matching[]>([])
 
   useEffect(() => {
-    if (user == null || location == null) {
+    if (user == null || location == null || location.latitude == 0 || location.longitude == 0) {
       return
     }
     const unsubscribe = listenOngoingMatching({ user, location }, (matching) => {
       setMatchingQueue((matchings) => [...matchings, matching])
     })
     return unsubscribe
-  }, [location, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location == null, location.latitude == 0, location.longitude == 0, user])
 
   const matching = matchingQueue[0]
 
@@ -42,13 +43,13 @@ const MatchingDialog: React.FC<MatchingDialogProps> = ({ children }) => {
     router.push(`/capsule/${matching.id}/lobby`)
   }
 
-  const isTimecapsuleOngoing = router.asPath.startsWith(`/capsule/`)
+  const showDialog = router.asPath.split("?")[0] === "/map"
 
   return (
     <>
       {children}
       <Drawer
-        opened={matching != null && !isTimecapsuleOngoing}
+        opened={showDialog && matching != null}
         onClose={() => {
           setMatchingQueue((matchings) => {
             if (matchings.length === 0) {
@@ -71,8 +72,8 @@ const MatchingDialog: React.FC<MatchingDialogProps> = ({ children }) => {
           },
         }}
       >
-        <div className="my-8 flex items-center">
-          <div className="h-20 w-20 shrink-0">
+        <div className="flex items-center my-8">
+          <div className="w-20 h-20 shrink-0">
             <Image
               src={matching?.host?.iconUrl ?? ""}
               alt=""

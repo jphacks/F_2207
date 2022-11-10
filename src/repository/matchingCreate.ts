@@ -97,7 +97,11 @@ export const listenOngoingMatching = (
   onDetectMatching: (matching: Matching) => void,
 ) => {
   const unsubscribe = onSnapshot(
-    query(collection(db, "matching"), where("createdAt", ">=", sub(new Date(), { minutes: 40 }))),
+    query(
+      collection(db, "matching"),
+      where("createdAt", ">=", sub(new Date(), { minutes: 10 })),
+      where("status", "==", matchingStatus.MEMBER_JOIN),
+    ),
     (snapshots) => {
       snapshots.docChanges().forEach((docChange) => {
         if (docChange.type === "added") {
