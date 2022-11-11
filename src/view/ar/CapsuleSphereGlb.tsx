@@ -70,7 +70,7 @@ type GLTFResult = GLTF & {
 
 export type CapsuleSphereGlbProps = {
   animation?: boolean
-  openRateRef: React.MutableRefObject<number>
+  openRateRef?: React.MutableRefObject<number>
 }
 
 const CapsuleSphereGlb: React.FC<CapsuleSphereGlbProps & JSX.IntrinsicElements["group"]> = ({
