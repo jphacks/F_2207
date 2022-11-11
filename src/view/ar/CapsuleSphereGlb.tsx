@@ -70,10 +70,12 @@ type GLTFResult = GLTF & {
 
 export type CapsuleSphereGlbProps = {
   animation?: boolean
+  openRateRef?: React.MutableRefObject<number>
 }
 
 const CapsuleSphereGlb: React.FC<CapsuleSphereGlbProps & JSX.IntrinsicElements["group"]> = ({
   animation = false,
+  openRateRef,
   ...props
 }) => {
   const ref = useRef<THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]> | null>(
@@ -98,12 +100,12 @@ const CapsuleSphereGlb: React.FC<CapsuleSphereGlbProps & JSX.IntrinsicElements["
     if (capsuleUpper == null || !animation) {
       return
     }
-    const MAX = (-Math.PI * 3) / 4
+    const MAX = (-Math.PI * 1) / 2
     // capsuleUpper.rotation.set((-Math.PI / 6) * openRate, 0, 0)
-    capsuleUpper.rotation.set(capsuleUpper.rotation.x + MAX / 300, 0, 0)
-    if (capsuleUpper.rotation.x < MAX) {
-      capsuleUpper.rotation.set(0, 0, 0)
+    if (MAX * (openRateRef?.current ?? 1) < capsuleUpper.rotation.x) {
+      capsuleUpper.rotation.set(capsuleUpper.rotation.x + MAX / 300, 0, 0)
     }
+    // capsuleUpper.rotation.set(0, 0, 0)
   })
 
   return (

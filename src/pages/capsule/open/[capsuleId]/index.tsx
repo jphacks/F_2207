@@ -5,8 +5,6 @@ import Webcam from "react-webcam"
 import { Button, Loader, Modal } from "@mantine/core"
 import { Text } from "@mantine/core"
 import { useRouter } from "next/router"
-import { EffectComposer, Bloom } from "@react-three/postprocessing"
-import { KernelSize } from "postprocessing"
 
 import { useGeolocation } from "@/provider/GpsProvider"
 import { useOrientation } from "@/lib/useOrientation"
@@ -38,20 +36,20 @@ const ArCanvas: React.FC<{
 }> = ({ orientation, capsulePositions, onClick }) => {
   useSyncCamera(orientation, { x: 0, y: 8, z: 0 })
 
-  const effector = useMemo(
-    () => (
-      <EffectComposer multisampling={8}>
-        <Bloom kernelSize={3} luminanceThreshold={0} luminanceSmoothing={0.4} intensity={0.6} />
-        <Bloom
-          kernelSize={KernelSize.SMALL}
-          luminanceThreshold={0}
-          luminanceSmoothing={0}
-          intensity={0.5}
-        />
-      </EffectComposer>
-    ),
-    [],
-  )
+  // const effector = useMemo(
+  //   () => (
+  //     <EffectComposer multisampling={8}>
+  //       <Bloom kernelSize={3} luminanceThreshold={0} luminanceSmoothing={0.4} intensity={0.6} />
+  //       <Bloom
+  //         kernelSize={KernelSize.SMALL}
+  //         luminanceThreshold={0}
+  //         luminanceSmoothing={0}
+  //         intensity={0.5}
+  //       />
+  //     </EffectComposer>
+  //   ),
+  //   [],
+  // )
 
   return (
     <>
@@ -75,7 +73,7 @@ const ArCanvas: React.FC<{
       <gridHelper args={[100]} />
       {/* eslint-disable-next-line react/no-unknown-property */}
       <fog attach="fog" color="#000" near={30} far={200} />
-      {effector}
+      {/* {effector} */}
     </>
   )
 }
@@ -83,6 +81,7 @@ const ArCanvas: React.FC<{
 const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
   const { orientation, orientationRef, requestPermission, isReady } = useOrientation()
   const geolocation = useGeolocation()
+  const [cameraReady, setCameraReady] = useState(false)
 
   const capsuleGeoData = useMemo(() => {
     if (geolocation == null) {
@@ -148,6 +147,7 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
       <MetaHeader title="探す" />
       <div className="relative">
         <Webcam
+          onUserMedia={() => setCameraReady(true)}
           videoConstraints={{
             facingMode: { exact: "environment" },
           }}
@@ -184,7 +184,12 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
           />
         </Canvas>
       </div>
-      <Modal centered opened={!isReady} onClose={requestPermission} withCloseButton={false}>
+      <Modal
+        centered
+        opened={!isReady && cameraReady}
+        onClose={requestPermission}
+        withCloseButton={false}
+      >
         <div className="flex flex-col items-center">
           <p>デバイスの姿勢情報にアクセスします</p>
           <Button onClick={requestPermission}>OK</Button>

@@ -86,10 +86,6 @@ const Show: NextPage = () => {
                   </div>
                 )
               })}
-              <div className="flex items-center space-x-3 bg-[#424242] p-3">
-                <Avatar src="" />
-                <p className="m-0 block text-sm text-white line-clamp-2">hello</p>
-              </div>
             </div>
             <div className="mt-10 flex items-center">
               <div className="mr-2 h-6 w-6">
