@@ -1,6 +1,7 @@
 import {
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -53,8 +54,8 @@ export const postCapsule = async (
         isOwner: true,
       },
     ],
-    latitude: geolocation.latitude,
-    longitude: geolocation.longitude,
+    latitude: input.geolocation ? input.geolocation.latitude : geolocation.latitude,
+    longitude: input.geolocation ? input.geolocation.longitude : geolocation.longitude,
   }
 
   await runTransaction(db, async (transaction) => {
@@ -180,4 +181,9 @@ export const fetchCapsules = async (user: AppUser) => {
     } as Capsule
   })
   return capsules
+}
+
+export const deleteCapsule = async ({ capsuleId }: { capsuleId: string }) => {
+  console.log(capsuleId)
+  await deleteDoc(doc(collection(db, "capsules"), capsuleId))
 }

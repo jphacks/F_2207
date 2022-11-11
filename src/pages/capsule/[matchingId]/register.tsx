@@ -48,6 +48,8 @@ const Register: NextPage = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [isSaveSuccessed, setIsSaveSuccessed] = useState(false)
 
+  const isAdminMode = router.query["admin"] == "true"
+
   const save = async () => {
     if (user == null) {
       window.alert("ログインしてください")
@@ -72,7 +74,14 @@ const Register: NextPage = () => {
         type: "Feature",
         geometry: {
           type: "Point",
-          coordinates: [geolocation.longitude, geolocation.latitude],
+          coordinates: [
+            capsuleCreateInput.geolocation
+              ? capsuleCreateInput.geolocation.longitude
+              : geolocation.longitude,
+            capsuleCreateInput.geolocation
+              ? capsuleCreateInput.geolocation.latitude
+              : geolocation.latitude,
+          ],
         },
         properties: {
           id: matchingId,
@@ -236,6 +245,40 @@ const Register: NextPage = () => {
               },
             })}
           />
+          {isAdminMode && (
+            <>
+              <TextInput
+                label="緯度"
+                placeholder="37.1234"
+                onChange={(e) => {
+                  const longitude =
+                    capsuleCreateInputState.geolocation == null
+                      ? 0
+                      : capsuleCreateInputState.geolocation.longitude
+                  capsuleCreateInputState.geolocation = {
+                    latitude: parseInt(e.target.value),
+                    longitude,
+                  }
+                }}
+              />
+
+              <TextInput
+                label="経度"
+                placeholder="135.1234"
+                onChange={(e) => {
+                  const latitude =
+                    capsuleCreateInputState.geolocation == null
+                      ? 0
+                      : capsuleCreateInputState.geolocation.latitude
+                  capsuleCreateInputState.geolocation = {
+                    latitude,
+                    longitude: parseInt(e.target.value),
+                  }
+                }}
+              />
+            </>
+          )}
+
           <Modal centered opened={isSaveSuccessed} onClose={moveToMap} withCloseButton={false}>
             <div className="flex flex-col items-center">
               <p>カプセルを埋めました！</p>
