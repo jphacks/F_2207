@@ -89,23 +89,6 @@ const addFeatureToScene = (
     })
     baseScene.add(gltf.scene)
   })
-
-  // var element = document.createElement("div")
-  // element.style.width = "30px"
-  // element.style.height = "30px"
-  // element.style.opacity = "0.999"
-  // element.style.background = new Color(
-  //   Math.random() * 0.21568627451 + 0.462745098039,
-  //   Math.random() * 0.21568627451 + 0.462745098039,
-  //   Math.random() * 0.21568627451 + 0.462745098039,
-  // ).getStyle()
-  // element.textContent = "text!"
-
-  // var domObject = new CSS3DObject(element)
-  // domObject.position.x = Math.random() * 200 - 100
-  // domObject.position.y = Math.random() * 200 - 100
-  // domObject.position.z = Math.random() * 200 - 100
-  // cssScene.add(domObject)
 }
 
 export const show3dOnMap = (
@@ -130,10 +113,6 @@ export const show3dOnMap = (
   }
 
   let renderer: THREE.WebGLRenderer | null = null
-  // let renderer2: CSS3DRenderer | null = null
-
-  // let cssScene = new Scene()
-
   // configuration of the custom layer for a 3D model per the CustomLayerInterface
   const featureLayer: mapboxgl.AnyLayer = {
     id: id,
@@ -161,19 +140,12 @@ export const show3dOnMap = (
 
       renderer!.autoClear = false
       renderer.physicallyCorrectLights = true
-
-      // renderer2 = new CSS3DRenderer()
-      // renderer2.setSize(window.innerWidth, window.innerHeight)
-      // renderer2.domElement.style.position = "absolute"
-      // renderer2.domElement.style.top = "0"
-      // map.getCanvas().appendChild(renderer2.domElement)
     },
 
     render: (_gl, matrix) => {
       camera.projectionMatrix = new Matrix4().fromArray(matrix).multiply(sceneTransform.matrix)
       renderer?.state.reset()
       renderer?.render(baseScene, camera)
-      // renderer2?.render(cssScene, camera)
       map.triggerRepaint()
     },
   }
