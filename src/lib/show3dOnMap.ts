@@ -1,18 +1,19 @@
 import { Map, MercatorCoordinate } from "mapbox-gl"
 import {
-  Scene,
-  Euler,
-  Matrix4,
-  Vector3,
   Camera,
   DirectionalLight,
+  Euler,
+  Matrix4,
+  Scene,
+  Vector3,
   WebGLRenderer,
+  Object3D,
   Mesh,
-  MeshStandardMaterial,
-  DoubleSide,
+  BufferGeometry,
   AmbientLight,
 } from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils"
 
 import { Feature } from "@/types/feature"
 
@@ -25,7 +26,6 @@ type SceneTransform = {
 const addLightToScene = (x: number, y: number, z: number, baseScene: Scene) => {
   const directionalLight = new DirectionalLight(0xffffff, 0.3)
   directionalLight.position.set(x, y, z).normalize()
-
   baseScene.add(directionalLight)
 }
 
@@ -44,24 +44,49 @@ const addFeatureToScene = (
   const featureid = feature.properties.id
 
   const mc = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
-  loader.load("/models/capsule_2nd.glb", (gltf) => {
+  loader.load("/models/capsule_ball.glb", (gltf) => {
     const scene = gltf.scene
-    scene.children
-      .filter((mesh) => mesh instanceof Mesh)
-      .map((mesh) => {
-        // @ts-ignore
-        mesh.material = new MeshStandardMaterial({ color: "rgb(0,255,50)", side: DoubleSide })
-        // meshStandardMaterial color="rgb(0,255,50)" side={DoubleSide}
-      })
     const origin = sceneTransform.origin
     scene.position.set(
       (mc.x - origin.x) / sceneTransform.meterScale,
       -(mc.y - origin.y) / sceneTransform.meterScale,
       ((mc.z as number) - origin.z) / sceneTransform.meterScale,
     )
-    scene.scale.set(20, 20, 20)
+    scene.scale.set(50, 50, 50)
     scene.quaternion.setFromEuler(modelRotate)
     scene.name = featureid
+    scene.traverse((object) => {
+      if (object instanceof Mesh && object.name.includes("カプセル")) {
+        // set color of body
+        object.material.emissive.r = 0.591
+        object.material.emissive.g = 0.905
+        object.material.emissive.b = 0.381
+        object.material.emissiveIntensity = 0.8
+      } else if (object instanceof Mesh) {
+        // set color of connection parts
+        object.material.color.r = 0.799
+        object.material.color.g = 0.799
+        object.material.color.b = 0.799
+        object.material.emissive.r = 0.799
+        object.material.emissive.g = 0.799
+        object.material.emissive.b = 0.799
+      }
+      if (object instanceof Object3D) {
+        // @ts-ignore
+        if (object.geometry !== undefined) {
+          // @ts-ignore
+          const a = object.geometry.isBufferGeometry
+            ? // @ts-ignore
+              object.geometry
+            : // @ts-ignore
+              new BufferGeometry(object.geometry)
+          const b = mergeVertices(a)
+          b.computeVertexNormals()
+          // @ts-ignore
+          object.geometry = b
+        }
+      }
+    })
     baseScene.add(gltf.scene)
   })
 
@@ -118,6 +143,7 @@ export const show3dOnMap = (
     onAdd: (map, gl) => {
       addLightToScene(1, 0, 1, baseScene)
       addLightToScene(-1, 0, 1 - 1, baseScene)
+      addLightToScene(0.7, 0, 1, baseScene)
       baseScene.add(new AmbientLight(undefined, 0.5))
 
       const loader = new GLTFLoader()
@@ -134,6 +160,7 @@ export const show3dOnMap = (
       })
 
       renderer!.autoClear = false
+      renderer.physicallyCorrectLights = true
 
       // renderer2 = new CSS3DRenderer()
       // renderer2.setSize(window.innerWidth, window.innerHeight)
