@@ -159,7 +159,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   }
 
   // set image to mapbox
-  const setMarker = (map: mapboxgl.Map, userID: string) => {
+  const setMarker = (map: mapboxgl.Map, userID: string, useCache = false) => {
     // get mapquest layer id
     axios
       .get(
@@ -204,6 +204,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                     .addTo(map)
                   addMarker(marker)
                 })
+
+                if (useCache) {
+                  return
+                }
+
                 const customLayer = show3dOnMap(
                   sortedFeatures,
                   "features",
@@ -211,21 +216,25 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                   camera.current,
                   scene.current,
                 )
+
                 if (map.getLayer("features") != null) {
                   map.removeLayer("features")
                 }
                 map.addLayer(customLayer)
+
+                console.log("save elements")
+                const mapElement = mapContainerRef.current
+                if (mapElement?.children != null) {
+                  console.log(mapElement?.children)
+                  console.log(mapElement?.children?.length)
+                  saveMapElement(mapElement.children, map)
+                }
               })
           }
         })
       })
       .finally(() => {
         setFinishMapLoad(true)
-        const mapElement = document.getElementById("map")
-
-        if (mapElement?.children != null) {
-          saveMapElement(mapElement.children, map)
-        }
       })
   }
 
@@ -271,16 +280,23 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
 
   useEffect(() => {
     if (mapElement == null) {
+      console.log("#mapSetUp")
       mapSetUp()
     } else {
+      console.log("#cache")
       const container = mapContainerRef.current
+      console.log(mapElement.length)
+      // @ts-ignore
+      console.log([...mapElement])
+      console.log(mapElement.length)
       for (let i = 0; i < mapElement.length; i++) {
-        container?.appendChild?.(mapElement.item(i))
+        console.log(`mapElement[${i}] = `, mapElement[i])
+        container?.appendChild?.(mapElement[i])
       }
       mapRef.current = mapObj
       // container?.appendChild?.(mapElement)
       if (mapObj != null && user != null) {
-        setMarker(mapObj, user.id)
+        setMarker(mapObj, user.id, true)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
