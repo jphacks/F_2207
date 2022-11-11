@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-imports */
 import { Map, MercatorCoordinate } from "mapbox-gl"
 import {
   Scene,
@@ -23,7 +24,7 @@ type SceneTransform = {
 }
 
 const addLightToScene = (x: number, y: number, z: number, baseScene: Scene) => {
-  const directionalLight = new DirectionalLight(0xffffff, 0.3)
+  const directionalLight = new DirectionalLight(0xffffff, 0.9)
   directionalLight.position.set(x, y, z).normalize()
 
   baseScene.add(directionalLight)
@@ -116,9 +117,10 @@ export const show3dOnMap = (
     renderingMode: "3d",
 
     onAdd: (map, gl) => {
+      console.log("OnAdd")
       addLightToScene(1, 0, 1, baseScene)
       addLightToScene(-1, 0, 1 - 1, baseScene)
-      baseScene.add(new AmbientLight(undefined, 0.5))
+      baseScene.add(new AmbientLight(undefined, 1.8))
 
       const loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
