@@ -101,10 +101,14 @@ export const fetchItems = async (capsuleId: string) => {
 
   const snapshots = await getDocs(matchRef)
 
-  console.log(snapshots)
-
-  return snapshots.docs.map((snapshot) => ({
-    id: snapshot.id,
-    itemurl: snapshot.data().itemurl,
-  }))
+  return snapshots.docs.map((snapshot) => {
+    const data = snapshot.data()
+    return {
+      id: snapshot.id,
+      createdBy: data.createdBy,
+      createdAt: data.createdAt?.toDate(),
+      itemUrl: data.itemurl,
+      mimeType: data.mimeType,
+    }
+  })
 }

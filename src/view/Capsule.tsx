@@ -3,7 +3,7 @@ import { MouseEventHandler } from "react"
 
 import { convertLngLat } from "@/lib/convertLngLat"
 
-type CapsuleSize = "xs" | "sm" | "md"
+type CapsuleSize = "xs" | "xs2" | "sm" | "md"
 
 type CapsuleProps = {
   capsuleColor: string
@@ -30,6 +30,8 @@ const Capsule: React.FC<CapsuleProps> = ({
     switch (size) {
       case "xs":
         return 60
+      case "xs2":
+        return 80
       case "sm":
         return 102
       case "md":
@@ -41,6 +43,8 @@ const Capsule: React.FC<CapsuleProps> = ({
     switch (size) {
       case "xs":
         return 32
+      case "xs2":
+        return 40
       case "sm":
         return 54.5
       case "md":
@@ -52,6 +56,8 @@ const Capsule: React.FC<CapsuleProps> = ({
     switch (size) {
       case "xs":
         return 8
+      case "xs2":
+        return 10
       case "sm":
         return 12.5
       case "md":

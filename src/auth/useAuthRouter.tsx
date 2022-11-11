@@ -10,6 +10,6 @@ export const useAuthRouter = (requireAuth: boolean) => {
     router.push("/")
   }
   if (!requireAuth && !isLoading && user != null) {
-    router.push("/map")
+    router.replace("/map")
   }
 }
