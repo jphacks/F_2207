@@ -204,6 +204,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                     .addTo(map)
                   addMarker(marker)
                 })
+                scene.current.clear()
                 const customLayer = show3dOnMap(
                   sortedFeatures,
                   "features",
