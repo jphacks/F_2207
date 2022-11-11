@@ -2,6 +2,8 @@ import { NextPage } from "next"
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { UnstyledButton, Text, Modal, Button } from "@mantine/core"
+import { useForm } from "@mantine/form"
+import { useRouter } from "next/router"
 
 import { useUser } from "@/auth/useAuth"
 import { useCapsuleFuzzySearch } from "@/lib/capsuleFuzzySearch"
@@ -13,6 +15,7 @@ import SearchBar from "@/view/SearchBar"
 import { Feature } from "@/types/feature"
 
 const AdminPage: NextPage = () => {
+  const router = useRouter()
   const user = useUser()
   const [opened, setOpened] = useState(false)
   const [capsules, setCapsules] = useState<Capsule[]>([])
@@ -70,6 +73,13 @@ const AdminPage: NextPage = () => {
         })
       })
   }
+
+  const form = useForm({
+    initialValues: {
+      longitude: 0,
+      latitude: 0,
+    },
+  })
 
   return (
     <>

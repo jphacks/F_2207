@@ -54,8 +54,8 @@ export const postCapsule = async (
         isOwner: true,
       },
     ],
-    latitude: geolocation.latitude,
-    longitude: geolocation.longitude,
+    latitude: input.geolocation ? input.geolocation.latitude : geolocation.latitude,
+    longitude: input.geolocation ? input.geolocation.longitude : geolocation.longitude,
   }
 
   await runTransaction(db, async (transaction) => {
