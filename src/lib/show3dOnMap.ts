@@ -56,6 +56,7 @@ const addFeatureToScene = (
     scene.quaternion.setFromEuler(modelRotate)
     scene.name = featureid
     scene.traverse((object) => {
+      // set color
       if (object instanceof Mesh && object.name.includes("カプセル")) {
         // set color of body
         object.material.emissive.r = 0.591
@@ -71,6 +72,8 @@ const addFeatureToScene = (
         object.material.emissive.g = 0.799
         object.material.emissive.b = 0.799
       }
+
+      // set smooth
       if (object instanceof Object3D) {
         // @ts-ignore
         if (object.geometry !== undefined) {
@@ -85,6 +88,17 @@ const addFeatureToScene = (
           // @ts-ignore
           object.geometry = b
         }
+      }
+
+      // TODO: set correct status
+      const IsOpened = false
+      // set state
+      // モデルは名前と実態が逆なので注意
+      if (object.name == "上カプセル開封済み" && IsOpened) {
+        object.visible = false
+      }
+      if (object.name == "上カプセル未開封" && !IsOpened) {
+        object.visible = false
       }
     })
     baseScene.add(gltf.scene)
