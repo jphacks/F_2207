@@ -3,8 +3,8 @@ import { useFrame } from "@react-three/fiber"
 import THREE from "three"
 import { Html } from "@react-three/drei"
 
-import { Capsule2ndModel } from "@/view/ar/Capsule2ndModel"
 import CapsuleDistance from "@/view/ar/CapsuleDistance"
+import CapsuleSphereGlb from "@/view/ar/CapsuleSphereGlb"
 
 export type CapsuleModelProps = {
   color: string
@@ -36,7 +36,7 @@ const CapsuleModel: React.FC<CapsuleModelProps> = ({
     <>
       {renderDistance <= 100 && (
         <Suspense fallback={null}>
-          <Capsule2ndModel position={position} scale={[2, 2, 2]} onClick={onClick} />
+          <CapsuleSphereGlb position={position} scale={[2, 2, 2]} onClick={onClick} />
         </Suspense>
       )}
       <mesh>
