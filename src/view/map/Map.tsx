@@ -211,7 +211,9 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                   camera.current,
                   scene.current,
                 )
-                map.removeLayer("features")
+                if (map.getLayer("features") != null) {
+                  map.removeLayer("features")
+                }
                 map.addLayer(customLayer)
               })
           }
@@ -268,19 +270,20 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   }
 
   useEffect(() => {
-    if (mapElement == null) {
-      mapSetUp()
-    } else {
-      const container = mapContainerRef.current
-      for (let i = 0; i < mapElement.length; i++) {
-        container?.appendChild?.(mapElement.item(i))
-      }
-      mapRef.current = mapObj
-      // container?.appendChild?.(mapElement)
-      if (mapObj != null && user != null) {
-        setMarker(mapObj, user.id)
-      }
-    }
+    // NOTE: 不具合を観測したのでキャッシュを一旦削除
+    // if (mapElement == null) {
+    mapSetUp()
+    // } else {
+    //   const container = mapContainerRef.current
+    //   for (let i = 0; i < mapElement.length; i++) {
+    //     container?.appendChild?.(mapElement.item(i))
+    //   }
+    //   mapRef.current = mapObj
+    //   // container?.appendChild?.(mapElement)
+    //   if (mapObj != null && user != null) {
+    //     setMarker(mapObj, user.id)
+    //   }
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
