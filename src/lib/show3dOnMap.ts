@@ -11,6 +11,8 @@ import {
   Mesh,
   BufferGeometry,
   AmbientLight,
+  MeshStandardMaterial,
+  DoubleSide,
 } from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils"
@@ -24,7 +26,7 @@ type SceneTransform = {
 }
 
 const addLightToScene = (x: number, y: number, z: number, baseScene: Scene) => {
-  const directionalLight = new DirectionalLight(0xffffff, 0.3)
+  const directionalLight = new DirectionalLight(0xffffff, 1.8)
   directionalLight.position.set(x, y, z).normalize()
   baseScene.add(directionalLight)
 }
@@ -59,18 +61,10 @@ const addFeatureToScene = (
       // set color
       if (object instanceof Mesh && object.name.includes("カプセル")) {
         // set color of body
-        object.material.emissive.r = 0.5
-        object.material.emissive.g = 0.9
-        object.material.emissive.b = 0.3
-        object.material.emissiveIntensity = 0.8
+        object.material = new MeshStandardMaterial({ color: "rgb(0,255,50)", side: DoubleSide })
       } else if (object instanceof Mesh) {
         // set color of connection parts
-        object.material.color.r = 0.799
-        object.material.color.g = 0.799
-        object.material.color.b = 0.799
-        object.material.emissive.r = 0.799
-        object.material.emissive.g = 0.799
-        object.material.emissive.b = 0.799
+        object.material = new MeshStandardMaterial({ color: "rgb(200,200,200)", side: DoubleSide })
       }
 
       // set smooth
@@ -136,8 +130,8 @@ export const show3dOnMap = (
     onAdd: (map, gl) => {
       addLightToScene(1, 0, 1, baseScene)
       addLightToScene(-1, 0, 1 - 1, baseScene)
-      addLightToScene(0.7, 0, 1, baseScene)
-      baseScene.add(new AmbientLight(undefined, 0.5))
+      addLightToScene(-0.75, 0, 11, baseScene)
+      baseScene.add(new AmbientLight(undefined, 3.0))
 
       const loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
