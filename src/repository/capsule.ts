@@ -1,6 +1,7 @@
 import {
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -180,4 +181,9 @@ export const fetchCapsules = async (user: AppUser) => {
     } as Capsule
   })
   return capsules
+}
+
+export const deleteCapsule = async ({ capsuleId }: { capsuleId: string }) => {
+  console.log(capsuleId)
+  await deleteDoc(doc(collection(db, "capsules"), capsuleId))
 }
