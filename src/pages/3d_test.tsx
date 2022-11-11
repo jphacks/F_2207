@@ -4,9 +4,10 @@ import { Canvas, useFrame } from "@react-three/fiber"
 import { Material, Mesh, BufferGeometry } from "three"
 import { OrbitControls } from "@react-three/drei"
 import { EffectComposer, Bloom } from "@react-three/postprocessing"
-import { KernelSize } from "postprocessing"
+import { BloomEffect, KernelSize } from "postprocessing"
+import { Button } from "@mantine/core"
 
-import { Capsule2ndModel } from "@/view/ar/Capsule2ndModel"
+import CapsuleSphereGlb from "@/view/ar/CapsuleSphereGlb"
 
 const Box: React.FC = (props) => {
   const ref = useRef<Mesh<BufferGeometry, Material | Material[]> | null>(null)
@@ -39,26 +40,59 @@ const Box: React.FC = (props) => {
 }
 
 const ThreeD: NextPage = () => {
+  const [animation, setAnimation] = useState(false)
+
   return (
     <div className="fixed inset-0">
+      <Button onClick={() => setAnimation((v) => !v)}>Open</Button>
       <Canvas>
         <Suspense fallback={null}>
-          <Capsule2ndModel position={[0, 0, 0]} />
+          <CapsuleSphereGlb position={[0, 0, 0]} animation={animation} />
         </Suspense>
         <OrbitControls />
         <gridHelper />
-        <EffectComposer multisampling={8}>
-          <Bloom kernelSize={3} luminanceThreshold={0} luminanceSmoothing={0.4} intensity={0.6} />
-          <Bloom
-            kernelSize={KernelSize.HUGE}
-            luminanceThreshold={0}
-            luminanceSmoothing={0}
-            intensity={0.5}
-          />
-        </EffectComposer>
+        <Effect animation={animation} />
       </Canvas>
     </div>
   )
 }
 
 export default ThreeD
+
+export const Effect: React.FC<{ animation?: boolean }> = ({ animation }) => {
+  const ref = useRef<typeof BloomEffect | null>(null)
+
+  useFrame(() => {
+    const bloom = ref.current
+    if (bloom == null || !animation) {
+      return
+    }
+    const MAX = 8
+    // @ts-ignore
+    bloom.intensity += MAX / 300
+
+    // @ts-ignore
+    if (MAX < bloom.intensity) {
+      // @ts-ignore
+      bloom.intensity = 0
+    }
+  })
+
+  return (
+    <EffectComposer multisampling={8}>
+      <Bloom
+        kernelSize={3}
+        luminanceThreshold={0}
+        luminanceSmoothing={0.4}
+        intensity={0.6}
+        ref={ref}
+      />
+      <Bloom
+        kernelSize={KernelSize.HUGE}
+        luminanceThreshold={0}
+        luminanceSmoothing={0}
+        intensity={0.5}
+      />
+    </EffectComposer>
+  )
+}
