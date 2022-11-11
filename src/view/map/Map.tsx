@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { Box, Button, LoadingOverlay, Modal } from "@mantine/core"
+import { Box, LoadingOverlay, Modal, Button } from "@mantine/core"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Head from "next/head"
