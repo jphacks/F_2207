@@ -211,7 +211,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                   camera.current,
                   scene.current,
                 )
-                if (map.getLayer("feature") != null) {
+                if (map.getLayer("features") != null) {
                   map.removeLayer("features")
                 }
                 map.addLayer(customLayer)
