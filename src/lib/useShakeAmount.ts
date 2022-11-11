@@ -5,7 +5,7 @@ import { useAcceleration } from "./useAcceleration"
 /**
  * 端末を振った量を計算する
  */
-export const useShakeAmount = () => {
+export const useShakeAmount = (start = true) => {
   const { acceleration, requirePermission } = useAcceleration()
 
   const [shakeAmount, setShakeAmount] = useState(0)
@@ -15,6 +15,9 @@ export const useShakeAmount = () => {
   deltas.current.push((acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2) / 5)
 
   useEffect(() => {
+    if (!start) {
+      return
+    }
     const timer = setInterval(() => {
       if (deltas.current.length < 10) {
         return
@@ -30,7 +33,7 @@ export const useShakeAmount = () => {
     }, 300)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [start])
 
   const resetAmount = useCallback(() => {
     setShakeAmount(0)
