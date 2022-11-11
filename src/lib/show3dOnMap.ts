@@ -59,9 +59,9 @@ const addFeatureToScene = (
       // set color
       if (object instanceof Mesh && object.name.includes("カプセル")) {
         // set color of body
-        object.material.emissive.r = 0.591
-        object.material.emissive.g = 0.905
-        object.material.emissive.b = 0.381
+        object.material.emissive.r = 0.5
+        object.material.emissive.g = 0.9
+        object.material.emissive.b = 0.3
         object.material.emissiveIntensity = 0.8
       } else if (object instanceof Mesh) {
         // set color of connection parts
