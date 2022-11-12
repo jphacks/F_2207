@@ -22,7 +22,7 @@ export type DiscoverDrawerPorps = {
   featureID: string
 }
 
-const TOTAL_COUNT = 100
+const TOTAL_COUNT = -1
 
 const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
   open,
@@ -40,11 +40,18 @@ const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
     // get old data
     const feature: Feature = await axios
       .get(
-        `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}/${featureID}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
+        `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
       )
       .then((res) => {
-        return res.data
+        const features = res.data.features.filter((feature: Feature) => {
+          return feature.properties.id == capsule.id
+        })
+        return features.length == 0 ? null : features[0]
       })
+
+    if (feature == null) {
+      return
+    }
 
     // mapquest update
     const newFeature = {
@@ -62,13 +69,13 @@ const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
       },
     }
     axios.put(
-      `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}/${featureID}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
+      `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}/${feature.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
       newFeature,
     )
 
     // firebase update
     setCapsuleOpen({ capsuleId: feature.properties.id })
-  }, [featureID, layerID])
+  }, [capsule.id, featureID, layerID])
 
   useEffect(() => {
     if (TOTAL_COUNT < shakeAmount) {
