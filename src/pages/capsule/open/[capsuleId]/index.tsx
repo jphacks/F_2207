@@ -1,5 +1,5 @@
 import { NextPage } from "next"
-import { Fragment, MutableRefObject, useMemo, useState } from "react"
+import { Fragment, MutableRefObject, useEffect, useMemo, useRef, useState } from "react"
 import { Canvas } from "@react-three/fiber"
 import Webcam from "react-webcam"
 import { Button, Loader, Modal } from "@mantine/core"
@@ -25,49 +25,63 @@ type CapsulePosition = Capsule & {
   y: number
   z: number
   distance: number
+  renderDistance: number
   color: string
 }
 
 const ArCanvas: React.FC<{
   orientation: MutableRefObject<{ x: number; y: number }>
-  capsulePositions: CapsulePosition[]
+  capsulePositions: MutableRefObject<CapsulePosition[]>
   onClick: (capsulePosition: CapsulePosition) => void
 }> = ({ orientation, capsulePositions, onClick }) => {
-  useSyncCamera(orientation, { x: 0, y: 10, z: 0 })
+  useSyncCamera(orientation, { x: 0, y: 8, z: 0 })
+
+  // const effector = useMemo(
+  //   () => (
+  //     <EffectComposer multisampling={8}>
+  //       <Bloom kernelSize={3} luminanceThreshold={0} luminanceSmoothing={0.4} intensity={0.6} />
+  //       <Bloom
+  //         kernelSize={KernelSize.SMALL}
+  //         luminanceThreshold={0}
+  //         luminanceSmoothing={0}
+  //         intensity={0.5}
+  //       />
+  //     </EffectComposer>
+  //   ),
+  //   [],
+  // )
 
   return (
     <>
-      {capsulePositions.map((capsulePosition) => (
+      {capsulePositions.current.map((capsulePosition) => (
         <Fragment key={capsulePosition.id}>
           <CapsuleModel
-            position={[capsulePosition.x, capsulePosition.y, capsulePosition.z]}
+            position={[capsulePosition.x * 2.5, capsulePosition.y, capsulePosition.z * 2.5]}
             color={capsulePosition.color}
             distance={capsulePosition.distance}
+            renderDistance={capsulePosition.renderDistance}
             onClick={() => onClick(capsulePosition)}
           />
           <CylinderGuide
-            position={[capsulePosition.x, capsulePosition.y + 50, capsulePosition.z]}
-            scale={[10, 10, 10]}
+            position={[capsulePosition.x, capsulePosition.y + 30, capsulePosition.z]}
+            scale={[5, 5, 5]}
             color="#d8cb52"
           />
         </Fragment>
       ))}
-      <ambientLight />
       {/* eslint-disable-next-line react/no-unknown-property */}
-      <gridHelper args={[20]} />
+      <gridHelper args={[100]} />
       {/* eslint-disable-next-line react/no-unknown-property */}
-      <pointLight position={[0, 0, 0]} />
-      <arrowHelper />
+      <fog attach="fog" color="#000" near={30} far={200} />
+      {/* {effector} */}
     </>
   )
 }
 
 const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
-  const router = useRouter()
-  // const isDebugMode = router.query.debug === "true"
-
   const { orientation, orientationRef, requestPermission, isReady } = useOrientation()
   const geolocation = useGeolocation()
+  const [cameraReady, setCameraReady] = useState(false)
 
   const capsuleGeoData = useMemo(() => {
     if (geolocation == null) {
@@ -84,6 +98,7 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
       return {
         ...capsule,
         distance,
+        renderDistance: Math.min(100, 10),
         bearing,
         deviceBearing: orientation.x - bearing,
       }
@@ -103,14 +118,19 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
       sortedCapsuleGeoData.map((geo) => {
         const degree = 90 - geo.bearing
         return {
-          x: -geo.distance * Math.cos(degree * (Math.PI / 180)),
-          y: 1,
-          z: geo.distance * Math.sin(degree * (Math.PI / 180)),
+          x: -geo.renderDistance * Math.cos(degree * (Math.PI / 180)),
+          y: 0,
+          z: geo.renderDistance * Math.sin(degree * (Math.PI / 180)),
           ...geo,
         }
       }),
     [sortedCapsuleGeoData],
   )
+
+  const capsulePositionsRef = useRef(capsulePositions)
+  useEffect(() => {
+    capsulePositionsRef.current = capsulePositions
+  }, [capsulePositions])
 
   const [discoverCapsule, setDiscoverCapsule] = useState<Capsule | null>(null)
 
@@ -127,6 +147,7 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
       <MetaHeader title="探す" />
       <div className="relative">
         <Webcam
+          onUserMedia={() => setCameraReady(true)}
           videoConstraints={{
             facingMode: { exact: "environment" },
           }}
@@ -158,12 +179,17 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
         <Canvas>
           <ArCanvas
             orientation={orientationRef}
-            capsulePositions={capsulePositions}
+            capsulePositions={capsulePositionsRef}
             onClick={handleClickCapsule}
           />
         </Canvas>
       </div>
-      <Modal centered opened={!isReady} onClose={requestPermission} withCloseButton={false}>
+      <Modal
+        centered
+        opened={!isReady && cameraReady}
+        onClose={requestPermission}
+        withCloseButton={false}
+      >
         <div className="flex flex-col items-center">
           <p>デバイスの姿勢情報にアクセスします</p>
           <Button onClick={requestPermission}>OK</Button>
@@ -171,10 +197,6 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
       </Modal>
       {discoverCapsule != null && (
         <DiscoverDrawer
-          // onOpenCapsule={() => {
-          //   window.alert(`/capsule/open/${discoverCapsule.id}/shake`)
-          //   router.push(`/capsule/open/${discoverCapsule.id}/shake`)
-          // }}
           href={`/capsule/open/${discoverCapsule.id}/shake`}
           capsule={discoverCapsule}
           open={discoverCapsule != null}

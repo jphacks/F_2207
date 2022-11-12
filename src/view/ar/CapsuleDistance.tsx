@@ -53,7 +53,7 @@ const CapsuleDistance: React.FC<CapsuleDistanceProps> = ({ capsuleColor, distanc
               textAlign: "center",
             }}
           >
-            {distance}m
+            {distance.toFixed(1)}m
           </Text>
         </Stack>
       }
