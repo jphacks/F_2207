@@ -1,6 +1,22 @@
+/* eslint-disable unused-imports/no-unused-imports */
 import { Map, MercatorCoordinate } from "mapbox-gl"
-import { Scene, Euler, Matrix4, Vector3, Camera, DirectionalLight, WebGLRenderer } from "three"
+import {
+  Camera,
+  DirectionalLight,
+  Euler,
+  Matrix4,
+  Scene,
+  Vector3,
+  WebGLRenderer,
+  Object3D,
+  Mesh,
+  BufferGeometry,
+  AmbientLight,
+  MeshStandardMaterial,
+  DoubleSide,
+} from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils"
 
 import { Feature } from "@/types/feature"
 
@@ -11,7 +27,7 @@ type SceneTransform = {
 }
 
 const addLightToScene = (x: number, y: number, z: number, baseScene: Scene) => {
-  const directionalLight = new DirectionalLight(0xffffff)
+  const directionalLight = new DirectionalLight(0xffffff, 0.9)
   directionalLight.position.set(x, y, z).normalize()
   baseScene.add(directionalLight)
 }
@@ -31,7 +47,7 @@ const addFeatureToScene = (
   const featureid = feature.properties.id
 
   const mc = MercatorCoordinate.fromLngLat(modelOrigin, modelAltitude)
-  loader.load("/models/capsule3.glb", (gltf) => {
+  loader.load("/models/capsule_ball.glb", (gltf) => {
     const scene = gltf.scene
     const origin = sceneTransform.origin
     scene.position.set(
@@ -39,28 +55,49 @@ const addFeatureToScene = (
       -(mc.y - origin.y) / sceneTransform.meterScale,
       ((mc.z as number) - origin.z) / sceneTransform.meterScale,
     )
-    scene.scale.set(0.2, 0.2, 0.2)
+    scene.scale.set(50, 50, 50)
     scene.quaternion.setFromEuler(modelRotate)
     scene.name = featureid
+    scene.traverse((object) => {
+      // set color
+      if (object instanceof Mesh && object.name.includes("カプセル")) {
+        // set color of body
+        object.material = new MeshStandardMaterial({ color: "rgb(0,255,50)", side: DoubleSide })
+      } else if (object instanceof Mesh) {
+        // set color of connection parts
+        object.material = new MeshStandardMaterial({ color: "rgb(200,200,200)", side: DoubleSide })
+      }
+
+      // set smooth
+      if (object instanceof Object3D) {
+        // @ts-ignore
+        if (object.geometry !== undefined) {
+          // @ts-ignore
+          const a = object.geometry.isBufferGeometry
+            ? // @ts-ignore
+              object.geometry
+            : // @ts-ignore
+              new BufferGeometry(object.geometry)
+          const b = mergeVertices(a)
+          b.computeVertexNormals()
+          // @ts-ignore
+          object.geometry = b
+        }
+      }
+
+      // TODO: set correct status
+      const IsOpened = false
+      // set state
+      // モデルは名前と実態が逆なので注意
+      if (object.name == "上カプセル開封済み" && IsOpened) {
+        object.visible = false
+      }
+      if (object.name == "上カプセル未開封" && !IsOpened) {
+        object.visible = false
+      }
+    })
     baseScene.add(gltf.scene)
   })
-
-  // var element = document.createElement("div")
-  // element.style.width = "30px"
-  // element.style.height = "30px"
-  // element.style.opacity = "0.999"
-  // element.style.background = new Color(
-  //   Math.random() * 0.21568627451 + 0.462745098039,
-  //   Math.random() * 0.21568627451 + 0.462745098039,
-  //   Math.random() * 0.21568627451 + 0.462745098039,
-  // ).getStyle()
-  // element.textContent = "text!"
-
-  // var domObject = new CSS3DObject(element)
-  // domObject.position.x = Math.random() * 200 - 100
-  // domObject.position.y = Math.random() * 200 - 100
-  // domObject.position.z = Math.random() * 200 - 100
-  // cssScene.add(domObject)
 }
 
 export const show3dOnMap = (
@@ -85,10 +122,6 @@ export const show3dOnMap = (
   }
 
   let renderer: THREE.WebGLRenderer | null = null
-  // let renderer2: CSS3DRenderer | null = null
-
-  // let cssScene = new Scene()
-
   // configuration of the custom layer for a 3D model per the CustomLayerInterface
   const featureLayer: mapboxgl.AnyLayer = {
     id: id,
@@ -96,8 +129,10 @@ export const show3dOnMap = (
     renderingMode: "3d",
 
     onAdd: (map, gl) => {
-      addLightToScene(0, -70, 100, baseScene)
-      addLightToScene(0, 70, 100, baseScene)
+      console.log("OnAdd")
+      addLightToScene(1, 0, 1, baseScene)
+      addLightToScene(-1, 0, 1 - 1, baseScene)
+      baseScene.add(new AmbientLight(undefined, 1.8))
 
       const loader = new GLTFLoader()
       // use the three.js GLTF loader to add the 3D model to the three.js scene
@@ -113,19 +148,13 @@ export const show3dOnMap = (
       })
 
       renderer!.autoClear = false
-
-      // renderer2 = new CSS3DRenderer()
-      // renderer2.setSize(window.innerWidth, window.innerHeight)
-      // renderer2.domElement.style.position = "absolute"
-      // renderer2.domElement.style.top = "0"
-      // map.getCanvas().appendChild(renderer2.domElement)
+      renderer.physicallyCorrectLights = true
     },
 
     render: (_gl, matrix) => {
       camera.projectionMatrix = new Matrix4().fromArray(matrix).multiply(sceneTransform.matrix)
       renderer?.state.reset()
       renderer?.render(baseScene, camera)
-      // renderer2?.render(cssScene, camera)
       map.triggerRepaint()
     },
   }

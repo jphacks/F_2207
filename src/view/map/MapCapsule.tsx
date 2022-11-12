@@ -18,7 +18,7 @@ const MapCapsule: React.FC<MapCapsuleProps> = ({ feature, onClick }) => {
 
   // TODO: Click Action
   return (
-    <Box className="pb-[150px]">
+    <Box className="pb-[200px]">
       <Capsule
         capsuleColor={feature.properties.capsuleColor}
         gpsColor={feature.properties.gpsColor}
