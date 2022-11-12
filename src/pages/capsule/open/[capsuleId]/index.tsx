@@ -18,7 +18,7 @@ import { convertLngLat } from "@/lib/convertLngLat"
 import { useCapsules } from "@/hooks/useCapsules"
 import DiscoverDrawer from "@/view/DiscoverDrawer"
 
-const CLOSE_DISTANCE_THRESHOLD = 50
+const CLOSE_DISTANCE_THRESHOLD = 500
 
 type CapsulePosition = Capsule & {
   x: number
