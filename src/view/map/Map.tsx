@@ -123,7 +123,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
       // calculate objects intersecting the picking ray
       const intersects = raycaster
         .intersectObjects(scene.current.children, true)
-        .filter((i) => i.object.name == "本体")
+        .filter((i) => i.object.name.includes("カプセル") || i.object.name == "接合シルバー")
       if (intersects.length) {
         const id = getSceneFrom3dObject(intersects[0].object).name
         setOpen(true)
@@ -204,6 +204,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                     .addTo(map)
                   addMarker(marker)
                 })
+                scene.current.clear()
                 const customLayer = show3dOnMap(
                   sortedFeatures,
                   "features",
@@ -260,7 +261,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
   }
 
   const getSceneFrom3dObject = (obj: Object3D): Object3D => {
-    if (obj.type == "Scene" || obj.parent == null) {
+    if (obj.type == "Group" || obj.parent == null) {
       return obj
     } else {
       return getSceneFrom3dObject(obj.parent)
