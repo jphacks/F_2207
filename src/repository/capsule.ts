@@ -8,6 +8,7 @@ import {
   query,
   runTransaction,
   Timestamp,
+  updateDoc,
   where,
 } from "firebase/firestore"
 
@@ -184,6 +185,11 @@ export const fetchCapsules = async (user: AppUser) => {
 }
 
 export const deleteCapsule = async ({ capsuleId }: { capsuleId: string }) => {
-  console.log(capsuleId)
   await deleteDoc(doc(collection(db, "capsules"), capsuleId))
+}
+
+export const setCapsuleOpen = async ({ capsuleId }: { capsuleId: string }) => {
+  await updateDoc(doc(collection(db, "capsules"), capsuleId), {
+    userOpenDate: Timestamp.fromDate(new Date()),
+  })
 }

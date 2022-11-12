@@ -18,6 +18,8 @@ import { Feature } from "@/types/feature"
 
 import "mapbox-gl/dist/mapbox-gl.css"
 
+import { setCapsuleOpen } from "@/repository/capsule"
+
 import LockedCapsule from "./LockedCapsule"
 import MapCapsule from "./MapCapsule"
 
@@ -331,6 +333,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         _revision: feature.properties._revision,
       },
     }
+    setCapsuleOpen({ capsuleId: feature.properties.id })
     axios.put(
       `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}/${featureID}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
       newFeature,
