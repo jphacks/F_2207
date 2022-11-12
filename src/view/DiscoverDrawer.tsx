@@ -1,11 +1,14 @@
 import { Button, Modal, Drawer } from "@mantine/core"
 import { useRouter } from "next/router"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Canvas } from "@react-three/fiber"
+import axios from "axios"
 
 import { useShakeAmount } from "@/lib/useShakeAmount"
 import { Capsule } from "@/types/capsule"
 import { formatDate } from "@/lib/date"
+import { Feature } from "@/types/feature"
+import { setCapsuleOpen } from "@/repository/capsule"
 
 import CapsulComponent from "./Capsule"
 import ShakeCapsuleModel from "./ShakeCapsuleModel"
@@ -15,21 +18,64 @@ export type DiscoverDrawerPorps = {
   onClose: () => void
   href: string
   capsule: Capsule
+  layerID: string
+  featureID: string
 }
 
 const TOTAL_COUNT = 100
 
-const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({ open, onClose, capsule, href }) => {
+const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
+  open,
+  onClose,
+  capsule,
+  layerID,
+  featureID,
+}) => {
   const router = useRouter()
   const [shakeMode, setShakeMode] = useState(false)
   const [cleared, setCleared] = useState(false)
   const { requirePermission, shakeAmount, resetAmount } = useShakeAmount(shakeMode)
 
+  const updateCapsuleStatusOpened = useCallback(async () => {
+    // get old data
+    const feature: Feature = await axios
+      .get(
+        `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}/${featureID}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
+      )
+      .then((res) => {
+        return res.data
+      })
+
+    // mapquest update
+    const newFeature = {
+      id: feature.id,
+      geometry: feature.geometry,
+      properties: {
+        addDate: feature.properties.addDate,
+        id: feature.properties.id,
+        capsuleColor: feature.properties.capsuleColor,
+        gpsColor: feature.properties.gpsColor,
+        emoji: feature.properties.emoji,
+        openDate: feature.properties.openDate,
+        opened: "true",
+        _revision: feature.properties._revision,
+      },
+    }
+    axios.put(
+      `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}/${featureID}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
+      newFeature,
+    )
+
+    // firebase update
+    setCapsuleOpen({ capsuleId: feature.properties.id })
+  }, [featureID, layerID])
+
   useEffect(() => {
     if (TOTAL_COUNT < shakeAmount) {
       setCleared(true)
+      updateCapsuleStatusOpened()
     }
-  }, [resetAmount, shakeAmount])
+  }, [resetAmount, shakeAmount, updateCapsuleStatusOpened])
 
   const shakeRate = Math.min(100, (shakeAmount / TOTAL_COUNT) * 100)
 

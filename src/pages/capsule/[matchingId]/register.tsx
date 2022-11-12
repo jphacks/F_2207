@@ -90,6 +90,7 @@ const Register: NextPage = () => {
           emoji: capsuleCreateInput.emoji,
           addDate: new Date().toISOString(),
           openDate: (capsuleCreateInput.openDate ?? add(new Date(), { years: 1 })).toISOString(),
+          opened: "false",
         },
       }
 
