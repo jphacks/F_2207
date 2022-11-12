@@ -36,7 +36,7 @@ const CapsuleModel: React.FC<CapsuleModelProps> = ({
     <>
       {renderDistance <= 100 && (
         <Suspense fallback={null}>
-          <CapsuleSphereGlb position={position} scale={[2, 2, 2]} onClick={onClick} />
+          <CapsuleSphereGlb position={position} scale={[2, 2, 2]} color={color} onClick={onClick} />
         </Suspense>
       )}
       <mesh>
