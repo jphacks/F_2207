@@ -18,8 +18,6 @@ import { Feature } from "@/types/feature"
 
 import "mapbox-gl/dist/mapbox-gl.css"
 
-import { setCapsuleOpen } from "@/repository/capsule"
-
 import LockedCapsule from "./LockedCapsule"
 import MapCapsule from "./MapCapsule"
 
@@ -311,35 +309,6 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
     })
   }, [selectedCapsuleCenter])
 
-  const updateCapsuleStatusOpened = async (layerID: string, featureID: string) => {
-    const feature: Feature = await axios
-      .get(
-        `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}/${featureID}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
-      )
-      .then((res) => {
-        return res.data
-      })
-    const newFeature = {
-      id: feature.id,
-      geometry: feature.geometry,
-      properties: {
-        addDate: feature.properties.addDate,
-        id: feature.properties.id,
-        capsuleColor: feature.properties.capsuleColor,
-        gpsColor: feature.properties.gpsColor,
-        emoji: feature.properties.emoji,
-        openDate: feature.properties.openDate,
-        opened: "true",
-        _revision: feature.properties._revision,
-      },
-    }
-    setCapsuleOpen({ capsuleId: feature.properties.id })
-    axios.put(
-      `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layerID}/${featureID}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
-      newFeature,
-    )
-  }
-
   return (
     <>
       <Head>
@@ -394,10 +363,9 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
               const feature = features.filter(
                 (feature) => feature.properties.id == searchTargetId,
               )[0]
-              updateCapsuleStatusOpened(usersLayerID, feature.id)
-              // router.push(
-              //   `/capsule/open/${searchTargetId}?layerId=${usersLayerID}&featureId=${feature.id}`,
-              // )
+              router.push(
+                `/capsule/open/${searchTargetId}?layerId=${usersLayerID}&featureId=${feature.id}`,
+              )
             }}
           >
             探しに行く
