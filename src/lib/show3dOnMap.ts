@@ -92,12 +92,12 @@ const addFeatureToScene = (
       const IsOpened = false
       // set state
       // モデルは名前と実態が逆なので注意
-      if (object.name == "上カプセル開封済み" && IsOpened) {
-        object.visible = false
-      }
-      if (object.name == "上カプセル未開封" && !IsOpened) {
-        object.visible = false
-      }
+      // if (object.name == "上カプセル開封済み" && IsOpened) {
+      //   object.visible = false
+      // }
+      // if (object.name == "上カプセル未開封" && !IsOpened) {
+      //   object.visible = false
+      // }
     })
     baseScene.add(gltf.scene)
   })

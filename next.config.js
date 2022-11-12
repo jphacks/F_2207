@@ -7,12 +7,12 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   compiler: {
-    removeConsole:
-      process.env.NODE_ENV === "production"
-        ? {
-            exclude: ["error"],
-          }
-        : undefined,
+    // removeConsole:
+    //   process.env.NODE_ENV === "production"
+    //     ? {
+    //         exclude: ["error"],
+    //       }
+    //     : undefined,
   },
   images: {
     domains: ["lh3.googleusercontent.com"],

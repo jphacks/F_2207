@@ -215,6 +215,7 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                 if (map.getLayer("features") != null) {
                   map.removeLayer("features")
                 }
+                console.log(scene.current)
                 map.addLayer(customLayer)
               })
           }
