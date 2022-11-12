@@ -62,7 +62,10 @@ const addFeatureToScene = (
       // set color
       if (object instanceof Mesh && object.name.includes("カプセル")) {
         // set color of body
-        object.material = new MeshStandardMaterial({ color: "rgb(0,255,50)", side: DoubleSide })
+        object.material = new MeshStandardMaterial({
+          color: feature.properties.capsuleColor,
+          side: DoubleSide,
+        })
       } else if (object instanceof Mesh) {
         // set color of connection parts
         object.material = new MeshStandardMaterial({ color: "rgb(200,200,200)", side: DoubleSide })
