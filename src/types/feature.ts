@@ -18,6 +18,7 @@ export type CreateFeature = {
   }
   properties: {
     addDate: string
+    opened: string
   }
 } & FeatureData
 
