@@ -71,6 +71,7 @@ type GLTFResult = GLTF & {
 export type CapsuleSphereGlbProps = {
   animation?: boolean
   openRateRef?: React.MutableRefObject<number>
+  color?: string
 }
 
 const CapsuleSphereGlb: React.FC<CapsuleSphereGlbProps & JSX.IntrinsicElements["group"]> = ({
@@ -91,8 +92,8 @@ const CapsuleSphereGlb: React.FC<CapsuleSphereGlbProps & JSX.IntrinsicElements["
   )
 
   const glassMaterial = useMemo(
-    () => <meshStandardMaterial color="rgb(0,255,50)" side={DoubleSide} />,
-    [],
+    () => <meshStandardMaterial color={props.color ?? "rgb(0,255,50)"} side={DoubleSide} />,
+    [props.color],
   )
 
   useFrame(() => {
