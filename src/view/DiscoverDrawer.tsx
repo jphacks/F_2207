@@ -124,7 +124,9 @@ const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
           </div>
           <div>
             <p className="m-0 text-lg font-bold text-white">{capsule.title}</p>
-            <p className="m-0">東京都丘高校付近・{formatDate(capsule.addDate)}に作成</p>
+            <p className="m-0">
+              {capsule.address}・{formatDate(capsule.addDate)}に作成
+            </p>
           </div>
         </div>
         {shakeMode ? (

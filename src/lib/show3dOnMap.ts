@@ -62,7 +62,10 @@ const addFeatureToScene = (
       // set color
       if (object instanceof Mesh && object.name.includes("カプセル")) {
         // set color of body
-        object.material = new MeshStandardMaterial({ color: "rgb(0,255,50)", side: DoubleSide })
+        object.material = new MeshStandardMaterial({
+          color: feature.properties.capsuleColor,
+          side: DoubleSide,
+        })
       } else if (object instanceof Mesh) {
         // set color of connection parts
         object.material = new MeshStandardMaterial({ color: "rgb(200,200,200)", side: DoubleSide })
@@ -88,10 +91,10 @@ const addFeatureToScene = (
       const IsOpened = feature.properties.opened == "true"
       // set state
       // モデルは名前と実態が逆なので注意
-      if (object.name == "上カプセル開封済み" && IsOpened) {
-        object.visible = false
-      }
-      if (object.name == "上カプセル未開封" && !IsOpened) {
+      // if (object.name == "上カプセル開封済み") {
+      //   object.visible = false
+      // }
+      if (object.name == "上カプセル未開封") {
         object.visible = false
       }
     })
