@@ -39,6 +39,8 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
 
   const [open, setOpen] = useState(false)
   const [searchTargetId, setSearchTargetId] = useState("")
+  const [usersLayerID, setUsersLayerID] = useState("")
+  const [features, setFeatures] = useState<Feature[]>([])
 
   const camera = useRef(new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 1e6))
   const scene = useRef(new Scene())
@@ -170,16 +172,19 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
         clearMarker()
         res.data.forEach((layer: any) => {
           if (layer.name == userID) {
+            setUsersLayerID(layer.id)
             // set Image
             axios
               .get(
                 `https://prod-mqplatform-api.azure-api.net/maps-api/features/v1/18/${layer.id}?subscription_key=${process.env.NEXT_PUBLIC_MAP_SUBSCRIPTION_KEY}`,
               )
               .then((res) => {
-                const sortedFeatures = res.data.features.sort(featureSortFunc)
+                const sortedFeatures = res.data.features.sort(featureSortFunc) as Feature[]
                 if (sortedFeatures.length === 0) {
                   return
                 }
+
+                setFeatures(sortedFeatures)
 
                 sortedFeatures.forEach((feature: Feature) => {
                   const div = document.createElement("div")
@@ -192,7 +197,11 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
                     root.render(
                       <MapCapsule
                         feature={feature}
-                        onClick={() => router.push(`/capsule/open/${feature.properties.id}`)}
+                        onClick={() =>
+                          router.push(
+                            `/capsule/open/${feature.properties.id}?layerId=${layer.id}&featureId=${feature.id}`,
+                          )
+                        }
                       />,
                     )
                   } else {
@@ -352,7 +361,12 @@ const MapPage: React.FC<MapPageProps> = ({ selectedCapsuleCenter }) => {
             className="mt-4 bg-[#d3f36b] text-black hover:bg-[#c8e762]"
             onClick={() => {
               setOpen(false)
-              router.push(`/capsule/open/${searchTargetId}`)
+              const feature = features.filter(
+                (feature) => feature.properties.id == searchTargetId,
+              )[0]
+              router.push(
+                `/capsule/open/${searchTargetId}?layerId=${usersLayerID}&featureId=${feature.id}`,
+              )
             }}
           >
             探しに行く

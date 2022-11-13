@@ -79,6 +79,9 @@ const ArCanvas: React.FC<{
 }
 
 const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
+  const router = useRouter()
+  const layerID = router.query.layerId as string
+  const featureID = router.query.featureId as string
   const { orientation, orientationRef, requestPermission, isReady } = useOrientation()
   const geolocation = useGeolocation()
   const [cameraReady, setCameraReady] = useState(false)
@@ -200,6 +203,8 @@ const ArPage: React.FC<{ capsules: Capsule[] }> = ({ capsules }) => {
           href={`/capsule/open/${discoverCapsule.id}/shake`}
           capsule={discoverCapsule}
           open={discoverCapsule != null}
+          layerID={layerID}
+          featureID={featureID}
           onClose={() => setDiscoverCapsule(null)}
         />
       )}
