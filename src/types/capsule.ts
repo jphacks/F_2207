@@ -11,4 +11,6 @@ export type Capsule = {
   latitude: number
   longitude: number
   userOpenDate?: Date
+  address: string
+  friends: { id: string; iconUrl: string; name: string }[]
 }

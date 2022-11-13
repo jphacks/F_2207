@@ -18,6 +18,7 @@ import { GpsType } from "@/provider/GpsProvider"
 import { Capsule } from "@/types/capsule"
 
 import { extractKeywords } from "./keyword"
+import { getAddress } from "./geocoding"
 
 /**
  * カプセルの投稿
@@ -33,7 +34,13 @@ export const postCapsule = async (
     return
   }
 
-  const keywords = await extractKeywords(input.title, input.memo)
+  const latitude = input.geolocation ? input.geolocation.latitude : geolocation.latitude
+  const longitude = input.geolocation ? input.geolocation.longitude : geolocation.longitude
+
+  const [keywords, address] = await Promise.all([
+    extractKeywords(input.title, input.memo),
+    getAddress(latitude, longitude),
+  ])
 
   const data = {
     color: input.color,
@@ -54,8 +61,9 @@ export const postCapsule = async (
         isOwner: true,
       },
     ],
-    latitude: input.geolocation ? input.geolocation.latitude : geolocation.latitude,
-    longitude: input.geolocation ? input.geolocation.longitude : geolocation.longitude,
+    latitude,
+    longitude,
+    address,
   }
 
   await runTransaction(db, async (transaction) => {
@@ -152,6 +160,8 @@ export const fetchCapsule = async ({ capsuleId }: { capsuleId: string }) => {
     longitude: data.longitude,
     keywords: data.keywords,
     userOpenDate: data.userOpenDate?.toDate() ?? null,
+    address: data.address,
+    friends: data.friends,
   } as Capsule
 }
 
@@ -178,6 +188,8 @@ export const fetchCapsules = async (user: AppUser) => {
       longitude: data.longitude,
       keywords: data.keywords,
       userOpenDate: data.userOpenDate?.toDate() ?? null,
+      address: data.address,
+      friends: data.friends,
     } as Capsule
   })
   return capsules
