@@ -22,7 +22,6 @@ const Show: NextPage = () => {
   useEffect(() => {
     ;(async () => {
       const items = await fetchItems(capsuleId)
-      console.log(items)
       setItems(items)
     })()
   }, [capsuleId])
@@ -49,7 +48,9 @@ const Show: NextPage = () => {
               <Text size="lg" weight="bold">
                 {capsule.title}
               </Text>
-              <Text size="xs">東京都丘高校付近・{formatDate(capsule.addDate)}に作成</Text>
+              <Text size="xs">
+                {capsule.address}・{formatDate(capsule.addDate)}に作成
+              </Text>
             </div>
             <ActionIcon>
               <FiMoreVertical size={24} />
@@ -79,9 +80,10 @@ const Show: NextPage = () => {
             <div className="mt-2 flex flex-col space-y-[1px] overflow-hidden rounded-lg">
               {capsule.memo.map((memo) => {
                 const [userId, ...body] = memo.split(":")
+                const user = capsule.friends.find(({ id }) => id === userId)
                 return (
                   <div key={userId} className="flex items-center space-x-3 bg-[#424242] p-3">
-                    <Avatar src={userId} />
+                    <Avatar src={user?.iconUrl} className="rounded-full" />
                     <p className="m-0 block text-sm text-white line-clamp-2">{body.join("")}</p>
                   </div>
                 )

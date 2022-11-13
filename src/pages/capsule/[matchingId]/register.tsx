@@ -227,7 +227,7 @@ const Register: NextPage = () => {
             />
           )}
           <Textarea
-            placeholder="メモを残す"
+            placeholder="メッセージを残す"
             icon={<AiOutlineMessage size={24} color={theme.colors.gray[0]} />}
             value={capsuleCreateInput.memo}
             onChange={(e) => {
