@@ -22,7 +22,7 @@ export type DiscoverDrawerPorps = {
   featureID: string
 }
 
-const TOTAL_COUNT = -1
+const TOTAL_COUNT = 100
 
 const DiscoverDrawer: React.FC<DiscoverDrawerPorps> = ({
   open,
